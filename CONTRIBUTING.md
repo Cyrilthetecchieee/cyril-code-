@@ -15,7 +15,7 @@ Thanks for helping improve Beast. Keep changes focused, test the behavior you ch
 Install [uv](https://docs.astral.sh/uv/) and Python 3.14, then run directly from the checkout:
 
 ```bash
-git clone https://github.com/Alishahryar1/beast.git
+git clone https://github.com/Cyrilthetecchieee/cyril-code-.git
 cd beast
 uv python install 3.14.0
 uv run start

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-REPO_ARCHIVE_URL="https://github.com/Alishahryar1/beast/archive/refs/heads/main.zip"
+REPO_ARCHIVE_URL="https://github.com/Cyrilthetecchieee/cyril-code-/archive/refs/heads/main.zip"
 PYTHON_VERSION="3.14.0"
 MIN_UV_VERSION="0.11.16"
 CLAUDE_INSTALL_URL="https://claude.ai/install.sh"

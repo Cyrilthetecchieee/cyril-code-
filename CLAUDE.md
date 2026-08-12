@@ -19,7 +19,7 @@
 - Do not add `from __future__ import annotations`; Python 3.14 native lazy annotations are the project standard.
 - All 5 check IDs are represented in `scripts/ci.sh` / `scripts/ci.ps1` and enforced by `tests.yml` before each merge (parallel jobs: suppression grep, ruff-format, ruff-check, ty, pytest).
 - GitHub CI runs only for pull requests targeting `main`. Strict required checks keep each PR current with `main`, so the tested PR tree is the tree squash-merged without a duplicate post-merge run.
-- Repository protection should use rulesets: a non-bypassable main integrity ruleset requires pull requests and strict required checks, keeps branches current, and blocks direct/force pushes to `main`; a separate review ruleset may allow `Alishahryar1`/admins to bypass review only.
+- Repository protection should use rulesets: a non-bypassable main integrity ruleset requires pull requests and strict required checks, keeps branches current, and blocks direct/force pushes to `main`; a separate review ruleset may allow `Cyrilthetecchieee`/admins to bypass review only.
 - Required status checks: set **required status checks** to **all** of those statuses (e.g. **Ban suppressions and legacy annotations**, **ruff-format**, **ruff-check**, **ty**, **pytest**—use the exact labels GitHub shows, which may be prefixed with **CI /**). Remove **ci** from required checks if it was previously added for the old gate job.
 
 ## IDENTITY & CONTEXT

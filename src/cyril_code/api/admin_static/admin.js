@@ -1019,6 +1019,28 @@ function renderSkills(skills) {
     card.append(title, meta, action);
     grid.appendChild(card);
   });
+
+  const searchInput = byId("skillsSearch");
+  if (searchInput && !searchInput.dataset.listenerAttached) {
+    searchInput.dataset.listenerAttached = "true";
+    searchInput.addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      const cards = grid.querySelectorAll(".provider-card");
+      cards.forEach(card => {
+        const name = card.querySelector(".provider-title strong").textContent.toLowerCase();
+        const desc = card.querySelector(".provider-meta").textContent.toLowerCase();
+        if (name.includes(term) || desc.includes(term)) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  }
+  
+  if (searchInput && searchInput.value) {
+    searchInput.dispatchEvent(new Event("input"));
+  }
 }
 
 function showMessage(message, kind = "") {

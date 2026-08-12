@@ -1,5 +1,6 @@
 """Skill management and installation logic."""
 
+import base64
 import os
 import shutil
 import sys
@@ -54,12 +55,10 @@ def list_available_skills() -> list[dict[str, Any]]:
 
     global_dir = get_global_skills_dir()
 
-    for item in repo_dir.iterdir():
-        if not item.is_dir() or item.name.startswith("."):
-            continue
-
-        skill_file = item / "SKILL.md"
-        if not skill_file.exists():
+    for skill_file in repo_dir.rglob("SKILL.md"):
+        item = skill_file.parent
+        # Skip if any part of the path starts with '.'
+        if any(part.startswith(".") for part in item.relative_to(repo_dir).parts):
             continue
 
         try:
@@ -69,12 +68,17 @@ def list_available_skills() -> list[dict[str, Any]]:
             name = metadata.get("name", item.name)
             description = metadata.get("description", "No description available.")
 
+            rel_path_str = str(item.relative_to(repo_dir)).replace("\\", "/")
+            skill_id = base64.urlsafe_b64encode(rel_path_str.encode("utf-8")).decode(
+                "utf-8"
+            )
+
             # Check if installed globally
             is_installed = (global_dir / name).exists()
 
             skills.append(
                 {
-                    "id": item.name,
+                    "id": skill_id,
                     "name": name,
                     "description": description,
                     "installed": is_installed,
@@ -90,10 +94,18 @@ def list_available_skills() -> list[dict[str, Any]]:
 def install_skill(skill_id: str) -> bool:
     """Install a skill by copying it to the global skills directory."""
     repo_dir = get_bundled_skills_repo()
-    source_dir = repo_dir / skill_id
+
+    try:
+        rel_path_str = base64.urlsafe_b64decode(skill_id.encode("utf-8")).decode(
+            "utf-8"
+        )
+    except Exception:
+        raise ValueError("Invalid skill ID format.") from None
+
+    source_dir = repo_dir / rel_path_str
 
     if not source_dir.exists() or not source_dir.is_dir():
-        raise ValueError(f"Skill {skill_id} not found in the repository.")
+        raise ValueError(f"Skill not found in the repository at {rel_path_str}.")
 
     skill_file = source_dir / "SKILL.md"
     if not skill_file.exists():
@@ -101,7 +113,7 @@ def install_skill(skill_id: str) -> bool:
 
     content = skill_file.read_text(encoding="utf-8")
     metadata = extract_yaml_frontmatter(content)
-    skill_name = metadata.get("name", skill_id)
+    skill_name = metadata.get("name", source_dir.name)
 
     global_dir = get_global_skills_dir()
     global_dir.mkdir(parents=True, exist_ok=True)

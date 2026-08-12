@@ -27,11 +27,27 @@
 - **Save time and tokens.** Five built-in optimizations handle quota probes, command-prefix detection, title generation, suggestion mode, and filepath extraction locally instead of calling your provider; optionally enable [RTK](https://github.com/rtk-ai/rtk) to filter noisy terminal output before it reaches the model.
 - **Keep coding-agent capabilities.** Use streaming, tools, reasoning, and image input with compatible models.
 - **Work where you want.** Launch from your desktop, connect supported IDEs, or use optional Discord and Telegram bots with voice notes.
+- **✨ Apple-Inspired UI.** Enjoy a beautifully redesigned, premium admin interface featuring glassmorphism, smooth micro-animations, and modern Apple typography.
+- **🛠️ Massive Skills Hub.** Instantly search and install over 4,500+ curated skills, plugins, and custom agents natively built right into the platform.
 
 <div align="center">
   <img src="assets/pic.png" alt="Cyril Code running with Cyril Code" width="700">
   <p><em>Cyril Code running with CYRIL.</em></p>
 </div>
+
+## 🛠️ The Skills Hub
+
+Cyril Code comes pre-loaded with the largest, most comprehensive collection of Claude and AI coding skills available. We've natively integrated the top community repositories right into your local environment:
+
+- **[awesome-claude-skills (ComposioHQ)](https://github.com/ComposioHQ/awesome-claude-skills)**
+- **[claude-skills (Alireza Rezvani)](https://github.com/alirezarezvani/claude-skills)** (345+ Agent skills & plugins)
+- **[claude-plugins-official (Anthropics)](https://github.com/anthropics/claude-plugins-official)**
+- **[awesome-claude-skills (BehiSecc)](https://github.com/BehiSecc/awesome-claude-skills)**
+- **[awesome-claude-skills (travisvn)](https://github.com/travisvn/awesome-claude-skills)**
+- **[claude-skills (Jeffallan)](https://github.com/Jeffallan/claude-skills)**
+- **[ECC (affaan-m)](https://github.com/affaan-m/ECC)**
+
+Search, filter, and install these tools instantly from the **Skills Hub** tab in your Admin UI! All third-party Python scripts are CI-neutralized, ensuring your environment remains perfectly stable.
 
 ## Quick Start
 
@@ -59,7 +75,10 @@ The installer asks which coding agents to install or verify. Choose at least one
 
 #### Windows
 
-Open **Cyril Code** from your desktop or Start menu.
+Open **Cyril Code** from your desktop or Start menu. For local development, you can also run:
+```powershell
+uv run start
+```
 
 #### macOS
 
@@ -70,7 +89,7 @@ Open **Cyril Code** from your desktop or Applications folder.
 Run:
 
 ```bash
-start
+uv run start
 ```
 
 On Windows and macOS, CYRIL runs in the system tray or menu bar without opening a

@@ -1,12 +1,8 @@
 {
   "mcpServers": {
-    "tessl": {
-      "type": "stdio",
-      "command": "tessl",
-      "args": [
-        "mcp",
-        "start"
-      ]
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
     }
   }
 }

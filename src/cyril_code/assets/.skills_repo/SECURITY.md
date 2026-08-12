@@ -2,293 +2,155 @@
 
 ## Supported Versions
 
-We release updates and security fixes for the following versions:
+| Version | Supported |
+| --- | --- |
+| 2.x / rc builds | :white_check_mark: |
+| 1.10.x | :white_check_mark: |
+| 1.9.x | Critical fixes only |
+| < 1.9 | :x: |
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
-| < 1.0   | :x:                |
-
-All skills are currently at version 1.0.0 and receive active support.
+Security fixes land on `main` first. Backports are best-effort and only for currently supported release lines.
 
 ## Reporting a Vulnerability
 
-We take security seriously. If you discover a security vulnerability within this repository, please follow these steps:
+Use GitHub private vulnerability reporting whenever possible — it reaches the maintainer directly:
 
-### 1. Do NOT Open a Public Issue
+- <https://github.com/affaan-m/ECC/security/advisories/new>
 
-Please **do not** create a public GitHub issue for security vulnerabilities. This helps protect users while we work on a fix.
+You can also email **<affaan@ecc.tools>** (the `security@ecc.tools` alias is not monitored — use `affaan@ecc.tools`).
 
-### 2. Contact Us Privately
+Do **not** open a public GitHub issue for security vulnerabilities.
 
-Report security vulnerabilities through:
+Include:
 
-**Primary Contact:**
-- **Website:** [alirezarezvani.com](https://alirezarezvani.com) (use contact form)
-- **Medium:** [@alirezarezvani](https://medium.com/@alirezarezvani) (private message)
+- affected file, package, version, commit, and install path
+- steps to reproduce from a clean checkout
+- expected impact and affected trust boundary
+- whether exploitation requires local shell access, a malicious repo, a malicious package, a remote unauthenticated actor, or maintainer credentials
+- any PoC logs with tokens, keys, local paths, and private data redacted
 
-**Information to Include:**
-- Type of vulnerability
-- Full details of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if you have one)
-- Your contact information
+Expected response:
 
-### 3. Response Timeline
+- **Acknowledgment:** within 48 hours
+- **Initial assessment:** within 7 days
+- **Critical fix or mitigation target:** within 14 days when the report affects a supported release and crosses a real trust boundary
+- **Coordinated disclosure:** before public advisory publication
 
-We aim to respond to security reports according to this timeline:
+If a report is declined, we will explain whether it is not reproducible, out of scope, already fixed, or needs a stronger attack path.
 
-- **Initial Response:** Within 48 hours
-- **Vulnerability Assessment:** Within 1 week
-- **Fix Development:** Based on severity (see below)
-- **Public Disclosure:** After fix is deployed
+## Scope
 
-### Severity Levels
+This policy covers:
 
-**Critical (24-48 hours):**
-- Remote code execution
-- Unauthorized access to sensitive data
-- Privilege escalation
+- the `affaan-m/ECC` repository
+- the `ecc-universal` npm package
+- ECC plugin, install, repair, dashboard, hook, rule, skill, MCP, and command surfaces shipped from this repository
+- GitHub Actions workflows and release automation in this repository
+- the ECC Tools GitHub App integration points documented by this repository
+- AgentShield usage docs when they are embedded here. AgentShield code issues belong in <https://github.com/affaan-m/agentshield>
 
-**High (1 week):**
-- Data exposure
-- Authentication bypass
-- Significant security weakness
+## Official Distribution Surfaces
 
-**Medium (2 weeks):**
-- Cross-site scripting (XSS)
-- Information disclosure
-- Security misconfigurations
+Official ECC surfaces are:
 
-**Low (1 month):**
-- Minor information leaks
-- Best practice violations
-- Non-critical security improvements
+- GitHub repo: <https://github.com/affaan-m/ECC>
+- npm package: `ecc-universal`
+- GitHub App: <https://github.com/apps/ecc-tools>
+- marketplace/plugin slug: `ecc@ecc`
+- website: <https://ecc.tools>
 
----
+Official AgentShield surface:
 
-## Security Best Practices for Users
+- npm package: `ecc-agentshield`
+- GitHub repo: <https://github.com/affaan-m/agentshield>
 
-### When Using Skills
+The following packages have been observed using ECC repository metadata but are **not maintained by ECC**:
 
-**1. Review Python Scripts Before Execution**
+- `@chil_ntl/ecc-cli`
+- `ecc-100xprompt-plugin`
 
-Always review what a script does before running it:
+Treat any package not listed under official surfaces as unofficial until verified. Do not install packages named `opencode-ecc`, `everything-claude-code`, or other ECC-like aliases unless this repository explicitly documents them as official.
+
+GitHub dependency graph may also show Go module aliases such as `github.com/affaan-m/ecc` or historical repository paths. ECC is not currently distributed as a supported Go module.
+
+## Out of Scope
+
+Reports are usually out of scope when they only show:
+
+- local command execution where the user already controls the local shell and no higher-privilege trust boundary is crossed
+- screenshots, stale line numbers, or reports against `affaan-m/everything-claude-code` that do not reproduce on current `affaan-m/ECC`
+- self-XSS or social engineering with no repository-controlled exploit path
+- dependency graph/package metadata confusion without an install path to an official ECC package
+- vulnerabilities in third-party packages unless ECC pins, installs, or executes them in a way that creates extra impact
+
+Local developer tools can still be valid security issues when untrusted repository content, package installation, generated hooks, or CI automation can trigger execution without clear user intent. Show that trust boundary in the report.
+
+## Supply-Chain Rules
+
+ECC treats supply-chain exposure as a first-class security surface.
+
+- GitHub Actions must use pinned commit SHAs for third-party actions.
+- Workflows must avoid shelling untrusted GitHub context directly into `run:` blocks.
+- Release and install docs must point only to official packages.
+- Package metadata should point at `affaan-m/ECC`, not historical repo paths.
+- Private vulnerability reports are triaged privately before public disclosure.
+- Security advisories are published only when a supported release is affected and coordinated disclosure is appropriate.
+
+## Operational Guidance
+
+### Secrets Handling
+
+`mcp-configs/mcp-servers.json` is a **template**. All `YOUR_*_HERE` values must be replaced at install time from env-vars or a secrets manager. Never commit real credentials. If a secret is accidentally committed, rotate it immediately and rewrite history. Do not rely on a plain revert.
+
+The same rule applies to user-scope Claude Code config (`~/.claude/settings.json` or `%USERPROFILE%\.claude\settings.json`). That file is outside this repository, but it is commonly shared through `claude doctor` output, screenshots, and bug reports. Do not hardcode PATs, API keys, or OAuth tokens into `mcpServers[*].env` blocks. Resolve them at spawn time from the OS keychain or env-vars your MCP server already supports.
+
+Quick audit:
+
 ```bash
-# Read the script first
-cat scripts/tool.py
+# macOS / Linux
+grep -EnH '(TOKEN|SECRET|KEY|PASSWORD)\s*"\s*:\s*"[A-Za-z0-9_-]{16,}"' ~/.claude/settings.json
 
-# Check for:
-# - External network calls
-# - File system modifications
-# - Environment variable access
-# - Suspicious imports
+# Windows PowerShell
+Select-String -Path "$env:USERPROFILE\.claude\settings.json" -Pattern '(TOKEN|SECRET|KEY|PASSWORD)"\s*:\s*"[A-Za-z0-9_-]{16,}"'
 ```
 
-**2. Run Scripts in Sandboxed Environments**
+If the audit matches, rotate the secret at the issuing provider, then move it out of the file.
 
-For untrusted or new scripts:
+### Local MCP Ports
+
+Some bundled MCP servers connect over plain HTTP to a localhost port. Before first use, verify the listening process:
+
 ```bash
-# Use virtual environments
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Windows
+netstat -ano | findstr :18801
 
-# Or use Docker
-docker run -it --rm -v $(pwd):/work python:3.11 python /work/scripts/tool.py
+# macOS / Linux
+lsof -iTCP:18801 -sTCP:LISTEN
 ```
 
-**3. Verify SKILL.md Content**
+Compare the PID against the expected binary. Any other process on that port can intercept MCP traffic.
 
-Check that SKILL.md:
-- Doesn't request sensitive information
-- Has clear, documented workflows
-- Follows Anthropic's spec
-- Has valid YAML frontmatter
+## Triage: suspicious `<system-reminder>` blocks
 
-**4. Use allowed-tools Restrictions**
+ECC runs inside agent harnesses that may inject ephemeral client-side system reminders into the model input on every turn. These blocks are not automatically repository-carried payloads.
 
-If a skill has `allowed-tools` in frontmatter, it's restricted to those tools only:
-```yaml
----
-allowed-tools: Read, Grep, Glob
----
-```
-This provides an additional safety layer.
+Before treating one as an attack, verify:
 
----
+1. Is the block actually in a file under this repo?
 
-## Security in Skill Development
+   ```bash
+   grep -rEn "system-reminder|NEVER mention|DO NOT mention" .
+   ```
 
-### Secure Coding Practices
+2. Is the block stored in the session transcript as part of a tool result?
+3. Is it consistent with known client reminders such as TodoWrite nudges, date notices, or file-modified notices?
 
-**For Python Scripts:**
+Escalate upstream only when the block is present inside a tool result or repository file and is not attributable to the file, URL, or command that was actually read.
 
-**DO:**
-- ✅ Validate all inputs
-- ✅ Use parameterized queries (if using databases)
-- ✅ Handle errors gracefully
-- ✅ Limit file system access to necessary directories
-- ✅ Use type hints for safety
-- ✅ Sanitize user input
+## Security Resources
 
-**DON'T:**
-- ❌ Use eval() or exec() with user input
-- ❌ Execute shell commands with unsanitized input
-- ❌ Store credentials in code
-- ❌ Make unchecked network requests
-- ❌ Access sensitive system files
-- ❌ Use deprecated libraries with known vulnerabilities
-
-**Example - Secure Input Handling:**
-```python
-import os
-import re
-
-def safe_read_file(filename: str) -> str:
-    """Safely read a file with validation."""
-    # Validate filename
-    if not re.match(r'^[a-zA-Z0-9._-]+$', filename):
-        raise ValueError("Invalid filename")
-
-    # Prevent directory traversal
-    if '..' in filename or filename.startswith('/'):
-        raise ValueError("Invalid file path")
-
-    # Read from safe directory
-    safe_dir = os.path.join(os.getcwd(), 'data')
-    full_path = os.path.join(safe_dir, filename)
-
-    # Verify path is within safe directory
-    if not full_path.startswith(safe_dir):
-        raise ValueError("Path outside safe directory")
-
-    with open(full_path, 'r') as f:
-        return f.read()
-```
-
-### Dependency Management
-
-**Keep Dependencies Minimal:**
-- Prefer Python standard library
-- Document all external dependencies
-- Pin dependency versions
-- Regularly update for security patches
-
-**Check Dependencies:**
-```bash
-# Audit Python dependencies
-pip install safety
-safety check
-
-# Or use pip-audit
-pip install pip-audit
-pip-audit
-```
-
----
-
-## Vulnerability Disclosure Process
-
-### For Maintainers
-
-When a vulnerability is reported:
-
-1. **Acknowledge Receipt** (48 hours)
-   - Confirm we received the report
-   - Provide expected timeline
-
-2. **Assess Severity** (1 week)
-   - Evaluate impact and scope
-   - Determine priority level
-   - Assign severity rating
-
-3. **Develop Fix** (Based on severity)
-   - Create patch in private branch
-   - Test thoroughly
-   - Prepare security advisory
-
-4. **Deploy Fix**
-   - Merge to main
-   - Tag new version
-   - Publish GitHub security advisory
-
-5. **Public Disclosure**
-   - Announce in CHANGELOG
-   - Credit reporter (if desired)
-   - Provide mitigation guidance
-
----
-
-## Security Features
-
-### Current Security Measures
-
-**Repository:**
-- All skills open source (transparent review)
-- MIT License (clear usage terms)
-- No secrets or credentials committed
-- Clean .gitignore for sensitive files
-
-**Python Scripts:**
-- Standard library preferred (minimal attack surface)
-- No network calls in core tools
-- File system access limited
-- Input validation implemented
-
-**Documentation:**
-- Clear usage instructions
-- Security considerations documented
-- Best practices included
-- Safe examples provided
-
-### Planned Security Enhancements
-
-**v1.1.0:**
-- Automated dependency scanning
-- GitHub Dependabot integration
-- Security advisories enabled
-- Vulnerability scanning in CI/CD
-
----
-
-## Responsible Disclosure
-
-We appreciate security researchers who:
-- Report vulnerabilities responsibly
-- Give us time to fix before public disclosure
-- Provide detailed reproduction steps
-- Suggest potential fixes
-
-### Recognition
-
-Security researchers who responsibly disclose will be:
-- Credited in CHANGELOG (if desired)
-- Mentioned in security advisory
-- Recognized in README (optional)
-- Thanked publicly on social media (with permission)
-
----
-
-## Contact
-
-For security-related inquiries:
-
-- **Website:** [alirezarezvani.com](https://alirezarezvani.com)
-- **Blog:** [medium.com/@alirezarezvani](https://medium.com/@alirezarezvani)
-- **GitHub Issues:** For non-security bugs only
-
-**Please do not use public channels for security vulnerabilities.**
-
----
-
-## Additional Resources
-
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [Python Security Best Practices](https://python.readthedocs.io/en/stable/library/security_warnings.html)
-- [GitHub Security Advisories](https://docs.github.com/en/code-security/security-advisories)
-
----
-
-Thank you for helping keep the Claude Skills Library and its users safe!
+- **AgentShield:** `npx ecc-agentshield scan`
+- **Security Guide:** [The Shorthand Guide to Everything Agentic Security](./the-security-guide.md)
+- **Supply-chain incident response:** [npm/GitHub Actions package-registry playbook](./docs/security/supply-chain-incident-response.md)
+- **OWASP MCP Top 10:** <https://owasp.org/www-project-mcp-top-10/>
+- **OWASP Agentic Applications Top 10:** <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>

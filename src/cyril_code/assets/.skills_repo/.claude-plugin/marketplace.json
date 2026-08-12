@@ -1,87 +1,47 @@
 {
-  "name": "fullstack-dev-skills",
+  "name": "ecc",
   "owner": {
-    "name": "jeffallan"
+    "name": "Affaan Mustafa",
+    "email": "me@affaanmustafa.com"
   },
   "metadata": {
-    "description": "Comprehensive skill pack for full-stack developers covering frameworks, workflows, and security",
-    "version": "0.4.16"
+    "description": "Harness-native ECC skills, hooks, rules, MCP conventions, and operator workflows"
   },
   "plugins": [
     {
-      "name": "fullstack-dev-skills",
+      "name": "ecc",
       "source": "./",
-      "description": "67 specialized skills for full-stack development: 12 language experts (Python, TypeScript, Go, Rust, C++, Swift, Kotlin, C#, PHP, Java, SQL, JavaScript), 10 backend frameworks, 6 frontend/mobile, plus infrastructure, DevOps, security, and testing skills. Includes 9 project workflow commands for epic planning, discovery, execution, and retrospectives.",
-      "version": "0.4.16",
+      "description": "Harness-native ECC operator layer - 68 agents, 287 skills, 94 legacy command shims, reusable hooks, rules, selective install profiles, and production-ready workflows for Claude Code, Codex, OpenCode, Cursor, and related agent harnesses",
+      "version": "2.2.0",
       "author": {
-        "name": "jeffallan",
-        "email": "github@jeffallan"
+        "name": "Affaan Mustafa",
+        "email": "me@affaanmustafa.com"
       },
-      "homepage": "https://github.com/jeffallan/claude-skills",
-      "repository": "https://github.com/jeffallan/claude-skills",
+      "homepage": "https://ecc.tools",
+      "repository": "https://github.com/affaan-m/ECC",
       "license": "MIT",
       "keywords": [
-        "claude-skill",
-        "claude-code",
-        "fullstack",
-        "typescript",
-        "python",
-        "go",
-        "rust",
-        "cpp",
-        "swift",
-        "kotlin",
-        "csharp",
-        "php",
-        "java",
-        "sql",
-        "dart",
-        "react",
-        "nextjs",
-        "vue",
-        "angular",
-        "react-native",
-        "flutter",
-        "nestjs",
-        "django",
-        "fastapi",
-        "spring-boot",
-        "laravel",
-        "rails",
-        "dotnet",
-        "kubernetes",
-        "terraform",
-        "graphql",
-        "microservices",
-        "debugging",
-        "monitoring",
-        "architecture",
-        "security",
+        "agents",
+        "skills",
+        "hooks",
+        "commands",
+        "tdd",
         "code-review",
-        "testing",
-        "playwright",
-        "devops",
-        "sre",
-        "model-invoked",
-        "project-management",
-        "epic-planning",
-        "jira",
-        "confluence",
-        "sprint",
-        "discovery",
-        "retrospectives"
-      ],
-      "category": "development",
-      "tags": [
-        "fullstack",
-        "development",
-        "frameworks",
         "security",
-        "testing",
-        "workflows"
+        "best-practices"
       ],
-      "skills": "./skills/",
-      "commands": "./commands/"
+      "category": "workflow",
+      "tags": [
+        "agents",
+        "skills",
+        "hooks",
+        "commands",
+        "tdd",
+        "code-review",
+        "security",
+        "best-practices"
+      ],
+      "strict": false
     }
   ]
 }

@@ -1,47 +1,37 @@
 {
-  "name": "claude-code-skills",
+  "name": "ecc",
   "version": "2.2.0",
-  "description": "223 production-ready skills, 23 agents, and 298 Python tools across 9 domains — engineering, marketing, product, compliance, C-level advisory, and more. The largest open-source skills library for AI coding agents.",
+  "description": "Harness-native ECC workflows for Codex: shared skills, production-ready MCP configs, and selective-install-aligned conventions for TDD, security scanning, code review, and autonomous development.",
   "author": {
-    "name": "Alireza Rezvani",
-    "url": "https://alirezarezvani.com"
+    "name": "Affaan Mustafa",
+    "email": "me@affaanmustafa.com",
+    "url": "https://x.com/affaanmustafa"
   },
-  "homepage": "https://alirezarezvani.github.io/claude-skills/",
-  "repository": "https://github.com/alirezarezvani/claude-skills",
+  "homepage": "https://ecc.tools",
+  "repository": "https://github.com/affaan-m/ECC",
   "license": "MIT",
-  "keywords": [
-    "openai-codex",
-    "codex-plugin",
-    "claude-code",
-    "agent-skills",
-    "engineering",
-    "marketing",
-    "product",
-    "compliance",
-    "devops",
-    "security",
-    "ai-agents"
-  ],
-  "skills": "./.codex/skills/",
+  "keywords": ["codex", "agents", "skills", "tdd", "code-review", "security", "workflow", "automation"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "hooks": "./hooks/codex-hooks.json",
   "interface": {
-    "type": "cli",
-    "composerIcon": "./assets/icon.png",
-    "displayName": "Claude Code Skills",
-    "shortDescription": "223 production-ready skills for AI coding agents across 9 domains",
-    "longDescription": "The largest open-source skills library for AI coding agents. 223 skills covering engineering (architecture, DevOps, security, AI/ML), marketing (SEO, CRO, content), product management, C-level advisory, regulatory compliance (ISO 13485, SOC 2, GDPR), project management, business growth, and finance. Includes 298 stdlib-only Python CLI tools, 416 reference guides, 23 orchestration agents, and 22 slash commands. Works with Codex, Claude Code, Gemini CLI, Cursor, Aider, Windsurf, and 5 more tools.",
-    "developerName": "Alireza Rezvani",
+    "displayName": "ECC",
+    "shortDescription": "281 ECC skills plus MCP configs for TDD, security, code review, and autonomous development.",
+    "longDescription": "ECC is a harness-native operator system for Codex and adjacent agent harnesses. It packages reusable skills, MCP configs, TDD workflows, security scanning, code review, architecture decisions, operator workflows, and release gates in one installable plugin.",
+    "developerName": "Affaan Mustafa",
     "category": "Coding",
-    "capabilities": [
-      "Read",
-      "Write"
-    ],
-    "websiteURL": "https://alirezarezvani.github.io/claude-skills/",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://ecc.tools",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#E07856",
+    "composerIcon": "./assets/ecc-icon.svg",
+    "logo": "./assets/hero.png",
+    "screenshots": [],
     "defaultPrompt": [
-      "Design an AWS architecture for my project",
-      "Run a security pen test on this codebase",
-      "Create a product requirements document",
-      "Audit this page for accessibility (WCAG 2.2)"
-    ],
-    "brandColor": "#0969da"
+      "Use the tdd-workflow skill to write tests before implementation.",
+      "Use the security-review skill to scan for OWASP Top 10 vulnerabilities.",
+      "Use the verification-loop skill to verify correctness before shipping changes."
+    ]
   }
 }

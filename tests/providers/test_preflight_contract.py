@@ -4,11 +4,11 @@ from collections.abc import AsyncIterator
 
 import pytest
 
-from free_claude_code.application.model_metadata import ProviderModelInfo
-from free_claude_code.core.anthropic.models import Message, MessagesRequest
-from free_claude_code.core.reasoning import DEFAULT_REASONING_POLICY, ReasoningPolicy
-from free_claude_code.providers.base import BaseProvider, ProviderConfig
-from free_claude_code.providers.openai_chat import OpenAIChatProvider
+from beast.application.model_metadata import ProviderModelInfo
+from beast.core.anthropic.models import Message, MessagesRequest
+from beast.core.reasoning import DEFAULT_REASONING_POLICY, ReasoningPolicy
+from beast.providers.base import BaseProvider, ProviderConfig
+from beast.providers.openai_chat import OpenAIChatProvider
 
 
 class RecordingOpenAIProvider(OpenAIChatProvider):

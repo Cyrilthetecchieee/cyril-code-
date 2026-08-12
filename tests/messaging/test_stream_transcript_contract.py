@@ -1,13 +1,13 @@
 """Messaging-specific assertions built on neutral Anthropic stream contracts."""
 
-from free_claude_code.core.anthropic import AnthropicStreamLedger
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.core.anthropic import AnthropicStreamLedger
+from beast.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     has_tool_use,
     parse_sse_text,
 )
-from free_claude_code.messaging.event_parser import parse_cli_event
-from free_claude_code.messaging.transcript import RenderCtx, TranscriptBuffer
+from beast.messaging.event_parser import parse_cli_event
+from beast.messaging.transcript import RenderCtx, TranscriptBuffer
 
 
 def test_thinking_tool_text_and_transcript_order_contract() -> None:

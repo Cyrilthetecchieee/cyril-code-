@@ -7,10 +7,10 @@ import httpx
 import openai
 import pytest
 
-from free_claude_code.config.nim import NimSettings
-from free_claude_code.core.failures import ExecutionFailure
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.nvidia_nim import NvidiaNimProvider
+from beast.config.nim import NimSettings
+from beast.core.failures import ExecutionFailure
+from beast.providers.base import ProviderConfig
+from beast.providers.nvidia_nim import NvidiaNimProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission
 

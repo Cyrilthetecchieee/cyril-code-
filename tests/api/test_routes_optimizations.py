@@ -3,10 +3,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from free_claude_code.api.dependencies import get_settings
-from free_claude_code.api.ports import ApiServices
-from free_claude_code.application.ports import StopResult
-from free_claude_code.config.settings import Settings
+from beast.api.dependencies import get_settings
+from beast.api.ports import ApiServices
+from beast.application.ports import StopResult
+from beast.config.settings import Settings
 from tests.api.support import create_test_app
 
 app = create_test_app()
@@ -37,11 +37,11 @@ def test_create_message_fast_prefix_detection(client, mock_settings):
 
     with (
         patch(
-            "free_claude_code.api.optimization_handlers.is_prefix_detection_request",
+            "beast.api.optimization_handlers.is_prefix_detection_request",
             return_value=(True, "/ask"),
         ),
         patch(
-            "free_claude_code.api.optimization_handlers.extract_command_prefix",
+            "beast.api.optimization_handlers.extract_command_prefix",
             return_value="/ask",
         ),
     ):
@@ -64,7 +64,7 @@ def test_create_message_quota_check_mock(client, mock_settings):
     }
 
     with patch(
-        "free_claude_code.api.optimization_handlers.is_quota_check_request",
+        "beast.api.optimization_handlers.is_quota_check_request",
         return_value=True,
     ):
         response = client.post("/v1/messages", json=payload)
@@ -85,7 +85,7 @@ def test_create_message_title_generation_skip(client, mock_settings):
     }
 
     with patch(
-        "free_claude_code.api.optimization_handlers.is_title_generation_request",
+        "beast.api.optimization_handlers.is_title_generation_request",
         return_value=True,
     ):
         response = client.post("/v1/messages", json=payload)
@@ -128,7 +128,7 @@ def test_count_tokens_endpoint(client):
         "messages": [{"role": "user", "content": "hello"}],
     }
 
-    with patch("free_claude_code.api.routes.get_token_count", return_value=5):
+    with patch("beast.api.routes.get_token_count", return_value=5):
         response = client.post("/v1/messages/count_tokens", json=payload)
 
     assert response.status_code == 200
@@ -143,7 +143,7 @@ def test_count_tokens_error_returns_500(client):
     }
 
     with patch(
-        "free_claude_code.api.routes.get_token_count",
+        "beast.api.routes.get_token_count",
         side_effect=RuntimeError("token error"),
     ):
         response = client.post("/v1/messages/count_tokens", json=payload)

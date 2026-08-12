@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.messaging.platforms.discord import (
+from beast.messaging.platforms.discord import (
     DISCORD_AVAILABLE,
     DiscordRuntime,
     _get_discord,
 )
-from free_claude_code.messaging.platforms.discord_inbound import (
+from beast.messaging.platforms.discord_inbound import (
     discord_text_message_from_event,
     parse_allowed_channels,
 )
-from free_claude_code.messaging.platforms.discord_io import truncate_discord_message
+from beast.messaging.platforms.discord_io import truncate_discord_message
 
 
 def _limiter_mock() -> MagicMock:
@@ -37,7 +37,7 @@ class TestGetDiscord:
     """Tests for _get_discord helper."""
 
     def test_raises_when_discord_not_available(self):
-        import free_claude_code.messaging.platforms.discord as discord_mod
+        import beast.messaging.platforms.discord as discord_mod
 
         with (
             patch.object(discord_mod, "DISCORD_AVAILABLE", False),
@@ -302,9 +302,7 @@ class TestDiscordRuntime:
             patch.object(
                 platform._client, "get_channel", MagicMock(return_value=mock_channel)
             ),
-            patch(
-                "free_claude_code.messaging.platforms.discord._get_discord"
-            ) as mock_get,
+            patch("beast.messaging.platforms.discord._get_discord") as mock_get,
         ):
             mock_discord = MagicMock()
             mock_get.return_value = mock_discord
@@ -346,9 +344,7 @@ class TestDiscordRuntime:
             patch.object(
                 platform._client, "get_channel", MagicMock(return_value=mock_channel)
             ),
-            patch(
-                "free_claude_code.messaging.platforms.discord._get_discord"
-            ) as mock_get,
+            patch("beast.messaging.platforms.discord._get_discord") as mock_get,
         ):
             mock_get.return_value = MagicMock()
             platform.outbound._get_discord = mock_get

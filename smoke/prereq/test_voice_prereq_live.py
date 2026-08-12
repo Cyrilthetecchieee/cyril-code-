@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from free_claude_code.messaging.transcription import TranscriptionService
-from free_claude_code.messaging.voice import Transcriber
-from free_claude_code.providers.nvidia_nim.voice import NvidiaNimTranscriber
+from beast.messaging.transcription import TranscriptionService
+from beast.messaging.voice import Transcriber
+from beast.providers.nvidia_nim.voice import NvidiaNimTranscriber
 from smoke.lib.config import SmokeConfig
 
 pytestmark = [pytest.mark.live, pytest.mark.smoke_target("voice")]
@@ -19,8 +19,8 @@ async def test_voice_transcription_backend_when_explicitly_enabled(
 ) -> None:
     if not smoke_config.settings.voice_note_enabled:
         pytest.skip("VOICE_NOTE_ENABLED is false")
-    if os.getenv("FCC_SMOKE_RUN_VOICE") != "1":
-        pytest.skip("set FCC_SMOKE_RUN_VOICE=1 to run transcription smoke")
+    if os.getenv("BEAST_SMOKE_RUN_VOICE") != "1":
+        pytest.skip("set BEAST_SMOKE_RUN_VOICE=1 to run transcription smoke")
 
     wav_path = tmp_path / "smoke-tone.wav"
     _write_tone_wav(wav_path)

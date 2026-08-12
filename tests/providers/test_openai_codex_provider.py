@@ -5,23 +5,23 @@ from typing import Any
 import httpx
 import pytest
 
-from free_claude_code.application.errors import InvalidRequestError
-from free_claude_code.core.anthropic.models import MessagesRequest
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.application.errors import InvalidRequestError
+from beast.core.anthropic.models import MessagesRequest
+from beast.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     parse_sse_text,
     text_content,
 )
-from free_claude_code.core.diagnostics import ERROR_DETAIL_DISPLAY_CAP_BYTES
-from free_claude_code.core.failures import ExecutionFailure
-from free_claude_code.core.reasoning import ReasoningEffort, ReasoningPolicy
-from free_claude_code.providers.admission import ProviderAdmissionController
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.openai_codex.auth import (
+from beast.core.diagnostics import ERROR_DETAIL_DISPLAY_CAP_BYTES
+from beast.core.failures import ExecutionFailure
+from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
+from beast.providers.admission import ProviderAdmissionController
+from beast.providers.base import ProviderConfig
+from beast.providers.openai_codex.auth import (
     OpenAIAccess,
     OpenAIAuthManager,
 )
-from free_claude_code.providers.openai_codex.provider import OpenAICodexProvider
+from beast.providers.openai_codex.provider import OpenAICodexProvider
 
 
 class _FakeAuth(OpenAIAuthManager):

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from free_claude_code.config.env_migrations import (
+from beast.config.env_migrations import (
     HUGGINGFACE_API_KEY_ENV,
     HUGGINGFACE_TOKEN_MIGRATION,
     LEGACY_HUGGINGFACE_TOKEN_ENV,
@@ -89,7 +89,7 @@ def test_explicit_env_file_migration_warning_does_not_rewrite(
     explicit = tmp_path / "custom.env"
     explicit.write_text("HF_TOKEN=explicit-token\n", encoding="utf-8")
 
-    warning = explicit_env_file_migration_warning({"FCC_ENV_FILE": str(explicit)})
+    warning = explicit_env_file_migration_warning({"BEAST_ENV_FILE": str(explicit)})
 
     assert warning is not None
     assert str(explicit) in warning
@@ -111,7 +111,7 @@ def test_opencode_zen_migration_rewrites_owned_model_refs_and_keys(
         "MODEL_OPUS='opencode/model-b'\n"
         "MODEL_SONNET=opencode_go/model-c\n"
         "MODEL_HAIKU=open_router/opencode/model-d\n"
-        "FCC_SMOKE_MODEL_OPENCODE=opencode/smoke\n"
+        "BEAST_SMOKE_MODEL_OPENCODE=opencode/smoke\n"
         "OPENCODE_PROXY=http://proxy.example\n",
         encoding="utf-8",
     )
@@ -126,7 +126,7 @@ def test_opencode_zen_migration_rewrites_owned_model_refs_and_keys(
         "MODEL_OPUS='opencode_zen/model-b'\n"
         "MODEL_SONNET=opencode_go/model-c\n"
         "MODEL_HAIKU=open_router/opencode/model-d\n"
-        "FCC_SMOKE_MODEL_OPENCODE_ZEN=opencode_zen/smoke\n"
+        "BEAST_SMOKE_MODEL_OPENCODE_ZEN=opencode_zen/smoke\n"
         "OPENCODE_ZEN_PROXY=http://proxy.example\n"
     )
     assert migrate_owned_env_files() == ()
@@ -165,7 +165,7 @@ def test_explicit_env_file_warns_for_opencode_zen_migrations(
         encoding="utf-8",
     )
 
-    warning = explicit_env_file_migration_warning({"FCC_ENV_FILE": str(explicit)})
+    warning = explicit_env_file_migration_warning({"BEAST_ENV_FILE": str(explicit)})
 
     assert warning is not None
     assert LEGACY_OPENCODE_PROXY_ENV in warning

@@ -3,11 +3,11 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
 
-from free_claude_code.messaging.command_context import ReplyClearResult, StopOutcome
-from free_claude_code.messaging.models import MessageScope
-from free_claude_code.messaging.platforms.ports import MessagingStartupNotice
-from free_claude_code.messaging.session import SessionStore
-from free_claude_code.messaging.trees import (
+from beast.messaging.command_context import ReplyClearResult, StopOutcome
+from beast.messaging.models import MessageScope
+from beast.messaging.platforms.ports import MessagingStartupNotice
+from beast.messaging.session import SessionStore
+from beast.messaging.trees import (
     CancellationReason,
     CancellationResult,
     CancellationUiOwner,
@@ -23,9 +23,9 @@ from free_claude_code.messaging.trees import (
     TreeQueueManager,
     TreeSnapshot,
 )
-from free_claude_code.messaging.trees.transitions import CancellationEffect
-from free_claude_code.messaging.voice import VoiceCancellationResult
-from free_claude_code.messaging.workflow import MessagingWorkflow
+from beast.messaging.trees.transitions import CancellationEffect
+from beast.messaging.voice import VoiceCancellationResult
+from beast.messaging.workflow import MessagingWorkflow
 
 _SCOPE = MessageScope(platform="telegram", chat_id="chat_1")
 _OTHER_SCOPE = MessageScope(platform="telegram", chat_id="other_chat")
@@ -121,7 +121,7 @@ async def test_handle_message_turn_trace_always_includes_full_message_text(
     incoming = incoming_message_factory(text=text)
     with (
         patch.object(workflow.turn_intake, "handle_message", new_callable=AsyncMock),
-        patch("free_claude_code.messaging.workflow.trace_event") as trace_mock,
+        patch("beast.messaging.workflow.trace_event") as trace_mock,
     ):
         await workflow.handle_message(incoming)
 
@@ -894,7 +894,7 @@ async def test_terminal_close_waits_past_interactive_drain_timeout(
     incoming_message_factory,
 ) -> None:
     monkeypatch.setattr(
-        "free_claude_code.messaging.trees.manager.CANCEL_TASK_DRAIN_TIMEOUT_S",
+        "beast.messaging.trees.manager.CANCEL_TASK_DRAIN_TIMEOUT_S",
         0.01,
     )
     runner_started = asyncio.Event()
@@ -1065,7 +1065,7 @@ async def test_session_info_rejects_unregistered_real_session_without_recording_
     handler,
     mock_cli_manager,
 ) -> None:
-    from free_claude_code.messaging.node_event_pipeline import (
+    from beast.messaging.node_event_pipeline import (
         handle_session_info_event,
     )
 
@@ -1406,7 +1406,7 @@ async def test_startup_notice_is_published_and_recorded_for_clear(
 
     mock_platform.queue_send_message.assert_awaited_once_with(
         _SCOPE.chat_id,
-        "🚀 *Claude Code Proxy is online\\!* \\(Bot API\\)",
+        "🚀 *Beast Proxy is online\\!* \\(Bot API\\)",
         parse_mode="MarkdownV2",
         fire_and_forget=False,
     )

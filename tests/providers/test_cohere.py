@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.application.errors import InvalidRequestError
-from free_claude_code.config.provider_catalog import COHERE_DEFAULT_BASE
-from free_claude_code.providers.base import ProviderConfig
+from beast.application.errors import InvalidRequestError
+from beast.config.provider_catalog import COHERE_DEFAULT_BASE
+from beast.providers.base import ProviderConfig
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     immediate_admission,
@@ -40,9 +40,7 @@ def test_default_base_url_constant():
 
 
 def test_init_uses_default_base_url_and_api_key(cohere_config):
-    with patch(
-        "free_claude_code.providers.openai_chat.provider.AsyncOpenAI"
-    ) as mock_openai:
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = profiled_provider(
             "cohere", cohere_config, admission=immediate_admission()
         )
@@ -55,7 +53,7 @@ def test_init_uses_default_base_url_and_api_key(cohere_config):
 def test_init_strips_trailing_slash(cohere_config):
     config = replace(cohere_config, base_url=f"{COHERE_DEFAULT_BASE}/")
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         provider = profiled_provider("cohere", config, admission=immediate_admission())
 
     assert provider._base_url == COHERE_DEFAULT_BASE
@@ -63,7 +61,7 @@ def test_init_strips_trailing_slash(cohere_config):
 
 def test_build_request_body_sanitizes_documented_unsupported_fields(cohere_provider):
     with patch(
-        "free_claude_code.providers.openai_chat.request_policy.build_base_request_body"
+        "beast.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "command-a-plus-05-2026",
@@ -112,7 +110,7 @@ def test_build_request_body_maps_reasoning_on_to_high(cohere_provider):
 
 def test_build_request_body_preserves_replayed_reasoning_content(cohere_provider):
     with patch(
-        "free_claude_code.providers.openai_chat.request_policy.build_base_request_body"
+        "beast.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "command-a-plus-05-2026",

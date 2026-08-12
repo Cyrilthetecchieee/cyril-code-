@@ -1,25 +1,25 @@
 import re
 from pathlib import Path
 
-from free_claude_code.config.provider_catalog import PROVIDER_CATALOG
-from free_claude_code.messaging.platforms.factory import create_messaging_components
-from free_claude_code.providers.base import BaseProvider
-from free_claude_code.providers.cloudflare import CloudflareProvider
-from free_claude_code.providers.deepseek import DeepSeekProvider
-from free_claude_code.providers.gemini import GeminiProvider
-from free_claude_code.providers.github_models import GitHubModelsProvider
-from free_claude_code.providers.groq import GroqProvider
-from free_claude_code.providers.kilo import KiloProvider
-from free_claude_code.providers.lmstudio import LMStudioProvider
-from free_claude_code.providers.mistral import MistralProvider
-from free_claude_code.providers.nvidia_nim import NvidiaNimProvider
-from free_claude_code.providers.open_router import OpenRouterProvider
-from free_claude_code.providers.openai_chat import (
+from beast.config.provider_catalog import PROVIDER_CATALOG
+from beast.messaging.platforms.factory import create_messaging_components
+from beast.providers.base import BaseProvider
+from beast.providers.cloudflare import CloudflareProvider
+from beast.providers.deepseek import DeepSeekProvider
+from beast.providers.gemini import GeminiProvider
+from beast.providers.github_models import GitHubModelsProvider
+from beast.providers.groq import GroqProvider
+from beast.providers.kilo import KiloProvider
+from beast.providers.lmstudio import LMStudioProvider
+from beast.providers.mistral import MistralProvider
+from beast.providers.nvidia_nim import NvidiaNimProvider
+from beast.providers.open_router import OpenRouterProvider
+from beast.providers.openai_chat import (
     OPENAI_CHAT_PROFILES,
     OpenAIChatProvider,
 )
-from free_claude_code.providers.openai_codex import OpenAICodexProvider
-from free_claude_code.providers.vertex import VertexProvider
+from beast.providers.openai_codex import OpenAICodexProvider
+from beast.providers.vertex import VertexProvider
 from smoke.features import FEATURE_INVENTORY
 
 

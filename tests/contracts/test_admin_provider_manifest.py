@@ -1,11 +1,11 @@
 """Ensure admin UI manifest exposes every catalog credential/proxy binding."""
 
-from free_claude_code.config.admin.manifest import FIELD_BY_KEY
-from free_claude_code.config.provider_catalog import (
+from beast.config.admin.manifest import FIELD_BY_KEY
+from beast.config.provider_catalog import (
     PROVIDER_CATALOG,
     ProviderAuthKind,
 )
-from free_claude_code.config.settings import Settings
+from beast.config.settings import Settings
 
 
 def test_provider_catalog_remote_credentials_in_admin_manifest() -> None:
@@ -99,8 +99,8 @@ def test_provider_catalog_proxy_attrs_in_admin_manifest() -> None:
 
 
 def test_provider_catalog_display_names_are_admin_status_source() -> None:
-    from free_claude_code.config.admin.status import provider_config_status
-    from free_claude_code.config.admin.values import load_value_state
+    from beast.config.admin.status import provider_config_status
+    from beast.config.admin.values import load_value_state
 
     status_by_provider = {
         entry["provider_id"]: entry
@@ -140,7 +140,7 @@ def test_vertex_project_and_location_are_admin_provider_fields() -> None:
 
 
 def test_vertex_admin_status_uses_project_configuration_not_an_api_key() -> None:
-    from free_claude_code.config.admin.status import provider_config_status
+    from beast.config.admin.status import provider_config_status
 
     def vertex_status(project_id: str) -> dict[str, object]:
         statuses = provider_config_status(
@@ -158,7 +158,7 @@ def test_vertex_admin_status_uses_project_configuration_not_an_api_key() -> None
 
 
 def test_azure_openai_admin_status_distinguishes_key_and_url() -> None:
-    from free_claude_code.config.admin.status import provider_config_status
+    from beast.config.admin.status import provider_config_status
 
     def azure_status(api_key: str, base_url: str) -> dict[str, object]:
         statuses = provider_config_status(

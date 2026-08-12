@@ -14,7 +14,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
-$RepoArchiveUrl = "https://github.com/Alishahryar1/free-claude-code/archive/refs/heads/main.zip"
+$RepoArchiveUrl = "https://github.com/Alishahryar1/beast/archive/refs/heads/main.zip"
 # Windows on ARM emulates x64, whose Python package ecosystem has broader wheel support.
 $PythonRequest = "cpython-3.14.0-windows-x86_64-none"
 $MinUvVersion = "0.11.16"
@@ -32,21 +32,21 @@ $script:InstallPi = $true
 $script:PiAvailable = $false
 $script:EnableRtk = $Rtk.IsPresent
 $FccCommands = @(
-    # Include retired entry points so updates reject older FCC processes before replacement.
-    "fcc-desktop",
-    "fcc-server",
-    "fcc-claude",
-    "fcc-codex",
-    "fcc-pi",
-    "fcc-init",
-    "free-claude-code"
+    # Include retired entry points so updates reject older BEAST processes before replacement.
+    "beast-desktop",
+    "start",
+    "beast",
+    "beast-codex",
+    "beast-pi",
+    "beast-init",
+    "beast"
 )
 
 function Show-Usage {
     @"
 Usage: install.ps1 [options]
 
-Installs or updates Free Claude Code and lets you choose which coding agents to install or verify.
+Installs or updates Beast and lets you choose which coding agents to install or verify.
 
 Options:
   -VoiceNim              Install NVIDIA NIM voice transcription support.
@@ -94,9 +94,9 @@ function Read-YesNo {
 
 function Select-CodingAgents {
     while ($true) {
-        $script:InstallClaudeCode = Read-YesNo "Install or verify Claude Code for fcc-claude?"
-        $script:InstallCodex = Read-YesNo "Install or verify Codex for fcc-codex?"
-        $script:InstallPi = Read-YesNo "Install or verify Pi for fcc-pi?"
+        $script:InstallClaudeCode = Read-YesNo "Install or verify Beast for beast?"
+        $script:InstallCodex = Read-YesNo "Install or verify Codex for beast-codex?"
+        $script:InstallPi = Read-YesNo "Install or verify Pi for beast-pi?"
 
         if ($script:InstallClaudeCode -or $script:InstallCodex -or $script:InstallPi) {
             break
@@ -271,7 +271,7 @@ function Assert-NoFccProcessesRunning {
     }
 
     if ($running.Count -gt 0) {
-        throw "Free Claude Code is still running ($($running -join ', ')). Stop those processes, then rerun the installer."
+        throw "Beast is still running ($($running -join ', ')). Stop those processes, then rerun the installer."
     }
 }
 
@@ -289,7 +289,7 @@ function Invoke-DownloadedPowerShellInstaller {
         return
     }
 
-    $temporaryScript = Join-Path ([IO.Path]::GetTempPath()) ("fcc-install-" + [guid]::NewGuid().ToString("N") + ".ps1")
+    $temporaryScript = Join-Path ([IO.Path]::GetTempPath()) ("beast-install-" + [guid]::NewGuid().ToString("N") + ".ps1")
     try {
         Write-Host "+ irm $Url -OutFile $(Format-Argument $temporaryScript)"
         Invoke-RestMethod -Uri $Url -OutFile $temporaryScript -ErrorAction Stop
@@ -398,7 +398,7 @@ function Install-Rtk {
         return
     }
 
-    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("fcc-rtk-" + [guid]::NewGuid().ToString("N"))
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("beast-rtk-" + [guid]::NewGuid().ToString("N"))
     $archivePath = Join-Path $temporaryRoot $RtkWindowsAssetName
     $extractPath = Join-Path $temporaryRoot "extracted"
     try {
@@ -538,14 +538,14 @@ function Configure-RtkForSelectedAgents {
 
 function Ensure-ClaudeCode {
     if (Get-ApplicationCommand "claude") {
-        Write-Host "Claude Code already found on PATH; verifying it."
+        Write-Host "Beast already found on PATH; verifying it."
     }
     else {
-        Invoke-DownloadedPowerShellInstaller -Url $ClaudeInstallUrl -Name "Claude Code"
+        Invoke-DownloadedPowerShellInstaller -Url $ClaudeInstallUrl -Name "Beast"
         Add-KnownBinDirectories
     }
 
-    Confirm-Application -CommandName "claude" -DisplayName "Claude Code"
+    Confirm-Application -CommandName "claude" -DisplayName "Beast"
 }
 
 function Ensure-Codex {
@@ -595,7 +595,7 @@ function Ensure-Pi {
 
 function Ensure-SelectedCodingAgents {
     if ($script:InstallClaudeCode) {
-        Write-Step "Ensuring Claude Code is installed"
+        Write-Step "Ensuring Beast is installed"
         Ensure-ClaudeCode
     }
 
@@ -721,15 +721,15 @@ function Get-PackageSpec {
     }
 
     if ($includeNim -and $includeLocal) {
-        return "free-claude-code[voice,voice_local] @ $RepoArchiveUrl"
+        return "beast[voice,voice_local] @ $RepoArchiveUrl"
     }
     if ($includeNim) {
-        return "free-claude-code[voice] @ $RepoArchiveUrl"
+        return "beast[voice] @ $RepoArchiveUrl"
     }
     if ($includeLocal) {
-        return "free-claude-code[voice_local] @ $RepoArchiveUrl"
+        return "beast[voice_local] @ $RepoArchiveUrl"
     }
-    return "free-claude-code @ $RepoArchiveUrl"
+    return "beast @ $RepoArchiveUrl"
 }
 
 function Install-FreeClaudeCode {
@@ -740,7 +740,7 @@ function Install-FreeClaudeCode {
         "install",
         "--force",
         "--refresh-package",
-        "free-claude-code",
+        "beast",
         "--python",
         $PythonRequest
     )
@@ -753,7 +753,7 @@ function Install-FreeClaudeCode {
     if (-not $DryRun) {
         $uvCommand = Get-ApplicationCommand "uv"
         if (-not $uvCommand) {
-            throw "uv is not available for the Free Claude Code installation."
+            throw "uv is not available for the Beast installation."
         }
         $uvPath = $uvCommand.Source
     }
@@ -790,7 +790,7 @@ function Export-FccDesktopIcon {
         throw "Command failed with exit code ${exitCode}: $commandText"
     }
     if (-not (Test-Path -LiteralPath $IconPath -PathType Leaf)) {
-        throw "Free Claude Code did not export its Windows app icon to '$IconPath'."
+        throw "Beast did not export its Windows app icon to '$IconPath'."
     }
 }
 
@@ -799,13 +799,13 @@ function Configure-AndConfirmFreeClaudeCode {
     if ($DryRun) {
         Write-Host "+ uv tool update-shell"
         Write-Host "+ uv tool dir --bin"
-        Write-Host "+ verify fcc-desktop, fcc-server, fcc-claude, fcc-codex, and fcc-pi in the uv tool bin directory"
-        Write-Host "+ fcc-server --version"
+        Write-Host "+ verify beast-desktop, start, beast, beast-codex, and beast-pi in the uv tool bin directory"
+        Write-Host "+ start --version"
         Export-FccDesktopIcon `
-            -DesktopCommand "<uv-tool-bin>\fcc-desktop.exe" `
+            -DesktopCommand "<uv-tool-bin>\beast-desktop.exe" `
             -IconPath $iconPath
         Install-FccDesktopShortcuts `
-            -DesktopCommand "<uv-tool-bin>\fcc-desktop.exe" `
+            -DesktopCommand "<uv-tool-bin>\beast-desktop.exe" `
             -IconPath $iconPath
         return
     }
@@ -826,10 +826,10 @@ function Configure-AndConfirmFreeClaudeCode {
         [IO.Path]::AltDirectorySeparatorChar
     )
     $installedCommands = @{}
-    foreach ($commandName in @("fcc-desktop", "fcc-server", "fcc-claude", "fcc-codex", "fcc-pi")) {
+    foreach ($commandName in @("beast-desktop", "start", "beast", "beast-codex", "beast-pi")) {
         $command = Get-ApplicationCommand $commandName
         if (-not $command) {
-            throw "Free Claude Code installation did not create '$commandName'."
+            throw "Beast installation did not create '$commandName'."
         }
         $commandDirectory = ([IO.Path]::GetFullPath((Split-Path -Parent $command.Source))).TrimEnd(
             [IO.Path]::DirectorySeparatorChar,
@@ -841,12 +841,12 @@ function Configure-AndConfirmFreeClaudeCode {
         $installedCommands[$commandName] = $command.Source
     }
 
-    Invoke-NativeCommand -FilePath $installedCommands["fcc-server"] -Arguments @("--version")
+    Invoke-NativeCommand -FilePath $installedCommands["start"] -Arguments @("--version")
     Export-FccDesktopIcon `
-        -DesktopCommand $installedCommands["fcc-desktop"] `
+        -DesktopCommand $installedCommands["beast-desktop"] `
         -IconPath $iconPath
     Install-FccDesktopShortcuts `
-        -DesktopCommand $installedCommands["fcc-desktop"] `
+        -DesktopCommand $installedCommands["beast-desktop"] `
         -IconPath $iconPath
 }
 
@@ -878,8 +878,8 @@ function Install-FccDesktopShortcuts {
     )
 
     $shortcutPaths = @(
-        (Join-Path $env:USERPROFILE "Desktop\Free Claude Code.lnk"),
-        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Free Claude Code.lnk")
+        (Join-Path $env:USERPROFILE "Desktop\Beast.lnk"),
+        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Beast.lnk")
     )
     foreach ($shortcutPath in $shortcutPaths) {
         Write-Host "+ create shortcut $(Format-Argument $shortcutPath) -> $(Format-Argument $DesktopCommand)"
@@ -899,7 +899,7 @@ function Install-FccDesktopShortcuts {
                 $isFccShortcut = $false
             }
             if (-not $isFccShortcut) {
-                Write-Host "A shortcut not managed by Free Claude Code already exists at $shortcutPath; leaving it unchanged."
+                Write-Host "A shortcut not managed by Beast already exists at $shortcutPath; leaving it unchanged."
                 continue
             }
         }
@@ -909,7 +909,7 @@ function Install-FccDesktopShortcuts {
         $shortcut.TargetPath = $DesktopCommand
         $shortcut.WorkingDirectory = $env:USERPROFILE
         $shortcut.IconLocation = "$IconPath,0"
-        $shortcut.Description = "Run Free Claude Code in the background"
+        $shortcut.Description = "Run Beast in the background"
         $shortcut.Save()
     }
 }
@@ -930,7 +930,7 @@ if ((-not [string]::IsNullOrWhiteSpace($TorchBackend)) -and (-not ($VoiceLocal -
 
 Add-KnownBinDirectories
 
-Write-Step "Checking for running Free Claude Code processes"
+Write-Step "Checking for running Beast processes"
 Assert-NoFccProcessesRunning
 
 if (Test-InteractiveInstaller) {
@@ -944,10 +944,10 @@ Configure-RtkForSelectedAgents
 Write-Step "Ensuring uv $MinUvVersion or newer is installed"
 Ensure-Uv
 
-Write-Step "Installing or updating Free Claude Code"
+Write-Step "Installing or updating Beast"
 Install-FreeClaudeCode
 
-Write-Step "Configuring PATH and verifying Free Claude Code"
+Write-Step "Configuring PATH and verifying Beast"
 Configure-AndConfirmFreeClaudeCode
 
 Write-Host ""
@@ -955,15 +955,15 @@ if ($DryRun) {
     Write-Host "Dry run complete. No changes were made."
 }
 else {
-    Write-Host "Free Claude Code is installed and verified. Open the Free Claude Code desktop shortcut to run it in the background."
-    Write-Host "For terminal use, start the proxy with: fcc-server"
+    Write-Host "Beast is installed and verified. Open the Beast desktop shortcut to run it in the background."
+    Write-Host "For terminal use, start the proxy with: start"
     if ($script:InstallClaudeCode) {
-        Write-Host "Run Claude Code with: fcc-claude"
+        Write-Host "Run Beast with: beast"
     }
     if ($script:InstallCodex) {
-        Write-Host "Run Codex with: fcc-codex"
+        Write-Host "Run Codex with: beast-codex"
     }
     if ($script:PiAvailable) {
-        Write-Host "Run Pi with: fcc-pi"
+        Write-Host "Run Pi with: beast-pi"
     }
 }

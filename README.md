@@ -2,15 +2,15 @@
 
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="assets/free-claude-code-wordmark-light.svg">
-    <img src="assets/free-claude-code-wordmark-dark.svg" alt="Free Claude Code" width="610">
+    <source media="(prefers-color-scheme: light)" srcset="assets/beast-wordmark-light.svg">
+    <img src="assets/beast-wordmark-dark.svg" alt="Beast" width="610">
   </picture>
 </h1>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-3776ab.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json&style=for-the-badge)](https://github.com/astral-sh/uv)
-[![Testing: Pytest](https://img.shields.io/badge/Testing-Pytest-00c0ff.svg?style=for-the-badge)](https://github.com/Alishahryar1/free-claude-code/actions/workflows/tests.yml)
+[![Testing: Pytest](https://img.shields.io/badge/Testing-Pytest-00c0ff.svg?style=for-the-badge)](https://github.com/Alishahryar1/beast/actions/workflows/tests.yml)
 [![Type checking: Ty](https://img.shields.io/badge/type%20checking-ty-ffcc00.svg?style=for-the-badge)](https://pypi.org/project/ty/)
 [![Code style: Ruff](https://img.shields.io/badge/code%20formatting-ruff-f5a623.svg?style=for-the-badge)](https://github.com/astral-sh/ruff)
 [![Logging: Loguru](https://img.shields.io/badge/logging-loguru-4ecdc4.svg?style=for-the-badge)](https://github.com/Delgan/loguru)
@@ -21,7 +21,7 @@
 
 ## What You Get
 
-- **Use your preferred coding agent.** Run Claude Code, Codex, or Pi with FCC.
+- **Use your preferred coding agent.** Run Beast, Codex, or Pi with BEAST.
 - **Choose your own models.** Connect free, paid, or local providers and search their models from one Admin UI.
 - **Route work your way.** Set one default model or map Fable, Opus, Sonnet, and Haiku separately.
 - **Save time and tokens.** Five built-in optimizations handle quota probes, command-prefix detection, title generation, suggestion mode, and filepath extraction locally instead of calling your provider; optionally enable [RTK](https://github.com/rtk-ai/rtk) to filter noisy terminal output before it reaches the model.
@@ -29,8 +29,8 @@
 - **Work where you want.** Launch from your desktop, connect supported IDEs, or use optional Discord and Telegram bots with voice notes.
 
 <div align="center">
-  <img src="assets/pic.png" alt="Claude Code running with Free Claude Code" width="700">
-  <p><em>Claude Code running with FCC.</em></p>
+  <img src="assets/pic.png" alt="Beast running with Beast" width="700">
+  <p><em>Beast running with BEAST.</em></p>
 </div>
 
 ## Quick Start
@@ -42,45 +42,45 @@
 macOS/Linux:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.sh" | sh
+curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/beast/main/scripts/install.sh" | sh
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.ps1")))
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/beast/main/scripts/install.ps1")))
 ```
 
 Re-run the same command whenever you want to update. You can review the installers before running them: [install.sh](scripts/install.sh) and [install.ps1](scripts/install.ps1).
 
 The installer asks which coding agents to install or verify. Choose at least one; skipped agents are left unchanged. It can also install and configure RTK globally for the selected agents; RTK is off by default.
 
-### 2. Start FCC
+### 2. Start BEAST
 
 #### Windows
 
-Open **Free Claude Code** from your desktop or Start menu.
+Open **Beast** from your desktop or Start menu.
 
 #### macOS
 
-Open **Free Claude Code** from your desktop or Applications folder.
+Open **Beast** from your desktop or Applications folder.
 
 #### Linux
 
 Run:
 
 ```bash
-fcc-server
+start
 ```
 
-On Windows and macOS, FCC runs in the system tray or menu bar without opening a
+On Windows and macOS, BEAST runs in the system tray or menu bar without opening a
 terminal. Use its menu to open Admin, check server status, restart, or quit. On
 Windows, left-clicking the tray icon opens Admin directly.
 
-To print the installed Free Claude Code version without starting the server,
-run `fcc-server --version`.
+To print the installed Beast version without starting the server,
+run `start --version`.
 
-When using `fcc-server`, keep the terminal open. The Admin UI opens in your
+When using `start`, keep the terminal open. The Admin UI opens in your
 browser after startup by default. Its address is also shown in the log:
 
 ```text
@@ -100,42 +100,42 @@ Use the port shown in your terminal if it differs from `8082`.
 5. Click **Validate**, then **Apply**.
 
 <div align="center">
-  <img src="assets/admin-page.png" alt="Free Claude Code Admin UI" width="700">
+  <img src="assets/admin-page.png" alt="Beast Admin UI" width="700">
 </div>
 
 ### 4. Run Your Coding Agent
 
-Claude Code:
+Beast:
 
 ```bash
-fcc-claude
+beast
 ```
 
 Codex:
 
 ```bash
-fcc-codex
+beast-codex
 ```
 
 Pi:
 
 ```bash
-fcc-pi
+beast-pi
 ```
 
-All three launchers use the current Admin UI settings. Use the agent's model picker to choose from the models FCC exposes. Normal CLI arguments still work, for example:
+All three launchers use the current Admin UI settings. Use the agent's model picker to choose from the models BEAST exposes. Normal CLI arguments still work, for example:
 
 ```bash
-fcc-codex exec "hello"
+beast-codex exec "hello"
 ```
 
-`fcc-pi` registers FCC only for that Pi process; your existing Pi settings, sessions, credentials, and extensions remain unchanged.
+`beast-pi` registers BEAST only for that Pi process; your existing Pi settings, sessions, credentials, and extensions remain unchanged.
 
 <a id="model-picker"></a>
 
 <div align="center">
-  <img src="assets/cc-model-picker.png" alt="Claude Code model picker showing FCC models" width="700">
-  <p><em>Select an FCC model from Claude Code's native <code>/model</code> picker.</em></p>
+  <img src="assets/cc-model-picker.png" alt="Beast model picker showing BEAST models" width="700">
+  <p><em>Select an BEAST model from Beast's native <code>/model</code> picker.</em></p>
 </div>
 
 ## Choose A Provider
@@ -228,7 +228,7 @@ Start LM Studio's local server, load a tool-capable model, and use the model ide
 
 ### llama.cpp
 
-Start `llama-server` with its OpenAI-compatible Chat Completions API and enough context for the model. Use the local model ID with the `llamacpp/` prefix. `LLAMACPP_BASE_URL` defaults to `http://localhost:8080/v1`; FCC accepts either the server root or an explicit `/v1` suffix.
+Start `llama-server` with its OpenAI-compatible Chat Completions API and enough context for the model. Use the local model ID with the `llamacpp/` prefix. `LLAMACPP_BASE_URL` defaults to `http://localhost:8080/v1`; BEAST accepts either the server root or an explicit `/v1` suffix.
 
 ### Ollama
 
@@ -237,14 +237,14 @@ ollama pull llama3.1
 ollama serve
 ```
 
-Use the tag shown by `ollama list` with the `ollama/` prefix. `OLLAMA_BASE_URL` defaults to `http://localhost:11434`; FCC accepts either the root URL or an explicit `/v1` suffix.
+Use the tag shown by `ollama list` with the `ollama/` prefix. `OLLAMA_BASE_URL` defaults to `http://localhost:11434`; BEAST accepts either the root URL or an explicit `/v1` suffix.
 
 </details>
 
 <details>
 <summary><strong>Optional model-tier routing</strong></summary>
 
-`MODEL` is the fallback for every request. Select a model for `MODEL_FABLE`, `MODEL_OPUS`, `MODEL_SONNET`, or `MODEL_HAIKU` to override an individual Claude Code tier; select **None** to use `MODEL`.
+`MODEL` is the fallback for every request. Select a model for `MODEL_FABLE`, `MODEL_OPUS`, `MODEL_SONNET`, or `MODEL_HAIKU` to override an individual Beast tier; select **None** to use `MODEL`.
 
 For example, route Opus to `nvidia_nim/nvidia/nemotron-3-super-120b-a12b`, Sonnet to `open_router/openrouter/free`, Haiku to `lmstudio/qwen3.5-coder`, and keep `MODEL` on `zai/glm-5.2`.
 
@@ -257,7 +257,7 @@ Open **Admin UI → Model Config → Reasoning** and select the behavior you wan
 
 | Selection | Behavior |
 | --- | --- |
-| **From client** (default) | Use the effort sent by Claude Code, Codex, or Pi. If none is sent, keep the provider default. |
+| **From client** (default) | Use the effort sent by Beast, Codex, or Pi. If none is sent, keep the provider default. |
 | **Off** | Request reasoning to be disabled. |
 | **Low**, **Medium**, **High**, **X-High**, or **Max** | Override the client with the selected reasoning level. |
 | **Inherit** (Fable, Opus, Sonnet, and Haiku only) | Use the root Reasoning selection. |
@@ -270,12 +270,12 @@ Providers that do not support a selected control retain their own behavior.
 
 ## Connect Your Client
 
-For terminal use, start `fcc-server`, then run `fcc-claude`, `fcc-codex`, or `fcc-pi`. Use the guides below for editor integrations.
+For terminal use, start `start`, then run `beast`, `beast-codex`, or `beast-pi`. Use the guides below for editor integrations.
 
 <details>
-<summary><strong>Claude Code in VS Code</strong></summary>
+<summary><strong>Beast in VS Code</strong></summary>
 
-Install the [Claude Code extension](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code). Open VS Code's user settings as JSON and add:
+Install the [Beast extension](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code). Open VS Code's user settings as JSON and add:
 
 ```json
 "claudeCode.disableLoginPrompt": true,
@@ -297,7 +297,7 @@ Match the port and authentication token to the Admin UI, then reload the extensi
 <details>
 <summary><strong>Codex App</strong></summary>
 
-Start FCC, then edit your Codex configuration:
+Start BEAST, then edit your Codex configuration:
 
 - Windows: `%USERPROFILE%\.codex\config.toml`
 - macOS: `~/.codex/config.toml`
@@ -316,25 +316,25 @@ macOS:
 model_catalog_json = "/Users/YOUR_USERNAME/.fcc/codex-model-catalog.json"
 ```
 
-Then add the shared FCC settings:
+Then add the shared BEAST settings:
 
 ```toml
 model_provider = "fcc"
 model = "nvidia_nim/nvidia/nemotron-3-super-120b-a12b"
 
 [model_providers.fcc]
-name = "Free Claude Code"
+name = "Beast"
 base_url = "http://127.0.0.1:8082/v1"
 wire_api = "responses"
 
 [model_providers.fcc.auth]
-command = "fcc-codex"
+command = "beast-codex"
 args = ["--print-proxy-auth-token"]
 ```
 
-Match the model and port to the Admin UI. The auth command reads FCC's current
+Match the model and port to the Admin UI. The auth command reads BEAST's current
 proxy token automatically. Restart the Codex App after setup or model changes,
-then select an FCC model from its model picker.
+then select an BEAST model from its model picker.
 
 </details>
 
@@ -348,23 +348,23 @@ model_provider = "fcc"
 model = "nvidia_nim/nvidia/nemotron-3-super-120b-a12b"
 
 [model_providers.fcc]
-name = "Free Claude Code"
+name = "Beast"
 base_url = "http://127.0.0.1:8082/v1"
 wire_api = "responses"
 
 [model_providers.fcc.auth]
-command = "fcc-codex"
+command = "beast-codex"
 args = ["--print-proxy-auth-token"]
 ```
 
-Match `model` and the port to the Admin UI. The auth command reads FCC's current
+Match `model` and the port to the Admin UI. The auth command reads BEAST's current
 proxy token automatically. Restart VS Code after setup or model changes. For
 WSL-backed Codex, edit the file inside WSL.
 
 </details>
 
 <details>
-<summary><strong>Claude Code in JetBrains ACP</strong></summary>
+<summary><strong>Beast in JetBrains ACP</strong></summary>
 
 Edit the installed Claude ACP configuration:
 
@@ -390,9 +390,9 @@ Match the port and token to the Admin UI, then restart the IDE.
 </details>
 
 <details>
-<summary><strong>Claude Code still asks you to log in</strong></summary>
+<summary><strong>Beast still asks you to log in</strong></summary>
 
-If Claude Code asks you to log in after you configure the FCC URL and token, open its state file:
+If Beast asks you to log in after you configure the BEAST URL and token, open its state file:
 
 - Windows: `%USERPROFILE%\.claude.json`
 - macOS/Linux/WSL: `~/.claude.json`
@@ -411,7 +411,7 @@ If the file does not exist, create it with a complete JSON object:
 }
 ```
 
-Restart Claude Code or the IDE after saving the file.
+Restart Beast or the IDE after saving the file.
 
 </details>
 
@@ -453,7 +453,7 @@ Configure integrations from **Admin UI → Messaging**, then click **Validate** 
 | `/stats` | Show session state. |
 | Standalone `/stop` | Cancel all work. |
 | Reply with `/stop` | Cancel only the selected request while other queued requests continue. |
-| Standalone `/clear` | Reset all FCC state and remove every tracked message in that chat, including user prompts, voice notes, FCC replies, Telegram's online notice, and the clear command itself. |
+| Standalone `/clear` | Reset all BEAST state and remove every tracked message in that chat, including user prompts, voice notes, BEAST replies, Telegram's online notice, and the clear command itself. |
 | Reply with `/clear` | Delete the selected message and its literal platform reply subtree while preserving its ancestors and siblings. |
 
 <details>
@@ -474,16 +474,16 @@ replace the final option with the matching one from the table.
 macOS/Linux:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.sh" | sh -s -- --voice-nim
+curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/beast/main/scripts/install.sh" | sh -s -- --voice-nim
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.ps1"))) -VoiceNim
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/beast/main/scripts/install.ps1"))) -VoiceNim
 ```
 
-Restart `fcc-server`. In **Admin UI → Messaging → Voice**, enable voice notes, select `cpu`, `cuda`, or `nvidia_nim`, and choose the Whisper model. Local gated models need `HUGGINGFACE_API_KEY`; NVIDIA NIM transcription needs `NVIDIA_NIM_API_KEY`.
+Restart `start`. In **Admin UI → Messaging → Voice**, enable voice notes, select `cpu`, `cuda`, or `nvidia_nim`, and choose the Whisper model. Local gated models need `HUGGINGFACE_API_KEY`; NVIDIA NIM transcription needs `NVIDIA_NIM_API_KEY`.
 
 </details>
 
@@ -495,34 +495,34 @@ Re-run the matching command from [Install Or Update](#install).
 
 ### Uninstall
 
-Stop every running FCC command before uninstalling.
+Stop every running BEAST command before uninstalling.
 
 **Removes**
 
-- Free Claude Code, including its desktop launcher and commands
+- Beast, including its desktop launcher and commands
 - `~/.fcc/`
 
 **Keeps**
 
 - uv and Python
-- Claude Code, Codex, Pi, and RTK
+- Beast, Codex, Pi, and RTK
 - Shared PATH entries
 
 macOS/Linux:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/uninstall.sh" | sh
+curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/beast/main/scripts/uninstall.sh" | sh
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/uninstall.ps1")))
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/beast/main/scripts/uninstall.ps1")))
 ```
 
 ## Project Links
 
-- [Report bugs or request features](https://github.com/Alishahryar1/free-claude-code/issues)
+- [Report bugs or request features](https://github.com/Alishahryar1/beast/issues)
 - [Architecture and extension guide](ARCHITECTURE.md)
 - [Contributing guide](CONTRIBUTING.md)
 

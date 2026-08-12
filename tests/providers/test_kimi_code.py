@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from free_claude_code.application.errors import InvalidRequestError
-from free_claude_code.application.model_metadata import ProviderModelInfo
-from free_claude_code.config.provider_catalog import KIMI_CODE_DEFAULT_BASE
-from free_claude_code.core.anthropic.models import MessagesRequest
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.openai_chat import OpenAIChatProvider
+from beast.application.errors import InvalidRequestError
+from beast.application.model_metadata import ProviderModelInfo
+from beast.config.provider_catalog import KIMI_CODE_DEFAULT_BASE
+from beast.core.anthropic.models import MessagesRequest
+from beast.providers.base import ProviderConfig
+from beast.providers.openai_chat import OpenAIChatProvider
 from tests.providers.support import (
     immediate_admission,
     profiled_provider,
@@ -45,9 +45,7 @@ def test_init_uses_subscription_endpoint_and_identifies_fcc(kimi_code_provider):
     assert kimi_code_provider._api_key == "test-subscription-key"
     assert kimi_code_provider._base_url == "https://api.kimi.com/coding/v1"
     assert kimi_code_provider._provider_name == "KIMI_CODE"
-    assert kimi_code_provider._client.default_headers["User-Agent"] == (
-        "free-claude-code"
-    )
+    assert kimi_code_provider._client.default_headers["User-Agent"] == ("beast")
 
 
 def test_explicit_output_limit_uses_max_completion_tokens(kimi_code_provider):

@@ -2,8 +2,8 @@
 
 import pytest
 
-from free_claude_code.core.anthropic.models import MessagesRequest
-from free_claude_code.providers.base import ProviderConfig
+from beast.core.anthropic.models import MessagesRequest
+from beast.providers.base import ProviderConfig
 from tests.providers.support import (
     capture_openai_chat_wire_body,
     immediate_admission,

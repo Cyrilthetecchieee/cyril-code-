@@ -1,12 +1,12 @@
 import pytest
 
-from free_claude_code.core.anthropic.openai_tool_names import OpenAIToolNameCodec
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.core.anthropic.openai_tool_names import OpenAIToolNameCodec
+from beast.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     parse_sse_text,
     thinking_content,
 )
-from free_claude_code.core.openai_responses.provider_stream import (
+from beast.core.openai_responses.provider_stream import (
     ResponsesProviderStream,
     ResponsesStreamFailure,
 )

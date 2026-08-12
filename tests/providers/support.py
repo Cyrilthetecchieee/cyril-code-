@@ -5,12 +5,12 @@ import json
 import httpx
 from openai import AsyncOpenAI
 
-from free_claude_code.application.reasoning import client_reasoning_policy
-from free_claude_code.core.anthropic.models import MessagesRequest
-from free_claude_code.core.reasoning import ReasoningPolicy
-from free_claude_code.providers.admission import ProviderAdmissionController
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.openai_chat import (
+from beast.application.reasoning import client_reasoning_policy
+from beast.core.anthropic.models import MessagesRequest
+from beast.core.reasoning import ReasoningPolicy
+from beast.providers.admission import ProviderAdmissionController
+from beast.providers.base import ProviderConfig
+from beast.providers.openai_chat import (
     OpenAIChatProvider,
     create_openai_chat_provider,
 )

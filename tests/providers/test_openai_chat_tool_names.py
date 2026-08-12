@@ -1,10 +1,10 @@
 from copy import deepcopy
 from typing import Any
 
-from free_claude_code.core.anthropic import ReasoningReplayMode
-from free_claude_code.core.anthropic.models import MessagesRequest
-from free_claude_code.core.reasoning import ReasoningPolicy
-from free_claude_code.providers.openai_chat.request_policy import (
+from beast.core.anthropic import ReasoningReplayMode
+from beast.core.anthropic.models import MessagesRequest
+from beast.core.reasoning import ReasoningPolicy
+from beast.providers.openai_chat.request_policy import (
     OpenAIChatRequestPolicy,
     build_openai_chat_request_body,
 )

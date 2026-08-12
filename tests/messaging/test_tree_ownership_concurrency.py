@@ -4,10 +4,10 @@ import sys
 
 import pytest
 
-from free_claude_code.messaging.models import IncomingMessage, MessageScope
-from free_claude_code.messaging.trees import manager as manager_module
-from free_claude_code.messaging.trees.manager import TreeQueueManager
-from free_claude_code.messaging.trees.transitions import (
+from beast.messaging.models import IncomingMessage, MessageScope
+from beast.messaging.trees import manager as manager_module
+from beast.messaging.trees.manager import TreeQueueManager
+from beast.messaging.trees.transitions import (
     AdmissionRejection,
     CancellationReason,
     CancellationUiOwner,

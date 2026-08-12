@@ -5,12 +5,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from free_claude_code.application.execution import ProviderExecutor
-from free_claude_code.application.routing import ResolvedModel, RoutedMessagesRequest
-from free_claude_code.config.reasoning import ReasoningPreference
-from free_claude_code.core.anthropic.models import Message, MessagesRequest
-from free_claude_code.core.async_iterators import AsyncCloseable
-from free_claude_code.core.reasoning import ReasoningPolicy
+from beast.application.execution import ProviderExecutor
+from beast.application.routing import ResolvedModel, RoutedMessagesRequest
+from beast.config.reasoning import ReasoningPreference
+from beast.core.anthropic.models import Message, MessagesRequest
+from beast.core.async_iterators import AsyncCloseable
+from beast.core.reasoning import ReasoningPolicy
 
 
 class FakeProvider:

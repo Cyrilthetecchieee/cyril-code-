@@ -1,5 +1,5 @@
-from free_claude_code.core.reasoning import ReasoningEffort, ReasoningPolicy
-from free_claude_code.providers.openai_chat.reasoning import (
+from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
+from beast.providers.openai_chat.reasoning import (
     ChatTemplateReasoning,
     LlamaCppReasoning,
     NamedEffortReasoning,

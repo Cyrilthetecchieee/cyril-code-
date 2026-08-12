@@ -6,19 +6,19 @@ import httpx
 import openai
 import pytest
 
-from free_claude_code.config.nim import NimSettings
-from free_claude_code.core.failures import ExecutionFailure, FailureKind
-from free_claude_code.providers.admission import (
+from beast.config.nim import NimSettings
+from beast.core.failures import ExecutionFailure, FailureKind
+from beast.providers.admission import (
     UPSTREAM_TRANSIENT_TOTAL_ATTEMPTS,
     ProviderAdmissionController,
 )
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.failure_policy import (
+from beast.providers.base import ProviderConfig
+from beast.providers.failure_policy import (
     overloaded_provider_failure,
     retryable_upstream_status,
 )
-from free_claude_code.providers.nvidia_nim import NvidiaNimProvider
-from free_claude_code.providers.open_router import OpenRouterProvider
+from beast.providers.nvidia_nim import NvidiaNimProvider
+from beast.providers.open_router import OpenRouterProvider
 from tests.providers.request_factory import make_messages_request
 
 _FUNCTION_ID = "87ea0ddc-cff1-4bca-bf8b-3bd98a35ddd0"
@@ -167,7 +167,7 @@ async def test_degraded_function_exhaustion_is_detailed_redacted_overload() -> N
             new_callable=AsyncMock,
             side_effect=error,
         ) as create,
-        patch("free_claude_code.providers.openai_chat.provider.trace_event") as trace,
+        patch("beast.providers.openai_chat.provider.trace_event") as trace,
         pytest.raises(ExecutionFailure) as exc_info,
     ):
         [

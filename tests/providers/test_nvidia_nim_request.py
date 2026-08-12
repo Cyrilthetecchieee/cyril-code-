@@ -6,21 +6,21 @@ from typing import Any
 
 import pytest
 
-from free_claude_code.config.nim import NimSettings
-from free_claude_code.core.anthropic import set_if_not_none
-from free_claude_code.core.anthropic.models import MessagesRequest, Tool
-from free_claude_code.core.reasoning import ReasoningEffort, ReasoningPolicy
-from free_claude_code.providers.nvidia_nim.request_options import (
+from beast.config.nim import NimSettings
+from beast.core.anthropic import set_if_not_none
+from beast.core.anthropic.models import MessagesRequest, Tool
+from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
+from beast.providers.nvidia_nim.request_options import (
     _set_extra,
 )
-from free_claude_code.providers.nvidia_nim.request_options import (
+from beast.providers.nvidia_nim.request_options import (
     build_nim_request_body as build_request_body,
 )
-from free_claude_code.providers.nvidia_nim.retry import (
+from beast.providers.nvidia_nim.retry import (
     clone_body_without_chat_template,
     clone_body_without_reasoning_content,
 )
-from free_claude_code.providers.nvidia_nim.tool_schema import (
+from beast.providers.nvidia_nim.tool_schema import (
     NIM_TOOL_ARGUMENT_ALIASES_KEY,
     body_without_nim_tool_argument_aliases,
     nim_tool_argument_aliases_from_body,
@@ -213,11 +213,11 @@ class TestBuildRequestBody:
 
     def test_grep_schema_type_parameter_is_aliased_without_mutating_request(self, req):
         tool_schema = deepcopy(GREP_SCHEMA_FROM_SERVER_LOG)
-        tool_schema["properties"]["_fcc_arg_type"] = {
+        tool_schema["properties"]["_beast_arg_type"] = {
             "type": "string",
             "description": "Existing safe property that collides with the alias",
         }
-        tool_schema["required"] = ["pattern", "-A", "_fcc_arg_type"]
+        tool_schema["required"] = ["pattern", "-A", "_beast_arg_type"]
         original_schema = deepcopy(tool_schema)
         req.tools = [
             Tool(
@@ -246,13 +246,13 @@ class TestBuildRequestBody:
             "count",
         ]
         assert (
-            properties["_fcc_arg_type"]
-            == original_schema["properties"]["_fcc_arg_type"]
+            properties["_beast_arg_type"]
+            == original_schema["properties"]["_beast_arg_type"]
         )
-        assert aliases == {"_fcc_arg_type_2": "type"}
-        assert properties["_fcc_arg_type_2"] == original_schema["properties"]["type"]
+        assert aliases == {"_beast_arg_type_2": "type"}
+        assert properties["_beast_arg_type_2"] == original_schema["properties"]["type"]
         assert "-A" in parameters["required"]
-        assert "_fcc_arg_type" in parameters["required"]
+        assert "_beast_arg_type" in parameters["required"]
         assert tool_schema == original_schema
 
     def test_reported_long_tool_name_uses_generic_alias_after_nim_repairs(self, req):
@@ -282,7 +282,7 @@ class TestBuildRequestBody:
         assert wire_name != long_name
         assert re.fullmatch(r"[A-Za-z0-9_-]{1,64}", wire_name)
         assert body[NIM_TOOL_ARGUMENT_ALIASES_KEY] == {
-            long_name: {"_fcc_arg_type": "type"}
+            long_name: {"_beast_arg_type": "type"}
         }
         assert (
             NIM_TOOL_ARGUMENT_ALIASES_KEY
@@ -347,26 +347,26 @@ class TestBuildRequestBody:
         parent = body["tools"][0]["function"]["parameters"]["properties"]["parent"]
         parent_properties = parent["properties"]
         assert "type" not in parent_properties
-        assert parent_properties["_fcc_arg_type"] == {
+        assert parent_properties["_beast_arg_type"] == {
             "type": "string",
             "enum": ["page_id"],
         }
-        assert parent["required"] == ["_fcc_arg_type", "id"]
-        assert aliases == {"_fcc_arg_type": "type"}
+        assert parent["required"] == ["_beast_arg_type", "id"]
+        assert aliases == {"_beast_arg_type": "type"}
         assert tool_schema == original_schema
 
     def test_private_alias_metadata_is_stripped_without_mutating_body(self):
         body = {
             "model": "test",
-            NIM_TOOL_ARGUMENT_ALIASES_KEY: {"Grep": {"_fcc_arg_A": "-A"}},
+            NIM_TOOL_ARGUMENT_ALIASES_KEY: {"Grep": {"_beast_arg_A": "-A"}},
         }
 
         upstream_body = body_without_nim_tool_argument_aliases(body)
 
         assert NIM_TOOL_ARGUMENT_ALIASES_KEY not in upstream_body
-        assert body[NIM_TOOL_ARGUMENT_ALIASES_KEY] == {"Grep": {"_fcc_arg_A": "-A"}}
+        assert body[NIM_TOOL_ARGUMENT_ALIASES_KEY] == {"Grep": {"_beast_arg_A": "-A"}}
         assert nim_tool_argument_aliases_from_body(body) == {
-            "Grep": {"_fcc_arg_A": "-A"}
+            "Grep": {"_beast_arg_A": "-A"}
         }
 
     def test_reasoning_params_in_extra_body(self):

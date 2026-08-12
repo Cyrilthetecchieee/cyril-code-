@@ -8,17 +8,17 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$PackageName = "free-claude-code"
+$PackageName = "beast"
 $FccHomeDirname = ".fcc"
 $FccCommands = @(
     # Include retired entry points so older installations are fully stopped and removed.
-    "fcc-desktop",
-    "fcc-server",
-    "fcc-claude",
-    "fcc-codex",
-    "fcc-pi",
-    "fcc-init",
-    "free-claude-code"
+    "beast-desktop",
+    "start",
+    "beast",
+    "beast-codex",
+    "beast-pi",
+    "beast-init",
+    "beast"
 )
 $script:UvPath = ""
 $script:UvToolBin = ""
@@ -27,8 +27,8 @@ function Show-Usage {
     @"
 Usage: uninstall.ps1 [options]
 
-Removes the Free Claude Code uv tool and deletes ~/.fcc/ after removal is verified.
-Does not remove uv, Claude Code, Codex, Pi, the uv-managed Python runtime, or shared PATH entries.
+Removes the Beast uv tool and deletes ~/.fcc/ after removal is verified.
+Does not remove uv, Beast, Codex, Pi, the uv-managed Python runtime, or shared PATH entries.
 
 Options:
   -DryRun                Print commands without running them.
@@ -130,7 +130,7 @@ function Assert-NoFccProcessesRunning {
         }
     }
     if ($running.Count -gt 0) {
-        throw "Free Claude Code is still running ($($running -join ', ')). Stop those processes, then rerun uninstall."
+        throw "Beast is still running ($($running -join ', ')). Stop those processes, then rerun uninstall."
     }
 }
 
@@ -144,7 +144,7 @@ function Initialize-UvContext {
 
     $uvCommand = Get-ApplicationCommand "uv"
     if (-not $uvCommand) {
-        throw "uv is required to remove the Free Claude Code tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
+        throw "uv is required to remove the Beast tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
     }
     $script:UvPath = $uvCommand.Source
 
@@ -181,7 +181,7 @@ function Uninstall-FreeClaudeCode {
         return
     }
     if (Test-MissingUvToolError -Output $result.Output) {
-        Write-Host "Free Claude Code uv tool is already absent; verifying its entry points."
+        Write-Host "Beast uv tool is already absent; verifying its entry points."
         return
     }
     if (-not [string]::IsNullOrWhiteSpace($result.Output)) {
@@ -192,7 +192,7 @@ function Uninstall-FreeClaudeCode {
 
 function Confirm-FccCommandsRemoved {
     if ($DryRun) {
-        Write-Host "+ verify all Free Claude Code entry points are absent from the uv tool bin directory"
+        Write-Host "+ verify all Beast entry points are absent from the uv tool bin directory"
         return
     }
 
@@ -207,7 +207,7 @@ function Confirm-FccCommandsRemoved {
         }
     }
     if ($remaining.Count -gt 0) {
-        throw "Free Claude Code entry points remain after uv uninstall: $($remaining -join ', '); ~/.fcc was not deleted."
+        throw "Beast entry points remain after uv uninstall: $($remaining -join ', '); ~/.fcc was not deleted."
     }
 }
 
@@ -236,7 +236,7 @@ function Test-FccDesktopShortcutTarget {
     param([string] $TargetPath)
 
     foreach ($extension in @("", ".exe", ".cmd", ".bat", ".ps1")) {
-        $expectedTarget = Join-Path $script:UvToolBin "fcc-desktop$extension"
+        $expectedTarget = Join-Path $script:UvToolBin "beast-desktop$extension"
         if (Test-EquivalentPath -Left $TargetPath -Right $expectedTarget) {
             return $true
         }
@@ -246,8 +246,8 @@ function Test-FccDesktopShortcutTarget {
 
 function Remove-FccDesktopShortcuts {
     $shortcutPaths = @(
-        (Join-Path $env:USERPROFILE "Desktop\Free Claude Code.lnk"),
-        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Free Claude Code.lnk")
+        (Join-Path $env:USERPROFILE "Desktop\Beast.lnk"),
+        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Beast.lnk")
     )
     $shell = New-Object -ComObject WScript.Shell
     foreach ($shortcutPath in $shortcutPaths) {
@@ -262,7 +262,7 @@ function Remove-FccDesktopShortcuts {
             $isFccShortcut = $false
         }
         if (-not $isFccShortcut) {
-            Write-Host "A shortcut not managed by Free Claude Code exists at $shortcutPath; leaving it unchanged."
+            Write-Host "A shortcut not managed by Beast exists at $shortcutPath; leaving it unchanged."
             continue
         }
         Write-Host "+ Remove-Item -LiteralPath $(Format-Argument $shortcutPath) -Force"
@@ -275,7 +275,7 @@ function Remove-FccDesktopShortcuts {
 function Purge-FccHome {
     $fccHome = Join-Path $env:USERPROFILE $FccHomeDirname
     if (-not (Test-Path -LiteralPath $fccHome)) {
-        Write-Host "No FCC config directory at $fccHome; skipping purge."
+        Write-Host "No BEAST config directory at $fccHome; skipping purge."
         return
     }
 
@@ -293,7 +293,7 @@ function Purge-FccHome {
 
     Remove-Item -LiteralPath $fccHome -Recurse -Force
     if (Test-Path -LiteralPath $fccHome) {
-        throw "FCC config directory still exists after deletion: $fccHome"
+        throw "BEAST config directory still exists after deletion: $fccHome"
     }
 }
 
@@ -306,25 +306,25 @@ if ($RemainingArgs.Count -gt 0) {
     throw "Unknown option: $($RemainingArgs -join ' ')"
 }
 if ([string]::IsNullOrWhiteSpace($env:USERPROFILE)) {
-    throw "USERPROFILE is not set; cannot locate Free Claude Code data."
+    throw "USERPROFILE is not set; cannot locate Beast data."
 }
 
-Write-Step "Checking for running Free Claude Code processes"
+Write-Step "Checking for running Beast processes"
 Assert-NoFccProcessesRunning
 
-Write-Step "Locating the uv-managed Free Claude Code installation"
+Write-Step "Locating the uv-managed Beast installation"
 Initialize-UvContext
 
-Write-Step "Removing the Free Claude Code uv tool"
+Write-Step "Removing the Beast uv tool"
 Uninstall-FreeClaudeCode
 
-Write-Step "Verifying Free Claude Code entry points were removed"
+Write-Step "Verifying Beast entry points were removed"
 Confirm-FccCommandsRemoved
 
-Write-Step "Removing Free Claude Code desktop shortcuts"
+Write-Step "Removing Beast desktop shortcuts"
 Remove-FccDesktopShortcuts
 
-Write-Step "Purging FCC config and data from ~/.fcc"
+Write-Step "Purging BEAST config and data from ~/.fcc"
 Purge-FccHome
 
 Write-Host ""
@@ -332,6 +332,6 @@ if ($DryRun) {
     Write-Host "Dry run complete. No changes were made."
 }
 else {
-    Write-Host "Free Claude Code has been removed and verified."
-    Write-Host "uv, Claude Code, Codex, Pi, the uv-managed Python runtime, and shared PATH entries were left installed."
+    Write-Host "Beast has been removed and verified."
+    Write-Host "uv, Beast, Codex, Pi, the uv-managed Python runtime, and shared PATH entries were left installed."
 }

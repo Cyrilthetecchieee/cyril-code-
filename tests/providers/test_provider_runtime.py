@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.application.errors import (
+from beast.application.errors import (
     ApplicationUnavailableError,
     UnknownProviderError,
 )
-from free_claude_code.config.nim import NimSettings
-from free_claude_code.config.provider_catalog import (
+from beast.config.nim import NimSettings
+from beast.config.provider_catalog import (
     BEDROCK_DEFAULT_BASE,
     COHERE_DEFAULT_BASE,
     GITHUB_MODELS_DEFAULT_BASE,
@@ -25,28 +25,28 @@ from free_claude_code.config.provider_catalog import (
     VERCEL_AI_GATEWAY_DEFAULT_BASE,
     ZAI_DEFAULT_BASE,
 )
-from free_claude_code.providers.admission import ProviderAdmissionController
-from free_claude_code.providers.cloudflare import CloudflareProvider
-from free_claude_code.providers.deepseek import DeepSeekProvider
-from free_claude_code.providers.gemini import GeminiProvider
-from free_claude_code.providers.github_models import GitHubModelsProvider
-from free_claude_code.providers.groq import GroqProvider
-from free_claude_code.providers.kilo import KiloProvider
-from free_claude_code.providers.lmstudio import LMStudioProvider
-from free_claude_code.providers.mistral import MistralProvider
-from free_claude_code.providers.nvidia_nim import NvidiaNimProvider
-from free_claude_code.providers.open_router import OpenRouterProvider
-from free_claude_code.providers.openai_chat import (
+from beast.providers.admission import ProviderAdmissionController
+from beast.providers.cloudflare import CloudflareProvider
+from beast.providers.deepseek import DeepSeekProvider
+from beast.providers.gemini import GeminiProvider
+from beast.providers.github_models import GitHubModelsProvider
+from beast.providers.groq import GroqProvider
+from beast.providers.kilo import KiloProvider
+from beast.providers.lmstudio import LMStudioProvider
+from beast.providers.mistral import MistralProvider
+from beast.providers.nvidia_nim import NvidiaNimProvider
+from beast.providers.open_router import OpenRouterProvider
+from beast.providers.openai_chat import (
     OPENAI_CHAT_PROFILES,
     OpenAIChatProvider,
 )
-from free_claude_code.providers.openai_codex import OpenAICodexProvider
-from free_claude_code.providers.runtime import (
+from beast.providers.openai_codex import OpenAICodexProvider
+from beast.providers.runtime import (
     ProviderRuntime,
     build_provider_config,
     create_provider,
 )
-from free_claude_code.providers.vertex import VertexProvider
+from beast.providers.vertex import VertexProvider
 
 
 def _make_settings(**overrides):
@@ -142,8 +142,8 @@ def test_importing_runtime_does_not_eager_load_other_adapters() -> None:
     """Runtime metadata must not import every provider adapter up front."""
     code = (
         "import sys\n"
-        "import free_claude_code.providers.runtime\n"
-        "assert 'free_claude_code.providers.open_router' not in sys.modules\n"
+        "import beast.providers.runtime\n"
+        "assert 'beast.providers.open_router' not in sys.modules\n"
     )
     proc = subprocess.run(
         [sys.executable, "-c", code],
@@ -261,7 +261,7 @@ def test_local_provider_factory_resolves_catalog_static_credential(
     settings = _make_settings()
 
     config = build_provider_config(descriptor, settings)
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         provider = create_provider(provider_id, settings)
 
     assert config.api_key == expected_api_key
@@ -322,7 +322,7 @@ def test_create_cloudflare_provider_uses_account_scoped_base_url():
         cloudflare_account_id="test-account",
     )
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         provider = create_provider("cloudflare", settings)
 
     assert isinstance(provider, CloudflareProvider)
@@ -452,7 +452,7 @@ def test_build_provider_config_github_models_uses_token_and_proxy() -> None:
 
 
 def test_create_provider_uses_openai_chat_openrouter_by_default():
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         provider = create_provider("open_router", _make_settings())
 
     assert isinstance(provider, OpenRouterProvider)
@@ -527,10 +527,10 @@ def test_create_provider_instantiates_each_builtin():
     }
 
     with (
-        patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"),
+        patch("beast.providers.openai_chat.provider.AsyncOpenAI"),
         patch("httpx.AsyncClient"),
         patch(
-            "free_claude_code.providers.runtime.factory.ProviderAdmissionController",
+            "beast.providers.runtime.factory.ProviderAdmissionController",
             return_value=sentinel_admission,
         ) as admission_factory,
     ):
@@ -557,7 +557,7 @@ def test_create_provider_instantiates_each_builtin():
 def test_provider_runtime_caches_by_provider_id():
     runtime = ProviderRuntime(_make_settings())
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         first = runtime.resolve_provider("nvidia_nim")
         second = runtime.resolve_provider("nvidia_nim")
 
@@ -567,7 +567,7 @@ def test_provider_runtime_caches_by_provider_id():
 def test_provider_runtime_provider_owns_one_admission_controller() -> None:
     runtime = ProviderRuntime(_make_settings())
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         first = runtime.resolve_provider("nvidia_nim")
         second = runtime.resolve_provider("nvidia_nim")
 
@@ -580,7 +580,7 @@ def test_separate_provider_runtimes_never_share_admission_controllers() -> None:
     first_runtime = ProviderRuntime(_make_settings())
     second_runtime = ProviderRuntime(_make_settings())
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         first = first_runtime.resolve_provider("nvidia_nim")
         second = second_runtime.resolve_provider("nvidia_nim")
 
@@ -593,7 +593,7 @@ def test_separate_provider_runtimes_never_share_admission_controllers() -> None:
 def test_different_providers_have_independent_admission_controllers() -> None:
     runtime = ProviderRuntime(_make_settings())
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         nim = runtime.resolve_provider("nvidia_nim")
         open_router = runtime.resolve_provider("open_router")
 

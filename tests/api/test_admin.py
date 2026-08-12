@@ -5,18 +5,18 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from free_claude_code.application.connected_accounts import (
+from beast.application.connected_accounts import (
     ConnectedAccountLoginMode,
     ConnectedAccountState,
     ConnectedAccountStatus,
 )
-from free_claude_code.application.model_metadata import (
+from beast.application.model_metadata import (
     ProviderModelInfo,
     ProviderModelRefreshResult,
 )
-from free_claude_code.config.admin.values import MASKED_SECRET
-from free_claude_code.config.server_urls import local_admin_url
-from free_claude_code.config.settings import Settings
+from beast.config.admin.values import MASKED_SECRET
+from beast.config.server_urls import local_admin_url
+from beast.config.settings import Settings
 from tests.api.support import create_test_app, provider_manager_for_app
 
 
@@ -42,14 +42,14 @@ def _clear_process_config(monkeypatch) -> None:
         "OLLAMA_API_KEY",
         "ANTHROPIC_AUTH_TOKEN",
         "TELEGRAM_PROXY_URL",
-        "FCC_ENV_FILE",
+        "BEAST_ENV_FILE",
         "CLOUDFLARE_API_TOKEN",
         "CLOUDFLARE_ACCOUNT_ID",
         "GITHUB_MODELS_TOKEN",
         "SAMBANOVA_API_KEY",
         "HOST",
         "PORT",
-        "FCC_OPEN_BROWSER",
+        "BEAST_OPEN_BROWSER",
         "VOICE_NOTE_ENABLED",
         "WHISPER_DEVICE",
         "LOG_FILE",
@@ -131,7 +131,7 @@ def test_admin_unexpected_errors_are_never_cached(monkeypatch, tmp_path):
     )
 
     with patch(
-        "free_claude_code.api.admin_routes.load_config_response",
+        "beast.api.admin_routes.load_config_response",
         side_effect=RuntimeError("test error"),
     ):
         response = client.get("/admin/api/config")
@@ -150,17 +150,13 @@ def test_admin_cache_policy_does_not_match_similar_public_paths(monkeypatch, tmp
 
 
 def test_admin_api_fetches_bypass_browser_cache():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert 'cache: "no-store"' in script
 
 
 def test_admin_connected_account_login_preopens_sign_in_window():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert 'window.open("about:blank", "_blank")' in script
     assert "popup.location.replace(target)" in script
@@ -168,7 +164,7 @@ def test_admin_connected_account_login_preopens_sign_in_window():
     assert '"Reconnect"' in script
     assert '"Copy code"' in script
     assert "Restart your agent to refresh its model picker." in script
-    assert 'window.confirm("Disconnect this ChatGPT account from FCC?")' in script
+    assert 'window.confirm("Disconnect this ChatGPT account from BEAST?")' in script
 
 
 class _FakeConnectedAccount:
@@ -265,9 +261,7 @@ def test_admin_rejects_auth_routes_for_non_connected_provider(monkeypatch, tmp_p
 
 
 def test_admin_provider_cards_support_non_key_configuration():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert '"missing_config"' in script
     assert ": provider.configuration;" in script
@@ -297,9 +291,7 @@ def test_admin_page_no_longer_renders_global_status_header(monkeypatch, tmp_path
 
 
 def test_admin_static_no_longer_fetches_global_status_header():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert 'api("/admin/api/status")' not in script
     assert "updateHeader" not in script
@@ -309,9 +301,7 @@ def test_admin_static_no_longer_fetches_global_status_header():
 
 
 def test_admin_static_hides_managed_source_label():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert 'managed_env: "",' in script
     assert "hasOwnProperty.call(labels, source)" in script
@@ -320,21 +310,15 @@ def test_admin_static_hides_managed_source_label():
 
 
 def test_admin_static_places_reasoning_fields_in_model_config():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert 'sections: ["models", "reasoning", "web_tools"]' in script
     assert 'sections: ["models", "thinking", "web_tools"]' not in script
 
 
 def test_admin_static_model_combobox_owns_dropdown_and_search_behavior():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
-    styles = Path("src/free_claude_code/api/admin_static/admin.css").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
+    styles = Path("src/beast/api/admin_static/admin.css").read_text(encoding="utf-8")
 
     assert 'api("/admin/api/models" + (refresh ? "/refresh" : "")' in script
     assert 'field.type === "model" || field.type === "optional_model"' in script
@@ -355,9 +339,7 @@ def test_admin_static_model_combobox_owns_dropdown_and_search_behavior():
 
 
 def test_admin_static_model_combobox_preserves_custom_slugs_and_none_semantics():
-    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
-        encoding="utf-8"
-    )
+    script = Path("src/beast/api/admin_static/admin.js").read_text(encoding="utf-8")
 
     assert '? ["None", ...state.modelOptions]' in script
     assert "You can still enter a custom slug." in script
@@ -395,7 +377,7 @@ def test_admin_config_masks_secrets_and_exposes_manifest(monkeypatch, tmp_path):
     assert "TELEGRAM_PROXY_URL" in keys
     assert "CEREBRAS_API_KEY" in keys
     assert "OLLAMA_API_KEY" in keys
-    assert "FCC_OPEN_BROWSER" in keys
+    assert "BEAST_OPEN_BROWSER" in keys
     assert "ZAI_BASE_URL" not in keys
     assert "CLAUDE_WORKSPACE" not in keys
     assert "CLAUDE_CLI_BIN" not in keys
@@ -411,7 +393,7 @@ def test_admin_config_masks_secrets_and_exposes_manifest(monkeypatch, tmp_path):
     )
     assert telegram_proxy_field["secret"] is True
     open_browser_field = next(
-        field for field in body["fields"] if field["key"] == "FCC_OPEN_BROWSER"
+        field for field in body["fields"] if field["key"] == "BEAST_OPEN_BROWSER"
     )
     assert open_browser_field["type"] == "boolean"
     assert open_browser_field["value"] == "true"
@@ -564,7 +546,7 @@ def test_admin_apply_persists_open_browser_for_next_launch(monkeypatch, tmp_path
 
     response = _local_client(app).post(
         "/admin/api/config/apply",
-        json={"values": {"FCC_OPEN_BROWSER": False}},
+        json={"values": {"BEAST_OPEN_BROWSER": False}},
     )
 
     assert response.status_code == 200
@@ -578,7 +560,7 @@ def test_admin_apply_persists_open_browser_for_next_launch(monkeypatch, tmp_path
         "fields": [],
     }
     managed_env = tmp_path / ".fcc" / ".env"
-    assert "FCC_OPEN_BROWSER=false" in managed_env.read_text(encoding="utf-8")
+    assert "BEAST_OPEN_BROWSER=false" in managed_env.read_text(encoding="utf-8")
 
 
 def test_admin_apply_masks_telegram_proxy_credentials(monkeypatch, tmp_path):
@@ -1013,7 +995,7 @@ def test_admin_apply_preserves_hidden_diagnostics_and_smoke_values(
             [
                 "MODEL=nvidia_nim/old-model",
                 "LOG_RAW_API_PAYLOADS=true",
-                "FCC_SMOKE_MODEL_ZAI=zai/smoke-model",
+                "BEAST_SMOKE_MODEL_ZAI=zai/smoke-model",
                 "",
             ]
         ),
@@ -1032,7 +1014,7 @@ def test_admin_apply_preserves_hidden_diagnostics_and_smoke_values(
     text = env_file.read_text("utf-8")
     assert "MODEL=open_router/test-model" in text
     assert "LOG_RAW_API_PAYLOADS=true" in text
-    assert "FCC_SMOKE_MODEL_ZAI=zai/smoke-model" in text
+    assert "BEAST_SMOKE_MODEL_ZAI=zai/smoke-model" in text
 
 
 def test_admin_apply_omits_stale_zai_base_url(monkeypatch, tmp_path):
@@ -1213,7 +1195,7 @@ def test_admin_local_provider_status_reports_reachable(monkeypatch, tmp_path):
         async def get(self, url: str):
             return httpx.Response(200, json={"data": []})
 
-    with patch("free_claude_code.api.admin_routes.httpx.AsyncClient", FakeAsyncClient):
+    with patch("beast.api.admin_routes.httpx.AsyncClient", FakeAsyncClient):
         response = _local_client(app).get("/admin/api/providers/local-status")
 
     assert response.status_code == 200

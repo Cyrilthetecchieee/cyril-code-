@@ -7,23 +7,23 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from free_claude_code.application.errors import (
+from beast.application.errors import (
     ApplicationUnavailableError,
     InvalidRequestError,
 )
-from free_claude_code.application.model_metadata import ProviderModelInfo
-from free_claude_code.config.settings import Settings
-from free_claude_code.messaging.transcription import TranscriptionService
-from free_claude_code.providers.nvidia_nim.client import NvidiaNimProvider
-from free_claude_code.providers.nvidia_nim.voice import NvidiaNimTranscriber
-from free_claude_code.runtime.application import (
+from beast.application.model_metadata import ProviderModelInfo
+from beast.config.settings import Settings
+from beast.messaging.transcription import TranscriptionService
+from beast.providers.nvidia_nim.client import NvidiaNimProvider
+from beast.providers.nvidia_nim.voice import NvidiaNimTranscriber
+from beast.runtime.application import (
     ApplicationRuntime,
     startup_failure_message,
     warn_if_process_auth_token,
 )
-from free_claude_code.runtime.asgi import RuntimeASGIApp
-from free_claude_code.runtime.bootstrap import _create_transcriber, build_asgi_app
-from free_claude_code.runtime.provider_manager import ProviderRuntimeManager
+from beast.runtime.asgi import RuntimeASGIApp
+from beast.runtime.bootstrap import _create_transcriber, build_asgi_app
+from beast.runtime.provider_manager import ProviderRuntimeManager
 from tests.api.support import create_test_app
 
 
@@ -32,7 +32,7 @@ def _settings(**updates: object) -> Settings:
 
 
 @pytest.fixture(autouse=True)
-def _redirect_fcc_home(monkeypatch, tmp_path):
+def _redirect_beast_home(monkeypatch, tmp_path):
     home = tmp_path / "home"
     monkeypatch.setenv("HOME", str(home))
     monkeypatch.setenv("USERPROFILE", str(home))
@@ -42,7 +42,7 @@ def test_warn_if_process_auth_token_logs_warning(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "process-token")
     monkeypatch.setitem(Settings.model_config, "env_file", ())
 
-    with patch("free_claude_code.runtime.application.logger.warning") as warning:
+    with patch("beast.runtime.application.logger.warning") as warning:
         warn_if_process_auth_token(Settings.model_construct())
 
     warning.assert_called_once()
@@ -55,7 +55,7 @@ def test_warn_if_process_auth_token_skips_explicit_dotenv_config(monkeypatch, tm
     monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "process-token")
     monkeypatch.setitem(Settings.model_config, "env_file", (env_file,))
 
-    with patch("free_claude_code.runtime.application.logger.warning") as warning:
+    with patch("beast.runtime.application.logger.warning") as warning:
         warn_if_process_auth_token(Settings.model_construct())
 
     warning.assert_not_called()
@@ -82,7 +82,7 @@ async def test_runtime_startup_logs_admin_url_without_printed_server_banner():
         patch.object(manager, "start_model_list_refresh") as start_refresh,
         patch.object(manager, "close", new=AsyncMock()),
         patch(
-            "free_claude_code.runtime.application.messaging_platform_factory.create_messaging_components",
+            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
             return_value=None,
         ),
         patch.object(logging, "getLogger", return_value=uvicorn_logger) as get_logger,
@@ -125,7 +125,7 @@ def test_application_error_handler_does_not_log_error_message():
     async def _raise_application_secret():
         raise InvalidRequestError(secret)
 
-    with patch("free_claude_code.api.app.logger.error") as log_error:
+    with patch("beast.api.app.logger.error") as log_error:
         response = TestClient(app).get("/raise_application_secret")
 
     assert response.status_code == 400
@@ -160,7 +160,7 @@ def test_general_exception_default_log_excludes_exception_message():
     async def _raise_secret():
         raise ValueError(secret)
 
-    with patch("free_claude_code.api.app.logger.error") as log_error:
+    with patch("beast.api.app.logger.error") as log_error:
         response = TestClient(app, raise_server_exceptions=False).get("/raise_secret")
 
     assert response.status_code == 500
@@ -197,7 +197,7 @@ async def test_runtime_startup_warms_catalog_before_background_refresh():
         ) as refresh,
         patch.object(manager, "close", new=AsyncMock()),
         patch(
-            "free_claude_code.runtime.application.messaging_platform_factory.create_messaging_components",
+            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
             return_value=None,
         ),
     ):
@@ -320,10 +320,10 @@ def test_bootstrap_configures_default_log_and_publishes_only_services(tmp_path):
 
     with (
         patch(
-            "free_claude_code.runtime.bootstrap.server_log_path",
+            "beast.runtime.bootstrap.server_log_path",
             return_value=log_path,
         ),
-        patch("free_claude_code.runtime.bootstrap.configure_logging") as configure,
+        patch("beast.runtime.bootstrap.configure_logging") as configure,
     ):
         asgi_app = build_asgi_app(settings)
 
@@ -340,9 +340,9 @@ def test_bootstrap_wires_the_codex_catalog_publisher() -> None:
     publisher = MagicMock()
 
     with (
-        patch("free_claude_code.runtime.bootstrap.configure_logging"),
+        patch("beast.runtime.bootstrap.configure_logging"),
         patch(
-            "free_claude_code.runtime.bootstrap.CodexModelCatalogPublisher",
+            "beast.runtime.bootstrap.CodexModelCatalogPublisher",
             return_value=publisher,
         ) as publisher_type,
     ):
@@ -362,7 +362,7 @@ def test_bootstrap_honors_process_log_file_override(monkeypatch, tmp_path):
     log_path = tmp_path / "custom.log"
     monkeypatch.setenv("LOG_FILE", str(log_path))
 
-    with patch("free_claude_code.runtime.bootstrap.configure_logging") as configure:
+    with patch("beast.runtime.bootstrap.configure_logging") as configure:
         build_asgi_app(_settings())
 
     assert configure.call_args.args[0] == log_path
@@ -387,7 +387,7 @@ async def test_bootstrap_constructs_isolated_runtime_resource_graphs() -> None:
         whisper_device="cpu",
     )
 
-    with patch("free_claude_code.runtime.bootstrap.configure_logging"):
+    with patch("beast.runtime.bootstrap.configure_logging"):
         first = build_asgi_app(settings)
         second = build_asgi_app(settings)
 

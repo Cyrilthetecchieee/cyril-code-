@@ -5,17 +5,17 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.application.model_metadata import ProviderModelInfo
-from free_claude_code.config.constants import ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS
-from free_claude_code.config.provider_catalog import MINIMAX_DEFAULT_BASE
-from free_claude_code.core.anthropic.models import Message, MessagesRequest, Tool
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.application.model_metadata import ProviderModelInfo
+from beast.config.constants import ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS
+from beast.config.provider_catalog import MINIMAX_DEFAULT_BASE
+from beast.core.anthropic.models import Message, MessagesRequest, Tool
+from beast.core.anthropic.stream_contracts import (
     parse_sse_text,
     text_content,
     thinking_content,
 )
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.openai_chat import OpenAIChatProvider
+from beast.providers.base import ProviderConfig
+from beast.providers.openai_chat import OpenAIChatProvider
 from tests.providers.support import (
     REASONING_OFF,
     immediate_admission,

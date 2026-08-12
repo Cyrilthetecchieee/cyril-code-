@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from free_claude_code.messaging.models import MessageScope
-from free_claude_code.messaging.voice import (
+from beast.messaging.models import MessageScope
+from beast.messaging.voice import (
     PendingVoiceClaim,
     PendingVoiceRegistry,
     VoiceCancellationResult,

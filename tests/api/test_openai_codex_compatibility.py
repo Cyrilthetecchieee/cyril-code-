@@ -4,18 +4,18 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     parse_sse_text,
     text_content,
 )
-from free_claude_code.providers.admission import ProviderAdmissionController
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.openai_codex.auth import (
+from beast.providers.admission import ProviderAdmissionController
+from beast.providers.base import ProviderConfig
+from beast.providers.openai_codex.auth import (
     OpenAIAccess,
     OpenAIAuthManager,
 )
-from free_claude_code.providers.openai_codex.provider import OpenAICodexProvider
+from beast.providers.openai_codex.provider import OpenAICodexProvider
 from tests.api.support import create_test_app
 
 

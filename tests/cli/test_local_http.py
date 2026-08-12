@@ -1,4 +1,4 @@
-"""Local FCC transport must never escape through an outbound proxy."""
+"""Local BEAST transport must never escape through an outbound proxy."""
 
 import threading
 from collections.abc import Iterator
@@ -7,8 +7,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from free_claude_code.cli.launchers.common import preflight_proxy
-from free_claude_code.cli.local_http import with_local_proxy_bypass
+from beast.cli.launchers.common import preflight_proxy
+from beast.cli.local_http import with_local_proxy_bypass
 
 
 @contextmanager
@@ -44,10 +44,10 @@ def test_proxy_preflight_connects_directly_when_http_proxy_is_configured(
         monkeypatch.delenv("NO_PROXY", raising=False)
         monkeypatch.delenv("no_proxy", raising=False)
 
-        with _status_server(200) as (fcc_url, fcc_hits):
-            assert preflight_proxy(fcc_url) is None
+        with _status_server(200) as (beast_url, beast_hits):
+            assert preflight_proxy(beast_url) is None
 
-    assert fcc_hits == ["/health"]
+    assert beast_hits == ["/health"]
     assert forward_proxy_hits == []
 
 

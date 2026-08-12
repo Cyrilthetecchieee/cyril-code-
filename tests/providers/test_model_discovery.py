@@ -6,25 +6,25 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from free_claude_code.application.model_metadata import ProviderModelInfo
-from free_claude_code.config.nim import NimSettings
-from free_claude_code.config.provider_catalog import (
+from beast.application.model_metadata import ProviderModelInfo
+from beast.config.nim import NimSettings
+from beast.config.provider_catalog import (
     DEEPSEEK_DEFAULT_BASE,
     NVIDIA_NIM_DEFAULT_BASE,
     OPENROUTER_DEFAULT_BASE,
     WAFER_DEFAULT_BASE,
 )
-from free_claude_code.config.settings import Settings
-from free_claude_code.core.reasoning import DEFAULT_REASONING_POLICY, ReasoningPolicy
-from free_claude_code.providers.base import BaseProvider, ProviderConfig
-from free_claude_code.providers.deepseek import DeepSeekProvider
-from free_claude_code.providers.model_listing import ModelListResponseError
-from free_claude_code.providers.nvidia_nim import NvidiaNimProvider
-from free_claude_code.providers.open_router import OpenRouterProvider
-from free_claude_code.providers.openai_chat import OpenAIChatProvider
-from free_claude_code.providers.runtime import ProviderRuntime
-from free_claude_code.providers.runtime.model_cache import ProviderModelCache
-from free_claude_code.runtime.provider_manager import ProviderRuntimeManager
+from beast.config.settings import Settings
+from beast.core.reasoning import DEFAULT_REASONING_POLICY, ReasoningPolicy
+from beast.providers.base import BaseProvider, ProviderConfig
+from beast.providers.deepseek import DeepSeekProvider
+from beast.providers.model_listing import ModelListResponseError
+from beast.providers.nvidia_nim import NvidiaNimProvider
+from beast.providers.open_router import OpenRouterProvider
+from beast.providers.openai_chat import OpenAIChatProvider
+from beast.providers.runtime import ProviderRuntime
+from beast.providers.runtime.model_cache import ProviderModelCache
+from beast.runtime.provider_manager import ProviderRuntimeManager
 from tests.providers.support import immediate_admission, profiled_provider
 
 
@@ -83,7 +83,7 @@ def test_provider_catalog_contract_is_metadata_only() -> None:
 @pytest.mark.asyncio
 async def test_nim_lists_openai_compatible_model_infos() -> None:
     config = ProviderConfig(api_key="test-key", base_url=NVIDIA_NIM_DEFAULT_BASE)
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         provider = NvidiaNimProvider(
             config, nim_settings=NimSettings(), admission=immediate_admission()
         )
@@ -439,9 +439,7 @@ async def test_runtime_warm_reports_query_failures_without_blocking() -> None:
         },
     )
 
-    with patch(
-        "free_claude_code.providers.runtime.discovery.logger.warning"
-    ) as warning:
+    with patch("beast.providers.runtime.discovery.logger.warning") as warning:
         result = await runtime.warm_referenced_model_cache()
 
     assert result.refreshed_provider_ids == ("nvidia_nim",)

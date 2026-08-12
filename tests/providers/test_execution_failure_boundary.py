@@ -6,13 +6,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.config.nim import NimSettings
-from free_claude_code.core.anthropic.stream_contracts import parse_sse_text
-from free_claude_code.core.async_iterators import AsyncCloseable
-from free_claude_code.core.failures import ExecutionFailure, FailureKind
-from free_claude_code.providers.base import ProviderConfig
-from free_claude_code.providers.http import close_provider_stream
-from free_claude_code.providers.nvidia_nim import NvidiaNimProvider
+from beast.config.nim import NimSettings
+from beast.core.anthropic.stream_contracts import parse_sse_text
+from beast.core.async_iterators import AsyncCloseable
+from beast.core.failures import ExecutionFailure, FailureKind
+from beast.providers.base import ProviderConfig
+from beast.providers.http import close_provider_stream
+from beast.providers.nvidia_nim import NvidiaNimProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission
 
@@ -128,7 +128,7 @@ async def test_openai_stream_close_failure_cannot_mask_execution_failure() -> No
             new_callable=AsyncMock,
             return_value=stream,
         ),
-        patch("free_claude_code.providers.http.trace_event") as trace_event,
+        patch("beast.providers.http.trace_event") as trace_event,
         pytest.raises(ExecutionFailure) as exc_info,
     ):
         [
@@ -166,7 +166,7 @@ async def test_stream_close_failure_without_active_error_is_observability_only()
         close_error=RuntimeError("normal close failed"),
     )
 
-    with patch("free_claude_code.providers.http.trace_event") as trace_event:
+    with patch("beast.providers.http.trace_event") as trace_event:
         await close_provider_stream(
             stream,
             active_error=None,
@@ -207,7 +207,7 @@ async def test_completed_stream_close_failure_preserves_success_lifecycle() -> N
             new_callable=AsyncMock,
             return_value=stream,
         ),
-        patch("free_claude_code.providers.http.trace_event") as trace_event,
+        patch("beast.providers.http.trace_event") as trace_event,
     ):
         emitted = [
             event

@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.config.provider_catalog import CODESTRAL_DEFAULT_BASE
-from free_claude_code.providers.base import ProviderConfig
+from beast.config.provider_catalog import CODESTRAL_DEFAULT_BASE
+from beast.providers.base import ProviderConfig
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission, profiled_provider
 
@@ -33,9 +33,7 @@ def codestral_provider(codestral_config):
 
 def test_init(codestral_config):
     """Test provider initialization."""
-    with patch(
-        "free_claude_code.providers.openai_chat.provider.AsyncOpenAI"
-    ) as mock_openai:
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = profiled_provider(
             "mistral_codestral",
             codestral_config,

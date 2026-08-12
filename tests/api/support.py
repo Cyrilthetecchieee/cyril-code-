@@ -4,14 +4,14 @@ from collections.abc import Mapping, MutableMapping
 
 from fastapi import FastAPI
 
-from free_claude_code.api.app import create_app
-from free_claude_code.api.ports import ApiServices
-from free_claude_code.application.connected_accounts import ConnectedAccountPort
-from free_claude_code.config.settings import Settings
-from free_claude_code.providers.base import BaseProvider
-from free_claude_code.providers.runtime import ProviderRuntime
-from free_claude_code.runtime.application import ApplicationRuntime, RestartCallback
-from free_claude_code.runtime.provider_manager import ProviderRuntimeManager
+from beast.api.app import create_app
+from beast.api.ports import ApiServices
+from beast.application.connected_accounts import ConnectedAccountPort
+from beast.config.settings import Settings
+from beast.providers.base import BaseProvider
+from beast.providers.runtime import ProviderRuntime
+from beast.runtime.application import ApplicationRuntime, RestartCallback
+from beast.runtime.provider_manager import ProviderRuntimeManager
 
 
 def create_test_app(

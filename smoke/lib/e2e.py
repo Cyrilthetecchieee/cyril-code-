@@ -16,9 +16,9 @@ from typing import Any
 import httpx
 import pytest
 
-from free_claude_code.cli.claude_env import build_claude_proxy_env
-from free_claude_code.config.provider_catalog import SUPPORTED_PROVIDER_IDS
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.cli.claude_env import build_claude_proxy_env
+from beast.config.provider_catalog import SUPPORTED_PROVIDER_IDS
+from beast.core.anthropic.stream_contracts import (
     SSEEvent,
     assert_anthropic_stream_contract,
     event_index,
@@ -26,10 +26,10 @@ from free_claude_code.core.anthropic.stream_contracts import (
     parse_sse_lines,
     text_content,
 )
-from free_claude_code.messaging.models import IncomingMessage, MessageScope
-from free_claude_code.messaging.session import SessionStore
-from free_claude_code.messaging.voice import VoiceCancellationResult
-from free_claude_code.messaging.workflow import MessagingWorkflow
+from beast.messaging.models import IncomingMessage, MessageScope
+from beast.messaging.session import SessionStore
+from beast.messaging.voice import VoiceCancellationResult
+from beast.messaging.workflow import MessagingWorkflow
 from smoke.lib.child_process import run_captured_text
 from smoke.lib.config import ProviderModel, SmokeConfig, auth_headers
 from smoke.lib.server import RunningServer, start_server
@@ -90,7 +90,7 @@ class ConversationDriver:
         self,
         text: str,
         *,
-        model: str = "fcc-smoke-default",
+        model: str = "beast-smoke-default",
         max_tokens: int = 256,
         extra: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
@@ -179,9 +179,9 @@ class ProviderMatrixDriver:
             )
 
         models = self.config.provider_smoke_models()
-        if not models and os.getenv("FCC_ALLOW_NO_PROVIDER_SMOKE") != "1":
+        if not models and os.getenv("BEAST_ALLOW_NO_PROVIDER_SMOKE") != "1":
             fail_missing_env(
-                "no configured provider smoke models; set FCC_ALLOW_NO_PROVIDER_SMOKE=1 "
+                "no configured provider smoke models; set BEAST_ALLOW_NO_PROVIDER_SMOKE=1 "
                 "only for no-provider smoke collection"
             )
         return models
@@ -228,7 +228,7 @@ class ClientProtocolDriver:
                         {"type": "text", "text": "Hello."},
                     ],
                 },
-                {"role": "user", "content": "Reply with exactly FCC_SMOKE_CLIENT"},
+                {"role": "user", "content": "Reply with exactly BEAST_SMOKE_CLIENT"},
             ],
             "thinking": {"type": "adaptive", "budget_tokens": 1024},
         }
@@ -247,7 +247,7 @@ class ClientProtocolDriver:
                             "type": "tool_use",
                             "id": "toolu_client_smoke",
                             "name": "echo_smoke",
-                            "input": {"value": "FCC_SMOKE_CLIENT"},
+                            "input": {"value": "BEAST_SMOKE_CLIENT"},
                         }
                     ],
                 },
@@ -257,7 +257,7 @@ class ClientProtocolDriver:
                         {
                             "type": "tool_result",
                             "tool_use_id": "toolu_client_smoke",
-                            "content": "FCC_SMOKE_CLIENT",
+                            "content": "BEAST_SMOKE_CLIENT",
                         }
                     ],
                 },
@@ -338,7 +338,7 @@ class FakePlatform:
         self.handler = handler
 
     def continue_message_sequence_after(self, previous: FakePlatform) -> None:
-        """Model platform-owned message IDs surviving an FCC restart."""
+        """Model platform-owned message IDs surviving an BEAST restart."""
         self._counter = previous._counter
 
     async def emit(self, incoming: IncomingMessage) -> None:
@@ -736,7 +736,7 @@ def default_cli_events(session_id: str) -> list[dict[str, Any]]:
                     {
                         "type": "tool_result",
                         "tool_use_id": "toolu_fake",
-                        "content": "Free Claude Code",
+                        "content": "Beast",
                     },
                     {"type": "text", "text": "Fake platform answer."},
                 ]

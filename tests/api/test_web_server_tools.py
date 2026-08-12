@@ -6,39 +6,39 @@ import httpx
 import pytest
 from fastapi.responses import JSONResponse, StreamingResponse
 
-import free_claude_code.api.web_tools.constants as web_tool_constants
-from free_claude_code.api.handlers import MessagesHandler
-from free_claude_code.api.web_tools import egress as web_egress
-from free_claude_code.api.web_tools.egress import (
+import beast.api.web_tools.constants as web_tool_constants
+from beast.api.handlers import MessagesHandler
+from beast.api.web_tools import egress as web_egress
+from beast.api.web_tools.egress import (
     WebFetchEgressPolicy,
     WebFetchEgressViolation,
     enforce_web_fetch_egress,
 )
-from free_claude_code.api.web_tools.outbound import (
+from beast.api.web_tools.outbound import (
     _drain_response_body_capped,
     _read_response_body_capped,
     _run_web_fetch,
 )
-from free_claude_code.api.web_tools.request import is_web_server_tool_request
-from free_claude_code.api.web_tools.streaming import stream_web_server_tool_response
-from free_claude_code.application.errors import InvalidRequestError
-from free_claude_code.application.routing import (
+from beast.api.web_tools.request import is_web_server_tool_request
+from beast.api.web_tools.streaming import stream_web_server_tool_response
+from beast.application.errors import InvalidRequestError
+from beast.application.routing import (
     ModelRouter,
     ResolvedModel,
     RoutedMessagesRequest,
 )
-from free_claude_code.config.provider_catalog import PROVIDER_CATALOG
-from free_claude_code.config.reasoning import ReasoningPreference
-from free_claude_code.config.settings import Settings
-from free_claude_code.core.anthropic.models import Message, MessagesRequest, Tool
-from free_claude_code.core.anthropic.stream_contracts import (
+from beast.config.provider_catalog import PROVIDER_CATALOG
+from beast.config.reasoning import ReasoningPreference
+from beast.config.settings import Settings
+from beast.core.anthropic.models import Message, MessagesRequest, Tool
+from beast.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     parse_sse_text,
     text_content,
 )
-from free_claude_code.core.reasoning import ReasoningPolicy
-from free_claude_code.core.version import package_version
-from free_claude_code.messaging.event_parser import parse_cli_event
+from beast.core.reasoning import ReasoningPolicy
+from beast.core.version import package_version
+from beast.messaging.event_parser import parse_cli_event
 
 _STRICT_EGRESS = WebFetchEgressPolicy(
     allow_private_network_targets=False,
@@ -49,7 +49,7 @@ _PROVIDER_IDS = tuple(PROVIDER_CATALOG)
 
 def test_web_tool_user_agent_reports_installed_package_version() -> None:
     assert {
-        "User-Agent": (f"Mozilla/5.0 compatible; free-claude-code/{package_version()}")
+        "User-Agent": (f"Mozilla/5.0 compatible; beast/{package_version()}")
     } == web_tool_constants._WEB_TOOL_HTTP_HEADERS
 
 
@@ -128,7 +128,7 @@ def test_web_server_tool_not_detected_when_forced_name_missing_from_tools():
 async def test_service_rejects_forced_server_tool_when_local_handler_is_disabled(
     provider_id: str,
 ):
-    """Every provider needs FCC's local handler for forced server tools."""
+    """Every provider needs BEAST's local handler for forced server tools."""
     settings = Settings()
     assert settings.enable_web_server_tools is False
     service = MessagesHandler(
@@ -282,9 +282,7 @@ async def test_run_web_fetch_follows_redirect_when_each_hop_is_allowed():
     )
     res_ok = _aiohttp_response(200, url="http://8.8.8.8/final", body=b"hello world")
     client_cm, session = _aiohttp_client_session_patch(res_redirect, res_ok)
-    with patch(
-        "free_claude_code.api.web_tools.outbound.ClientSession", return_value=client_cm
-    ):
+    with patch("beast.api.web_tools.outbound.ClientSession", return_value=client_cm):
         out = await _run_web_fetch("http://8.8.8.8/start", _STRICT_EGRESS)
 
     assert out["data"] == "hello world"
@@ -297,9 +295,7 @@ async def test_run_web_fetch_truncates_large_body_to_byte_cap(monkeypatch):
     res_ok = _aiohttp_response(200, url="http://8.8.8.8/big", body=huge)
     client_cm, _ = _aiohttp_client_session_patch(res_ok)
     monkeypatch.setattr(web_tool_constants, "_MAX_WEB_FETCH_RESPONSE_BYTES", 100)
-    with patch(
-        "free_claude_code.api.web_tools.outbound.ClientSession", return_value=client_cm
-    ):
+    with patch("beast.api.web_tools.outbound.ClientSession", return_value=client_cm):
         out = await _run_web_fetch("http://8.8.8.8/big", _STRICT_EGRESS)
 
     assert len(out["data"]) <= 100
@@ -317,7 +313,7 @@ async def test_run_web_fetch_redirect_to_blocked_host_raises():
     client_cm, session = _aiohttp_client_session_patch(res_redirect)
     with (
         patch(
-            "free_claude_code.api.web_tools.outbound.ClientSession",
+            "beast.api.web_tools.outbound.ClientSession",
             return_value=client_cm,
         ),
         pytest.raises(WebFetchEgressViolation),
@@ -333,7 +329,7 @@ async def test_run_web_fetch_redirect_without_location_raises():
     client_cm, _ = _aiohttp_client_session_patch(res_bad)
     with (
         patch(
-            "free_claude_code.api.web_tools.outbound.ClientSession",
+            "beast.api.web_tools.outbound.ClientSession",
             return_value=client_cm,
         ),
         pytest.raises(WebFetchEgressViolation, match="missing Location"),
@@ -347,9 +343,9 @@ async def test_run_web_fetch_excess_redirects_raises():
     res2 = _aiohttp_response(302, url="http://8.8.8.8/b", location="/c", body=b"")
     client_cm, _ = _aiohttp_client_session_patch(res1, res2)
     with (
-        patch("free_claude_code.api.web_tools.constants._MAX_WEB_FETCH_REDIRECTS", 1),
+        patch("beast.api.web_tools.constants._MAX_WEB_FETCH_REDIRECTS", 1),
         patch(
-            "free_claude_code.api.web_tools.outbound.ClientSession",
+            "beast.api.web_tools.outbound.ClientSession",
             return_value=client_cm,
         ),
         pytest.raises(WebFetchEgressViolation, match="exceeded maximum redirects"),
@@ -363,9 +359,7 @@ async def test_streams_web_search_server_tool_result(monkeypatch):
         assert query == "DeepSeek V4 model release 2026"
         return [{"title": "DeepSeek V4 Released", "url": "https://example.com/v4"}]
 
-    monkeypatch.setattr(
-        "free_claude_code.api.web_tools.outbound._run_web_search", fake_search
-    )
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_search", fake_search)
     request = MessagesRequest(
         model="claude-haiku-4-5-20251001",
         max_tokens=100,
@@ -425,9 +419,7 @@ async def test_service_streams_forced_web_search_by_default(monkeypatch):
     async def fake_search(_query: str) -> list[dict[str, str]]:
         return [{"title": "DeepSeek V4 Released", "url": "https://example.com/v4"}]
 
-    monkeypatch.setattr(
-        "free_claude_code.api.web_tools.outbound._run_web_search", fake_search
-    )
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_search", fake_search)
     settings = Settings.model_validate({"ENABLE_WEB_SERVER_TOOLS": True})
     provider_resolver = MagicMock()
     service = MessagesHandler(
@@ -469,9 +461,7 @@ async def test_service_aggregates_forced_web_search_when_stream_false(monkeypatc
     async def fake_search(_query: str) -> list[dict[str, str]]:
         return [{"title": "DeepSeek V4 Released", "url": "https://example.com/v4"}]
 
-    monkeypatch.setattr(
-        "free_claude_code.api.web_tools.outbound._run_web_search", fake_search
-    )
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_search", fake_search)
     settings = Settings.model_validate({"ENABLE_WEB_SERVER_TOOLS": True})
     provider_resolver = MagicMock()
     service = MessagesHandler(
@@ -518,9 +508,7 @@ async def test_forced_web_fetch_ignores_stale_url_from_prior_user_turns(monkeypa
             "data": "x",
         }
 
-    monkeypatch.setattr(
-        "free_claude_code.api.web_tools.outbound._run_web_fetch", fake_fetch
-    )
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_fetch", fake_fetch)
     request = MessagesRequest(
         model="claude-haiku-4-5-20251001",
         max_tokens=100,
@@ -560,9 +548,7 @@ async def test_service_aggregates_forced_web_fetch_when_stream_false(monkeypatch
             "data": "Article body",
         }
 
-    monkeypatch.setattr(
-        "free_claude_code.api.web_tools.outbound._run_web_fetch", fake_fetch
-    )
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_fetch", fake_fetch)
     settings = Settings.model_validate({"ENABLE_WEB_SERVER_TOOLS": True})
     provider_resolver = MagicMock()
     service = MessagesHandler(
@@ -606,9 +592,7 @@ async def test_streams_web_fetch_server_tool_result(monkeypatch):
             "data": "Article body",
         }
 
-    monkeypatch.setattr(
-        "free_claude_code.api.web_tools.outbound._run_web_fetch", fake_fetch
-    )
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_fetch", fake_fetch)
     request = MessagesRequest(
         model="claude-haiku-4-5-20251001",
         max_tokens=100,
@@ -662,7 +646,7 @@ async def test_streams_web_fetch_error_summary_generic_by_default(monkeypatch):
     async def boom(_url: str, _egress: WebFetchEgressPolicy) -> dict[str, str]:
         raise ValueError(secret)
 
-    monkeypatch.setattr("free_claude_code.api.web_tools.outbound._run_web_fetch", boom)
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_fetch", boom)
     request = MessagesRequest(
         model="claude-haiku-4-5-20251001",
         max_tokens=100,
@@ -676,7 +660,7 @@ async def test_streams_web_fetch_error_summary_generic_by_default(monkeypatch):
         tool_choice={"type": "tool", "name": "web_fetch"},
     )
 
-    with patch("free_claude_code.api.web_tools.outbound.logger.warning") as log_warn:
+    with patch("beast.api.web_tools.outbound.logger.warning") as log_warn:
         raw = "".join(
             [
                 event
@@ -720,7 +704,7 @@ async def test_streams_web_fetch_error_summary_verbose_includes_exception_class(
     async def boom(_url: str, _egress: WebFetchEgressPolicy) -> dict[str, str]:
         raise OSError(5, "oops")
 
-    monkeypatch.setattr("free_claude_code.api.web_tools.outbound._run_web_fetch", boom)
+    monkeypatch.setattr("beast.api.web_tools.outbound._run_web_fetch", boom)
     request = MessagesRequest(
         model="claude-haiku-4-5-20251001",
         max_tokens=100,

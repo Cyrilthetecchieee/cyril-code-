@@ -1,6 +1,6 @@
 # Architecture
 
-This document is a maintainer-oriented map of Free Claude Code. It explains the
+This document is a maintainer-oriented map of Beast. It explains the
 runtime boundaries, request flows, provider abstraction, configuration model,
 optional messaging bridge, and verification strategy.
 
@@ -10,8 +10,8 @@ and how contributors should extend it.
 
 ## System Overview
 
-Free Claude Code is a local proxy for agent clients. It accepts Anthropic
-Messages traffic from Claude Code and Pi clients and OpenAI Responses traffic
+Beast is a local proxy for agent clients. It accepts Anthropic
+Messages traffic from Beast and Pi clients and OpenAI Responses traffic
 from Codex CLI, IDE, and App clients, routes the request to a configured
 upstream provider, and preserves the wire protocol expected by the caller.
 
@@ -19,14 +19,14 @@ There are three runtime surfaces:
 
 - HTTP proxy: FastAPI routes expose Anthropic-compatible, Responses-compatible,
   health, model-listing, stop, and admin endpoints.
-- CLI launchers: wrapper entrypoints prepare Claude Code, Codex, and Pi sessions
+- CLI launchers: wrapper entrypoints prepare Beast, Codex, and Pi sessions
   so they target the local proxy.
 - Messaging bridge: optional Discord or Telegram adapters turn chat messages
   into managed client CLI sessions.
 
 ```mermaid
 flowchart LR
-    ClaudeCode[Claude Code CLI and Extensions] --> ProxyAPI[FastAPI Proxy]
+    ClaudeCode[Beast CLI and Extensions] --> ProxyAPI[FastAPI Proxy]
     Codex[Codex CLI, IDE, and App] --> ProxyAPI
     Pi[Pi Coding Agent] --> ProxyAPI
     AdminUI[Local Admin UI] --> ProxyAPI
@@ -45,31 +45,31 @@ flowchart LR
 
 The installable wheel packages are declared in [pyproject.toml](pyproject.toml):
 
-- [src/free_claude_code/application/](src/free_claude_code/application/) is the dependency-leaf application boundary. It
+- [src/beast/application/](src/beast/application/) is the dependency-leaf application boundary. It
   owns immutable routing/model-metadata values, model routing, shared provider
   execution, the consumer-facing `ProviderPort`, request-runtime lease ports,
   task control, and deterministic request/readiness errors. It depends only on
   configuration and core protocol-neutral logic.
-- [src/free_claude_code/api/](src/free_claude_code/api/) is the HTTP adapter. It owns the FastAPI app, routes, API product
+- [src/beast/api/](src/beast/api/) is the HTTP adapter. It owns the FastAPI app, routes, API product
   handlers, local optimizations, model-catalog responses, HTTP error mapping,
   response commit timing, and Admin-specific ports. It consumes application and
   protocol types instead of defining use cases or wire schemas.
-- [src/free_claude_code/cli/](src/free_claude_code/cli/) owns console entrypoints, client CLI launchers, process/session
+- [src/beast/cli/](src/beast/cli/) owns console entrypoints, client CLI launchers, process/session
   management, and client adapter contracts.
-- [src/free_claude_code/config/](src/free_claude_code/config/) owns settings, provider metadata, filesystem paths,
+- [src/beast/config/](src/beast/config/) owns settings, provider metadata, filesystem paths,
   logging setup, constants, and provider ID catalogs.
-- [src/free_claude_code/core/](src/free_claude_code/core/) owns provider-neutral protocol logic: wire request and response
+- [src/beast/core/](src/beast/core/) owns provider-neutral protocol logic: wire request and response
   models, Anthropic conversion, SSE construction, OpenAI Responses conversion,
   canonical execution-failure semantics, credential-safe diagnostics, token
   counting, and structured trace helpers. It never classifies provider SDK or
   HTTP client exceptions.
-- [src/free_claude_code/messaging/](src/free_claude_code/messaging/) owns optional platform adapters, incoming message
+- [src/beast/messaging/](src/beast/messaging/) owns optional platform adapters, incoming message
   handling, tree queues, transcript rendering, persistence, commands, and voice
   support.
-- [src/free_claude_code/providers/](src/free_claude_code/providers/) owns provider construction, the shared OpenAI-chat
+- [src/beast/providers/](src/beast/providers/) owns provider construction, the shared OpenAI-chat
   provider, specialized adapters, SDK/HTTP failure classification, retry and
   recovery policy, rate limiting, model listing, and concrete provider adapters.
-- [src/free_claude_code/runtime/](src/free_claude_code/runtime/) is the process composition root. It owns application
+- [src/beast/runtime/](src/beast/runtime/) is the process composition root. It owns application
   startup and shutdown, provider generations, Admin runtime operations, and the
   concrete wiring between API, providers, messaging, and managed CLI sessions.
 
@@ -93,8 +93,8 @@ also removes that permission:
 | `runtime` | `api`, `application`, `cli`, `config`, `core`, `messaging`, `providers` |
 
 There is one exact exception:
-`free_claude_code.cli.entrypoints` imports
-`free_claude_code.runtime.bootstrap` because the installed server executable
+`beast.cli.entrypoints` imports
+`beast.runtime.bootstrap` because the installed server executable
 delegates construction to the process composition root. The exception does not
 permit any broader dependency from `cli` to `runtime`. Every new top-level
 package or cross-package edge must be added to the policy deliberately.
@@ -119,17 +119,17 @@ server does not require an optional extra. Static AST enforcement cannot observe
 dynamic imports. Deliberate provider factory loading is instead protected by the
 provider catalog, supported-ID, and factory synchronization contract.
 
-[core/version.py](src/free_claude_code/core/version.py) is the sole runtime owner
-of the FCC release version. It reads installed distribution metadata for
-FastAPI/OpenAPI, FCC-owned CLI `--version` output, and the outbound web-tools
+[core/version.py](src/beast/core/version.py) is the sole runtime owner
+of the BEAST release version. It reads installed distribution metadata for
+FastAPI/OpenAPI, BEAST-owned CLI `--version` output, and the outbound web-tools
 user agent. A source-only checkout without installed metadata reports the
 explicit `0+unknown` fallback; runtime code never parses `pyproject.toml` or
 duplicates a release literal. Client launcher arguments remain transparent to
-their wrapped clients except for FCC-owned ephemeral provider configuration.
+their wrapped clients except for BEAST-owned ephemeral provider configuration.
 
 The main ownership rule is that Anthropic and Responses protocol schemas and
-shared protocol behavior belong in [src/free_claude_code/core/](src/free_claude_code/core/), while request routing and
-provider execution belong in [src/free_claude_code/application/](src/free_claude_code/application/). Routes use core schemas
+shared protocol behavior belong in [src/beast/core/](src/beast/core/), while request routing and
+provider execution belong in [src/beast/application/](src/beast/application/). Routes use core schemas
 directly for wire validation and call application use cases. Provider modules use
 the same concrete request types and neutral helpers instead of importing the API
 adapter or another provider.
@@ -143,23 +143,23 @@ The model-list schema stays beside its API-owned construction policy in
 
 ## Customer-Facing Contract
 
-FCC optimizes for installed user workflows, not internal compatibility. The
+BEAST optimizes for installed user workflows, not internal compatibility. The
 behavior that must be preserved is that these user-facing surfaces run correctly
 for real prompts against supported providers:
 
-- `fcc-server`, the Windows/macOS FCC Desktop shell, and the local Admin UI for
+- `start`, the Windows/macOS BEAST Desktop shell, and the local Admin UI for
   configuring supported providers, model routing, auth, server tools, messaging,
   and diagnostics.
-- `fcc-claude`, Claude Code, and the Anthropic-compatible proxy behavior Claude
+- `beast`, Beast, and the Anthropic-compatible proxy behavior Claude
   Code relies on, including streaming text, native/interleaved thinking, tool
   use/results, model discovery, token counting, retries/recovery, and supported
   local server-tool behavior.
-- `fcc-codex`, Codex CLI/extensions, and the streaming OpenAI Responses behavior
+- `beast-codex`, Codex CLI/extensions, and the streaming OpenAI Responses behavior
   Codex relies on, including native/interleaved reasoning, function and custom
   tool calls, generated `/model` catalog support, Responses stream lifecycle
   events, and Responses-to-Anthropic conversion at the adapter boundary.
-- `fcc-pi`, Pi, and the Anthropic-compatible proxy behavior Pi relies on,
-  including an FCC-scoped model catalog, streaming text and reasoning, and tool
+- `beast-pi`, Pi, and the Anthropic-compatible proxy behavior Pi relies on,
+  including an BEAST-scoped model catalog, streaming text and reasoning, and tool
   use/results.
 - Configured Discord and Telegram messaging bridges, including command handling,
   reply-based conversation branches, status updates, transcript rendering,
@@ -188,20 +188,20 @@ The current package boundaries are intentional, but several modules still carry
 large orchestration responsibilities. Treat these as refactor targets, not as
 new places to add unrelated behavior:
 
-- [api/handlers/](src/free_claude_code/api/handlers/) owns customer-facing API product flows:
+- [api/handlers/](src/beast/api/handlers/) owns customer-facing API product flows:
   Claude Messages, OpenAI Responses, and token counting. Keep route handlers
   thin, keep Claude-only behavior in the Messages handler, and use
-  [application/execution.py](src/free_claude_code/application/execution.py) only for shared
+  [application/execution.py](src/beast/application/execution.py) only for shared
   provider resolution, preflight, tracing, token counting, and streaming.
-- [providers/openai_chat/](src/free_claude_code/providers/openai_chat/) owns the common upstream provider
+- [providers/openai_chat/](src/beast/providers/openai_chat/) owns the common upstream provider
   behavior. It separates immutable vendor profiles from per-request stream
   execution, recovery, request policy, and tool-call assembly. Shared
-  protocol rules belong in [src/free_claude_code/core/](src/free_claude_code/core/).
-- [messaging/workflow.py](src/free_claude_code/messaging/workflow.py) coordinates messaging runtime
+  protocol rules belong in [src/beast/core/](src/beast/core/).
+- [messaging/workflow.py](src/beast/messaging/workflow.py) coordinates messaging runtime
   dependencies. Inbound turn intake, queued node execution, slash command
   dependencies, and tree queue internals live in separate modules so new
   behavior has one owner instead of growing the workflow object.
-- [config/admin/](src/free_claude_code/config/admin/) owns Admin UI config behavior. Keep
+- [config/admin/](src/beast/config/admin/) owns Admin UI config behavior. Keep
   provider fields catalog-driven, and keep manifest, source loading, validation,
   env rendering, value presentation, and status metadata in their package owners.
 
@@ -209,25 +209,25 @@ new places to add unrelated behavior:
 
 Console scripts are registered in [pyproject.toml](pyproject.toml):
 
-- `fcc-server` calls `free_claude_code.cli.entrypoints:serve`.
-- `fcc-desktop` is a GUI script calling
-  `free_claude_code.cli.desktop_entrypoint:launch` on Windows and macOS.
-- `fcc-claude` calls `free_claude_code.cli.launchers.claude:launch`.
-- `fcc-codex` calls `free_claude_code.cli.launchers.codex:launch`.
-- `fcc-pi` calls `free_claude_code.cli.launchers.pi:launch`.
+- `start` calls `beast.cli.entrypoints:serve`.
+- `beast-desktop` is a GUI script calling
+  `beast.cli.desktop_entrypoint:launch` on Windows and macOS.
+- `beast` calls `beast.cli.launchers.claude:launch`.
+- `beast-codex` calls `beast.cli.launchers.codex:launch`.
+- `beast-pi` calls `beast.cli.launchers.pi:launch`.
 
 [scripts/install.sh](scripts/install.sh) and [scripts/install.ps1](scripts/install.ps1)
 install or update the uv tool plus optional voice extras. On Windows the
-installer owns the FCC desktop and Start-menu shortcuts; on macOS it owns the
+installer owns the BEAST desktop and Start-menu shortcuts; on macOS it owns the
 per-user application bundle and desktop link. [scripts/uninstall.sh](scripts/uninstall.sh)
 and [scripts/uninstall.ps1](scripts/uninstall.ps1) remove those exact desktop
-artifacts, the FCC uv tool, and the managed `~/.fcc/` tree from
-[config/paths.py](src/free_claude_code/config/paths.py); they do not remove
-uv, Claude Code, Codex, Pi, or uv-managed Python runtimes. [scripts/ci.sh](scripts/ci.sh) and
+artifacts, the BEAST uv tool, and the managed `~/.fcc/` tree from
+[config/paths.py](src/beast/config/paths.py); they do not remove
+uv, Beast, Codex, Pi, or uv-managed Python runtimes. [scripts/ci.sh](scripts/ci.sh) and
 [scripts/ci.ps1](scripts/ci.ps1) mirror [.github/workflows/tests.yml](.github/workflows/tests.yml)
 for local pre-push verification.
 
-[cli/entrypoints.py](src/free_claude_code/cli/entrypoints.py) starts the FastAPI server with Uvicorn.
+[cli/entrypoints.py](src/beast/cli/entrypoints.py) starts the FastAPI server with Uvicorn.
 The shared `ServerSupervisor` migrates legacy env files when needed, loads cached
 settings, runs one server instance, and can restart it after Admin config changes.
 An Admin restart constructs the next instance only when the prior
@@ -236,32 +236,32 @@ incomplete ASGI shutdown therefore exits the supervisor instead of overlapping
 old and replacement graphs. On final shutdown it best-effort kills registered
 child processes.
 
-[cli/desktop.py](src/free_claude_code/cli/desktop.py) owns the platform-neutral
+[cli/desktop.py](src/beast/cli/desktop.py) owns the platform-neutral
 desktop lifecycle. An operating-system file lock admits one desktop host, the
 tray remains on the process main thread for native event-loop compatibility, and
 one worker runs the same in-process `ServerSupervisor` with console output and
 automatic browser launch disabled. A second desktop launch waits for health,
 opens the existing Admin page, and exits. Tray restart delegates to the canonical
 supervisor; tray quit requests the same graceful ASGI and application-runtime
-shutdown as `fcc-server`. [cli/desktop_tray.py](src/free_claude_code/cli/desktop_tray.py)
+shutdown as `start`. [cli/desktop_tray.py](src/beast/cli/desktop_tray.py)
 owns only native status-area presentation and callbacks.
 
-[runtime/bootstrap.py](src/free_claude_code/runtime/bootstrap.py) is the single production composition function. The CLI
+[runtime/bootstrap.py](src/beast/runtime/bootstrap.py) is the single production composition function. The CLI
 supervisor supplies one settings snapshot and its restart callback; bootstrap
 configures logging, constructs the runtime owners and the configured voice
   transcriber, constructs the explicit `ApiServices` composition value, and
   returns the ASGI application. Provider request leases and task control satisfy
-  the consumer-owned ports in [application/ports.py](src/free_claude_code/application/ports.py); Admin operations retain
-  their inbound-adapter port in [api/ports.py](src/free_claude_code/api/ports.py).
+  the consumer-owned ports in [application/ports.py](src/beast/application/ports.py); Admin operations retain
+  their inbound-adapter port in [api/ports.py](src/beast/api/ports.py).
 
-[api/app.py](src/free_claude_code/api/app.py) registers routers and exception
+[api/app.py](src/beast/api/app.py) registers routers and exception
 handlers around an explicit `ApiServices` value, then wraps the application in a
 pure ASGI correlation boundary. The boundary surrounds the complete wire send;
 it does not proxy streaming responses through `BaseHTTPMiddleware`. The API does
 not read global settings or construct runtime resources.
 `app.state.services` is the only runtime state published to FastAPI.
 
-[runtime/application.py](src/free_claude_code/runtime/application.py) owns process startup and shutdown, optional messaging,
+[runtime/application.py](src/beast/runtime/application.py) owns process startup and shutdown, optional messaging,
 the selected transcriber, the managed CLI session manager, Admin pending state,
 connected-account use cases, and the injected restart callback. Shutdown is
 serialized and ordered: quiesce
@@ -277,13 +277,13 @@ the process supervisor owns any force-termination deadline. Optional messaging
 startup remains nonfatal only when every partially constructed messaging owner
 was successfully cleaned; incomplete startup cleanup fails the application
 startup and retains the graph for the next close attempt.
-[runtime/asgi.py](src/free_claude_code/runtime/asgi.py) drives that owner from ASGI lifespan messages and preserves
+[runtime/asgi.py](src/beast/runtime/asgi.py) drives that owner from ASGI lifespan messages and preserves
 the concise startup-failure contract.
 
-[runtime/provider_manager.py](src/free_claude_code/runtime/provider_manager.py) is the only owner that constructs, publishes,
+[runtime/provider_manager.py](src/beast/runtime/provider_manager.py) is the only owner that constructs, publishes,
 retires, and closes provider generations. Each request acquires a generation
 lease before routing. Non-streaming responses release it after aggregation;
-streaming responses bind it to FCC's response owner, which first closes the
+streaming responses bind it to BEAST's response owner, which first closes the
 entire body chain and then releases the lease on completion, failure,
 cancellation, disconnect, or a response-start send failure. A provider-only
 Admin Apply prepares a candidate and commits configuration before publication.
@@ -309,22 +309,22 @@ retain the model list they loaded at startup.
 
 ## Configuration Model
 
-[config/settings.py](src/free_claude_code/config/settings.py) owns the flat Pydantic Settings schema:
+[config/settings.py](src/beast/config/settings.py) owns the flat Pydantic Settings schema:
 raw env fields, validation, and `get_settings()`. It should not own routing,
 model-ref parsing, launcher defaults, or web-tool policy. Dotenv discovery lives
-in [config/env_files.py](src/free_claude_code/config/env_files.py) and uses this order:
+in [config/env_files.py](src/beast/config/env_files.py) and uses this order:
 
 1. repo-local `.env`;
 2. managed `~/.fcc/.env`;
-3. optional `FCC_ENV_FILE`, appended when present.
+3. optional `BEAST_ENV_FILE`, appended when present.
 
 Later dotenv files override earlier dotenv files. Process environment variables
 also participate through Pydantic settings resolution. `ANTHROPIC_AUTH_TOKEN`
 has an extra guard after settings are built: if any configured dotenv file
 defines it, that dotenv value replaces a stale inherited shell token. Auth-token
-source detection for startup warnings also belongs to `src/free_claude_code/config/env_files.py`.
+source detection for startup warnings also belongs to `src/beast/config/env_files.py`.
 
-[config/paths.py](src/free_claude_code/config/paths.py) defines managed paths:
+[config/paths.py](src/beast/config/paths.py) defines managed paths:
 
 - config directory: `~/.fcc`;
 - managed env file: `~/.fcc/.env`;
@@ -341,22 +341,22 @@ Model routing configuration is tiered:
 - `REASONING_FABLE`, `REASONING_OPUS`, `REASONING_SONNET`, and
   `REASONING_HAIKU` accept the same values plus `inherit`.
 
-[config/reasoning.py](src/free_claude_code/config/reasoning.py) owns the typed
-configuration vocabulary. FCC-owned dotenv files receive one-time migrations
+[config/reasoning.py](src/beast/config/reasoning.py) owns the typed
+configuration vocabulary. BEAST-owned dotenv files receive one-time migrations
 for retired configuration keys and values before Settings loads them. Explicit
-`FCC_ENV_FILE` files are never rewritten and instead receive an actionable
+`BEAST_ENV_FILE` files are never rewritten and instead receive an actionable
 startup warning.
 
-[config/model_refs.py](src/free_claude_code/config/model_refs.py) owns provider-prefixed model ref
+[config/model_refs.py](src/beast/config/model_refs.py) owns provider-prefixed model ref
 parsing and configured `MODEL*` inventory. API routing and provider validation
 depend on those helpers instead of adding behavior methods to Settings.
 
-[config/admin/](src/free_claude_code/config/admin/) owns the Admin UI config manifest and
+[config/admin/](src/beast/config/admin/) owns the Admin UI config manifest and
 managed env writes. Provider credential, configurable base URL, proxy, and display-name
-metadata is generated from [config/provider_catalog.py](src/free_claude_code/config/provider_catalog.py);
+metadata is generated from [config/provider_catalog.py](src/beast/config/provider_catalog.py);
 admin-only help text stays beside the admin manifest. The package splits source
 loading, value presentation, validation, persistence, and provider status into
-separate modules. [api/admin_routes.py](src/free_claude_code/api/admin_routes.py) exposes local-only
+separate modules. [api/admin_routes.py](src/beast/api/admin_routes.py) exposes local-only
 admin endpoints that load and validate config, then delegate runtime operations
 through `AdminRuntimePort`. Provider-only Apply prepares prospective settings,
 atomically commits the managed env, and publishes a new provider generation.
@@ -364,7 +364,7 @@ Restart-required changes preserve the existing supervisor restart flow and do
 not publish an in-process generation first.
 
 [.env.example](.env.example) is the single Admin UI template source. It is
-packaged as a [src/free_claude_code/config/](src/free_claude_code/config/) resource for Admin UI defaults;
+packaged as a [src/beast/config/](src/beast/config/) resource for Admin UI defaults;
 runtime settings do not read it as a live config file. The Admin UI creates and
 atomically replaces `~/.fcc/.env` when configuration is applied; server startup
 only migrates legacy env files when the managed file is absent.
@@ -374,7 +374,7 @@ and non-local origins.
 
 ## HTTP Request Flow
 
-[api/routes.py](src/free_claude_code/api/routes.py) exposes the public proxy routes:
+[api/routes.py](src/beast/api/routes.py) exposes the public proxy routes:
 
 - `POST /v1/messages`: Anthropic Messages-compatible streaming requests.
 - `POST /v1/responses`: OpenAI Responses-compatible requests.
@@ -384,17 +384,17 @@ and non-local origins.
 - `POST /stop`: stop CLI sessions and pending tasks.
 - `HEAD` and `OPTIONS` probes for compatibility on supported endpoints.
 
-Admin routes live beside these in [api/admin_routes.py](src/free_claude_code/api/admin_routes.py).
+Admin routes live beside these in [api/admin_routes.py](src/beast/api/admin_routes.py).
 
 Authentication is handled by `require_proxy_auth()` in
-[api/dependencies.py](src/free_claude_code/api/dependencies.py). If `ANTHROPIC_AUTH_TOKEN` is blank,
-proxy auth is disabled. Otherwise FCC accepts exactly `Authorization: Bearer
+[api/dependencies.py](src/beast/api/dependencies.py). If `ANTHROPIC_AUTH_TOKEN` is blank,
+proxy auth is disabled. Otherwise BEAST accepts exactly `Authorization: Bearer
 <token>`. Other credential headers are ignored, so a stale provider API key
 cannot mask valid proxy authorization. The complete bearer token is compared
 in constant time; no model suffix or other token mutation is accepted.
 
 HTTP request correlation is owned at ingress. A pure ASGI boundary creates one
-opaque FCC request ID before routing, places it in log context and request state,
+opaque BEAST request ID before routing, places it in log context and request state,
 and adds `request-id` while forwarding the actual `http.response.start` message.
 OpenAI-compatible Responses and the shared model catalog also expose the same
 value as `x-request-id`. Provider execution and trace events receive that
@@ -404,28 +404,28 @@ response lifetime finalization under the concrete response owner. Starlette's
 outer server-error boundary bypasses user middleware for its catch-all 500, so
 that one handler explicitly attaches the same ingress-owned headers.
 
-[api/handlers/](src/free_claude_code/api/handlers/) owns the public API product flows.
+[api/handlers/](src/beast/api/handlers/) owns the public API product flows.
 `MessagesHandler` validates non-empty messages, resolves models, applies
 Claude-only safety-classifier and local optimization policy, handles local web
 server tools, then streams Anthropic SSE. `ResponsesHandler` owns streaming-only
 OpenAI Responses validation and conversion for Codex clients. `TokenCountHandler`
 owns Anthropic token counting. Shared provider execution lives in
-[application/execution.py](src/free_claude_code/application/execution.py). `ProviderExecutor` resolves the narrow
+[application/execution.py](src/beast/application/execution.py). `ProviderExecutor` resolves the narrow
 consumer-owned `ProviderPort`, synchronously preflights the upstream request,
 emits trace events, counts input tokens, and returns an Anthropic SSE iterator.
 It receives only a provider resolver and the few scalar collaborators it needs;
 it does not depend on FastAPI, provider implementations, or the full settings
 object.
-[api/response_streams.py](src/free_claude_code/api/response_streams.py) owns public streaming egress
+[api/response_streams.py](src/beast/api/response_streams.py) owns public streaming egress
 commit timing. It waits for the first protocol chunk before returning a
-successful FCC-owned `StreamingResponse`. Its explicit replay iterator owns the
+successful BEAST-owned `StreamingResponse`. Its explicit replay iterator owns the
 prefetched stream even before replay begins. The response itself owns one
 idempotent finalization task: close the body transitively, then release the
 provider-generation lease. This finalizer surrounds the real ASGI send and runs
 to completion even when sending headers or the first body frame fails. A provider
 execution failure before that commit boundary remains a real typed non-2xx JSON
-response. Once FCC has finalized the failure, the response includes
-`x-should-retry: false` so FCC retains ownership of upstream retry/recovery
+response. Once BEAST has finalized the failure, the response includes
+`x-should-retry: false` so BEAST retains ownership of upstream retry/recovery
 without causing a second client retry loop. After the first chunk has escaped,
 HTTP status is committed; Messages emits an Anthropic `event: error` and closes
 without a synthetic `message_stop`; Responses emits `response.failed` with the
@@ -482,17 +482,17 @@ sequenceDiagram
 OpenAI Responses uses the same provider execution primitive without importing
 Claude-only message intercepts. `ResponsesHandler` delegates protocol work to
 the `OpenAIResponsesAdapter` in
-[src/free_claude_code/core/openai_responses/adapter.py](src/free_claude_code/core/openai_responses/adapter.py). The adapter
+[src/beast/core/openai_responses/adapter.py](src/beast/core/openai_responses/adapter.py). The adapter
 converts the Responses payload into an Anthropic Messages payload before
 provider execution, then converts Anthropic SSE back to Responses SSE.
 
 ## Model Routing
 
-[application/routing.py](src/free_claude_code/application/routing.py) resolves incoming client model names.
+[application/routing.py](src/beast/application/routing.py) resolves incoming client model names.
 It supports two forms:
 
 - Direct provider model refs such as `nvidia_nim/nvidia/model-name`.
-- Gateway model IDs decoded by [core/gateway_model_ids.py](src/free_claude_code/core/gateway_model_ids.py).
+- Gateway model IDs decoded by [core/gateway_model_ids.py](src/beast/core/gateway_model_ids.py).
 
 If the incoming model is not direct, `ModelRouter` maps it by Claude tier. Names
 containing `fable`, `opus`, `sonnet`, or `haiku` use the matching tier override when set,
@@ -501,7 +501,7 @@ otherwise they fall back to `MODEL`.
 The router also selects the applicable reasoning preference. Direct provider
 refs use the root policy; Claude tier routes use a non-inherited tier override
 or the root fallback; the no-thinking gateway variant forces `off`.
-[application/reasoning.py](src/free_claude_code/application/reasoning.py) then
+[application/reasoning.py](src/beast/application/reasoning.py) then
 combines that preference with the concrete client request exactly once. The
 resulting `ReasoningPolicy` preserves independent control, named effort, and an
 exact client token budget without guessing provider behavior. `ResolvedModel`
@@ -524,7 +524,7 @@ publish the private upstream model as the response model.
 
 Provider model discovery and optional thinking metadata live in the
 application-level catalog owned by `ProviderRuntimeManager`.
-[providers/runtime/discovery.py](src/free_claude_code/providers/runtime/discovery.py)
+[providers/runtime/discovery.py](src/beast/providers/runtime/discovery.py)
 is the sole owner of provider model-list queries and cache population. Startup
 synchronously warms the providers referenced by model routing before clients can
 perform their one-time model fetch, then a background pass fills the remaining
@@ -544,7 +544,7 @@ generation, so a hot replacement does not erase the last useful model list.
 Discovery failures retain prior entries.
 
 Codex-specific model picker shaping stays out of this route.
-[runtime/codex_catalog.py](src/free_claude_code/runtime/codex_catalog.py) is the
+[runtime/codex_catalog.py](src/beast/runtime/codex_catalog.py) is the
 composition bridge: it asks this route's pure builder for the exact application
 inventory, passes that response to the existing Codex adapter, and writes
 `~/.fcc/codex-model-catalog.json` without making a loopback HTTP request.
@@ -558,26 +558,26 @@ not fail server startup, Admin operations, discovery, or inference. Shutdown
 never publishes the cleared in-memory cache.
 
 The Codex App reads `model_catalog_json` at startup, so it must restart to see a
-later catalog publication. `fcc-codex` remains an additional launch-time
+later catalog publication. `beast-codex` remains an additional launch-time
 synchronizer: it fetches the same `/v1/models` response, uses the same adapter
 and writer, and passes the path as an ephemeral override. Codex users open the
-native picker with `/model`; FCC does not implement a proxy-level `/models`
+native picker with `/model`; BEAST does not implement a proxy-level `/models`
 alias.
 
 ## Provider Architecture
 
 Provider metadata is neutral and centralized in
-[config/provider_catalog.py](src/free_claude_code/config/provider_catalog.py). Each
+[config/provider_catalog.py](src/beast/config/provider_catalog.py). Each
 `ProviderDescriptor` declares provider ID, display name, authentication kind, locality, credential env
 var, default base URL, settings attribute names, configuration readiness, and
 proxy support. Readiness may require multiple ordinary settings or a non-secret
 project ID; it is not inferred exclusively from API-key presence. The catalog
 does not select a concrete adapter.
 
-[providers/runtime/](src/free_claude_code/providers/runtime/) owns construction details for one
+[providers/runtime/](src/beast/providers/runtime/) owns construction details for one
 closable provider generation: construction policy, resolved provider
 configuration, lazy provider instances, provider-owned admission controllers, and
-cleanup. [providers/runtime/factory.py](src/free_claude_code/providers/runtime/factory.py)
+cleanup. [providers/runtime/factory.py](src/beast/providers/runtime/factory.py)
 constructs ordinary provider IDs from `OPENAI_CHAT_PROFILES`, keeps a sparse
 factory mapping for adapters with real state or algorithms, and accepts explicit
 composition-root factories for providers with process-lifetime dependencies.
@@ -587,7 +587,7 @@ catalog.
 provider ID within a generation; there is no pass-through cache object, process
 singleton, or second admission registry.
 
-[providers/admission.py](src/free_claude_code/providers/admission.py) owns the
+[providers/admission.py](src/beast/providers/admission.py) owns the
 complete shared upstream-admission lifecycle for that provider generation. A
 strict sliding window admits each real attempt before a concurrency bulkhead;
 the bulkhead is held only while an upstream operation or stream is active, never
@@ -616,18 +616,18 @@ and discovery orchestration belong to `ProviderRuntimeManager` in the runtime
 package. This separates a single generation's resources from process-lifetime
 state.
 
-[application/model_metadata.py](src/free_claude_code/application/model_metadata.py) owns the immutable
+[application/model_metadata.py](src/beast/application/model_metadata.py) owns the immutable
 `ProviderModelInfo` value consumed by the application catalog. Provider-specific
 model-list modules retain response parsing and construct that value directly;
 there is no provider-layer alias for the former owner.
 
-[application/ports.py](src/free_claude_code/application/ports.py) defines the two provider operations consumed by request
+[application/ports.py](src/beast/application/ports.py) defines the two provider operations consumed by request
 execution: synchronous `preflight_stream()` and lazy `stream_response()`. API
 handlers and application execution depend on that structural port, never on a
 provider base class. Provider adapters implement it without registration or a
 compatibility layer.
 
-[providers/base.py](src/free_claude_code/providers/base.py) defines provider-internal construction and lifecycle contracts:
+[providers/base.py](src/beast/providers/base.py) defines provider-internal construction and lifecycle contracts:
 
 - `ProviderConfig`: shared provider settings such as API key, base URL, rate
   limits, timeouts, proxy, and logging flags. It is a frozen internal
@@ -638,7 +638,7 @@ compatibility layer.
   values directly; there is no parallel IDs-only catalog contract.
 
 There are two upstream transport families:
-[providers/openai_chat/](src/free_claude_code/providers/openai_chat/) implements the concrete
+[providers/openai_chat/](src/beast/providers/openai_chat/) implements the concrete
 `OpenAIChatProvider` used by every OpenAI-compatible `/chat/completions`
 upstream. `OpenAIChatProfile` contains immutable request policy, an explicit
 reasoning encoder, an explicit history replay mode, its standard
@@ -649,7 +649,7 @@ owns the exactly typed private per-request runner, recovery operations, tool-cal
 assembly, and streamed usage handling. No obsolete generic transport namespace
 or untyped provider backchannel remains.
 
-[providers/groq/](src/free_claude_code/providers/groq/) is a specialized
+[providers/groq/](src/beast/providers/groq/) is a specialized
 `OpenAIChatProvider` because Groq exposes incompatible `reasoning_effort`
 vocabularies without publishing that capability in model metadata. The Groq
 adapter owns a generation-local vocabulary cache keyed by the exact opaque model
@@ -663,15 +663,15 @@ structured assistant reasoning fields in replayed Chat Completions history, so
 the same provider policy preserves prior reasoning as ordinary tagged assistant
 content; this replay rule is provider-wide and never selected by model name.
 
-[providers/openai_codex/](src/free_claude_code/providers/openai_codex/) owns
+[providers/openai_codex/](src/beast/providers/openai_codex/) owns
 ChatGPT subscription authentication and the Codex backend's OpenAI Responses
-transport. Its process-lifetime auth manager owns FCC's credential file,
+transport. Its process-lifetime auth manager owns BEAST's credential file,
 browser/device authorization, refresh, and revocation; provider generations
 borrow it and resolve fresh headers for each operation. The provider owns HTTP
 failure classification, model discovery, admission, and commit-boundary retry.
 Neutral Anthropic-to-Responses input and Responses-to-Anthropic stream
 conversion remain in
-[core/openai_responses/](src/free_claude_code/core/openai_responses/), which
+[core/openai_responses/](src/beast/core/openai_responses/), which
 never imports OAuth, account IDs, or provider endpoints. That neutral converter
 preserves the public Responses contract; the subscription provider owns the
 private Codex request projection and omits fields that backend does not accept,
@@ -682,17 +682,17 @@ declared non-SSE media type retains the bounded diagnostic failure path. The
 Admin API exposes only safe connected-account state and never serializes token
 objects.
 
-[providers/google_openai/](src/free_claude_code/providers/google_openai/) owns the
+[providers/google_openai/](src/beast/providers/google_openai/) owns the
 Google-specific protocol behavior shared by AI Studio and Vertex AI: literal
 Google `extra_body` construction, exclusive reasoning serialization, and
 thought-signature replay. Each concrete profile selects one Google reasoning
 encoder, and that encoder is the sole writer of `reasoning_effort` or
 `extra_body.google.thinking_config` for its request. Caller-provided Google
 thinking configuration is preserved only for provider-default reasoning;
-combining it with FCC reasoning controls fails during deterministic preflight.
+combining it with BEAST reasoning controls fails during deterministic preflight.
 Thought-signature replay is a separate component and never mutates reasoning
 controls. Neither concrete provider imports from the other. AI Studio owns its
-API-key endpoint; [providers/vertex/](src/free_claude_code/providers/vertex/)
+API-key endpoint; [providers/vertex/](src/beast/providers/vertex/)
 owns project/location endpoint composition, renewable Application Default
 Credentials, and translation of Google's native publisher-model catalog. The
 OpenAI transport receives a callable credential source, so access-token refresh
@@ -711,7 +711,7 @@ client-specific recovery phrase.
 Providers call the OpenAI request policy for Anthropic-to-OpenAI conversion,
 reasoning replay selection, `extra_body`, and chat-completion field normalization.
 The SDK-free `OpenAIToolNameCodec` in
-[core/anthropic/](src/free_claude_code/core/anthropic/) owns reversible
+[core/anthropic/](src/beast/core/anthropic/) owns reversible
 translation from client tool identities to OpenAI's portable function-name
 grammar. OpenAI Chat and upstream Responses adapters apply that codec only to
 their explicit declaration, forced-choice, and replay fields, then restore the
@@ -748,15 +748,15 @@ Kimi Code, MiniMax, Fireworks, and Z.ai use ordinary
 declarative profiles for their thinking, token, and `extra_body` policy. Kimi
 Code remains distinct from Kimi API because its subscription key and base URL
 are a separate customer contract; its profile maps provider-neutral reasoning
-to Kimi's named efforts and identifies FCC through the upstream user agent.
+to Kimi's named efforts and identifies BEAST through the upstream user agent.
 Z.ai is treated as the GLM Coding Plan provider and uses Z.ai's Coding Plan
 OpenAI base.
 Mistral La Plateforme keeps its native `reasoning_effort` and thinking-chunk
 request/stream mapping inside
-[providers/mistral/reasoning.py](src/free_claude_code/providers/mistral/reasoning.py), including its
+[providers/mistral/reasoning.py](src/beast/providers/mistral/reasoning.py), including its
 fallback retry when an upstream request rejects reasoning fields.
 NIM reasoning budget control is also treated as a provider-owned best-effort
-downgrade: if an upstream NIM deployment rejects explicit budget control, FCC
+downgrade: if an upstream NIM deployment rejects explicit budget control, BEAST
 retries without the budget while preserving thinking enablement.
 NIM also owns response normalization for model-native tool markup exposed in
 chat-completion text. The normalizer recognizes the native protocol signature
@@ -771,7 +771,7 @@ arguments and validates the original schema.
 
 ### Reasoning Ownership
 
-[core/reasoning.py](src/free_claude_code/core/reasoning.py) owns the immutable,
+[core/reasoning.py](src/beast/core/reasoning.py) owns the immutable,
 provider-neutral `ReasoningPolicy`. It represents three distinct facts:
 
 - `control`: provider default, explicitly off, or explicitly on;
@@ -779,7 +779,7 @@ provider-neutral `ReasoningPolicy`. It represents three distinct facts:
 - `budget_tokens`: an exact positive client budget when one was supplied.
 
 When a numeric-budget provider needs a budget, `ReasoningPolicy` expresses named
-effort through FCC's single product scale: `minimal`/`low=512`, `medium=1024`,
+effort through BEAST's single product scale: `minimal`/`low=512`, `medium=1024`,
 `high=2048`, `xhigh=4096`, and `max=8192`. Exact client budgets take precedence.
 
 The application layer resolves configuration and client input into this value;
@@ -800,14 +800,14 @@ for a valid continuation.
 The boundary has five hard rules:
 
 1. Never inspect an upstream model name or version to select reasoning behavior.
-2. Prefer a provider's named effort vocabulary; use FCC's documented numeric
+2. Prefer a provider's named effort vocabulary; use BEAST's documented numeric
    scale only when the provider exposes a numeric budget rather than named effort.
 3. Never use the output-token limit as a reasoning budget. Forward exact or
-   FCC-mapped budgets only through documented numeric fields; otherwise translate
+   BEAST-mapped budgets only through documented numeric fields; otherwise translate
    a supported named or boolean control and leave unsupported precision upstream.
 4. Provider-default intent emits no compute-control field. Explicit off requests
    an upstream disable where supported and always suppresses reasoning output at
-   the FCC protocol boundary.
+   the BEAST protocol boundary.
 5. Each provider profile has exactly one reasoning encoder. That encoder alone
    writes the provider's computation and reasoning-output request fields;
    unrelated request postprocessors never add, repair, or remove those fields.
@@ -841,14 +841,14 @@ disjoint input categories into its single `input_tokens` total.
 
 ### Adding A Provider
 
-1. Add provider metadata to [config/provider_catalog.py](src/free_claude_code/config/provider_catalog.py).
-2. Add credentials and related settings to [config/settings.py](src/free_claude_code/config/settings.py)
+1. Add provider metadata to [config/provider_catalog.py](src/beast/config/provider_catalog.py).
+2. Add credentials and related settings to [config/settings.py](src/beast/config/settings.py)
    and [.env.example](.env.example) when user configurable.
 3. Let Admin UI provider credential, configurable base URL, and proxy fields come from the
    catalog. Add admin-only help text or provider-specific fields under
-   [config/admin/](src/free_claude_code/config/admin/) only when the generated manifest is
+   [config/admin/](src/beast/config/admin/) only when the generated manifest is
    insufficient.
-4. Add an `OpenAIChatProfile` under [providers/openai_chat/](src/free_claude_code/providers/openai_chat/) when
+4. Add an `OpenAIChatProfile` under [providers/openai_chat/](src/beast/providers/openai_chat/) when
    request policy fully describes the upstream.
 5. Add a specialized provider package and sparse factory entry only when the
    upstream owns state, model-list behavior, stream events, or retry algorithms
@@ -862,7 +862,7 @@ disjoint input categories into its single `input_tokens` total.
 
 ## Protocol Conversion And Streaming Contracts
 
-[src/free_claude_code/core/anthropic/](src/free_claude_code/core/anthropic/) owns Anthropic-side protocol behavior:
+[src/beast/core/anthropic/](src/beast/core/anthropic/) owns Anthropic-side protocol behavior:
 
 - `models.py` defines the permissive Messages and token-count wire requests,
   content/tool/thinking blocks, and Anthropic response envelopes;
@@ -872,7 +872,7 @@ disjoint input categories into its single `input_tokens` total.
 - request serialization primitives shared by provider request policies;
 - tool schema and tool-result handling;
 - thinking block handling;
-- stream lifecycle through `src/free_claude_code/core/anthropic/streaming`, including the neutral
+- stream lifecycle through `src/beast/core/anthropic/streaming`, including the neutral
   stream ledger, Anthropic SSE emitter, continuation-body construction, and tool repair;
 - token counting and Anthropic-owned failure-kind-to-wire mapping.
 
@@ -898,21 +898,21 @@ while any deliberate provider-specific attachment removal remains explicit
 compatibility policy.
 
 Shared stream behavior lives under
-[src/free_claude_code/core/anthropic/streaming/](src/free_claude_code/core/anthropic/streaming/). The shared layer owns the
+[src/beast/core/anthropic/streaming/](src/beast/core/anthropic/streaming/). The shared layer owns the
 Anthropic content-block ledger, SSE serialization, continuation request
 transformations, and tool JSON repair. It does not import `httpx` or the OpenAI
 SDK and does not decide whether an upstream failure is retryable.
 
-[core/failures.py](src/free_claude_code/core/failures.py) defines the immutable,
+[core/failures.py](src/beast/core/failures.py) defines the immutable,
 protocol-neutral `FailureKind` and `ExecutionFailure`. The exception is the
 value propagated through async iterators; its semantic fields are immutable,
 while Python remains free to attach traceback/cause metadata during unwinding.
-[core/diagnostics.py](src/free_claude_code/core/diagnostics.py) owns bounded error
+[core/diagnostics.py](src/beast/core/diagnostics.py) owns bounded error
 body/cause extraction, credential redaction, safe traceback formatting, and
 copyable request-ID diagnostics. Anthropic and Responses packages independently
 map the canonical kind and status to their wire error types.
 
-[providers/failure_policy.py](src/free_claude_code/providers/failure_policy.py)
+[providers/failure_policy.py](src/beast/providers/failure_policy.py)
 owns generic raw OpenAI SDK and `httpx` exception classification,
 transient status/body inference, stable provider wording, and final diagnostic
 construction for those failures.
@@ -927,7 +927,7 @@ one-controller-per-provider policy; a degraded NIM function can therefore
 briefly pause other NIM models during shared recovery. No provider-specific
 marker enters `core/`, another provider, or an API adapter.
 
-[providers/stream_recovery.py](src/free_claude_code/providers/stream_recovery.py)
+[providers/stream_recovery.py](src/beast/providers/stream_recovery.py)
 owns only the 0.75-second/65,536-byte commit holdback and the choice between
 transparent replay, request-local continuation/tool salvage, and final failure.
 `ProviderRetrySession` owns one five-attempt budget for the whole logical
@@ -943,9 +943,9 @@ For streams, upstream acceptance is the first received chunk. Retryable failure
 before that point participates in provider-wide coordinated recovery. Failure
 after that point remains request-local so one interrupted connection does not
 freeze healthy parallel streams, but any continuation still consumes the same
-execution budget. The OpenAI SDK's internal retries remain disabled so FCC is
+execution budget. The OpenAI SDK's internal retries remain disabled so BEAST is
 the only retry owner. `ExecutionFailure.retryable` records provider-policy
-eligibility; it never tells the client to retry after FCC has finalized the
+eligibility; it never tells the client to retry after BEAST has finalized the
 failure.
 
 The OpenAI-chat provider remains an upstream adapter: it converts OpenAI chat
@@ -963,19 +963,19 @@ Messages appends one Anthropic `event: error`, while Responses emits
 the same failure and discards its partial aggregate. Unexpected failures use the
 same commit-state split but do not acquire provider retry semantics.
 
-[src/free_claude_code/core/openai_responses/](src/free_claude_code/core/openai_responses/) owns OpenAI Responses support:
+[src/beast/core/openai_responses/](src/beast/core/openai_responses/) owns OpenAI Responses support:
 
 - the permissive `OpenAIResponsesRequest` ingress model used directly by the
   FastAPI route and the protocol adapter;
 - the `OpenAIResponsesAdapter` facade used by the API layer;
-- streaming-only `/v1/responses` support for Codex/FCC workflows;
+- streaming-only `/v1/responses` support for Codex/BEAST workflows;
 - Responses request conversion into Anthropic Messages payloads;
 - Anthropic SSE conversion into Responses SSE;
 - OpenAI-compatible error envelopes.
 
 The package intentionally does not implement the full OpenAI Responses surface.
-FCC accepts omitted `stream` or `stream: true`; `stream: false` is rejected with
-an OpenAI-shaped client error because installed FCC/Codex workflows only need
+BEAST accepts omitted `stream` or `stream: true`; `stream: false` is rejected with
+an OpenAI-shaped client error because installed BEAST/Codex workflows only need
 streaming. Request conversion, stream transformation, Anthropic SSE parsing,
 Responses SSE event formatting, output item construction, tool identity mapping,
 reasoning mapping, ID generation, and error envelope construction each live
@@ -983,7 +983,7 @@ behind the adapter boundary. The concrete request object crosses that boundary
 unchanged; nested Responses input and tool data stays permissive and is
 interpreted by the conversion functions. `stream.py` is the public streaming
 entrypoint;
-[src/free_claude_code/core/openai_responses/streaming/](src/free_claude_code/core/openai_responses/streaming/) owns the
+[src/beast/core/openai_responses/streaming/](src/beast/core/openai_responses/streaming/) owns the
 block-indexed Responses stream assembler. The package separates Anthropic SSE
 dispatch, block state, output ledger ordering, block completion, SSE event
 builders, and error mapping. API code should depend on the adapter, not on
@@ -1006,7 +1006,7 @@ Responses `custom` tool declarations, represents them internally as Anthropic
 tools with a single string `input` field, and restores `custom_tool_call`,
 `custom_tool_call_output`, and `response.custom_tool_call_input.*` shapes at the
 Responses edge. Text or grammar format metadata is preserved as model guidance;
-FCC does not validate custom-tool grammars.
+BEAST does not validate custom-tool grammars.
 
 Client-facing Responses tool identity mapping is distinct from upstream wire
 portability. Namespaces and custom-tool identities are restored at the public
@@ -1036,7 +1036,7 @@ Provider thinking output maps back to Responses reasoning in the same block
 order the upstream Anthropic stream produced. Anthropic `thinking` blocks become
 Responses `reasoning` output items and `response.reasoning_text.*` stream
 events. Anthropic `redacted_thinking` becomes a Responses `reasoning` item with
-`encrypted_content`; the opaque value is not exposed as visible text and FCC
+`encrypted_content`; the opaque value is not exposed as visible text and BEAST
 does not synthesize reasoning summaries.
 
 Provider code should delegate protocol details to these modules. Avoid copying
@@ -1045,7 +1045,7 @@ for shared Anthropic behavior.
 
 ## Local Optimizations And Server Tools
 
-[api/optimization_handlers.py](src/free_claude_code/api/optimization_handlers.py) short-circuits
+[api/optimization_handlers.py](src/beast/api/optimization_handlers.py) short-circuits
 common low-value client requests before they reach a provider:
 
 - quota probes;
@@ -1061,16 +1061,16 @@ request remains ordered and unchanged for provider execution.
 The Messages handler runs these only after model routing and after local server-tool
 handling. Each optimization is controlled by settings flags.
 
-Claude Code auto-mode safety-classifier requests are a message-only routing
+Beast auto-mode safety-classifier requests are a message-only routing
 policy, not a short-circuit response. After routing, the Messages handler detects the
 narrow classifier prompt shape and forces reasoning off before provider execution
-so Claude Code receives a parser-readable `<block>yes</block>` or
+so Beast receives a parser-readable `<block>yes</block>` or
 `<block>no</block>` verdict.
 
 Local `web_search` and `web_fetch` handling lives under
-[api/web_tools/](src/free_claude_code/api/web_tools/). When `ENABLE_WEB_SERVER_TOOLS` is true, the
+[api/web_tools/](src/beast/api/web_tools/). When `ENABLE_WEB_SERVER_TOOLS` is true, the
 Messages handler can stream local Anthropic server-tool responses without sending the
-request upstream. [api/web_tools/egress.py](src/free_claude_code/api/web_tools/egress.py) enforces URL
+request upstream. [api/web_tools/egress.py](src/beast/api/web_tools/egress.py) enforces URL
 scheme and private-network restrictions for `web_fetch`.
 
 Anthropic server-tool definitions are never passed to upstream OpenAI Chat
@@ -1080,76 +1080,76 @@ otherwise the Messages handler rejects them before provider execution.
 
 ## CLI Launchers And Managed Claude
 
-[cli/local_http.py](src/free_claude_code/cli/local_http.py) owns the direct
-agent-to-FCC connection boundary. Launcher health checks and local model-catalog
+[cli/local_http.py](src/beast/cli/local_http.py) owns the direct
+agent-to-BEAST connection boundary. Launcher health checks and local model-catalog
 requests never inherit environment or operating-system forward proxies. Every
 spawned agent environment preserves the user's outbound proxy configuration but
-adds the configured FCC host and standard loopback names to both `NO_PROXY` and
+adds the configured BEAST host and standard loopback names to both `NO_PROXY` and
 `no_proxy`. Provider-specific upstream proxies remain provider-owned and do not
 participate in this local boundary.
 
-[cli/proxy_auth.py](src/free_claude_code/cli/proxy_auth.py) owns the neutral
+[cli/proxy_auth.py](src/beast/cli/proxy_auth.py) owns the neutral
 proxy-auth token policy shared by client launchers. A blank configured token
-becomes the local-only `fcc-no-auth` sentinel so clients cross their login gates
-while FCC continues to run without API authentication.
+becomes the local-only `beast-no-auth` sentinel so clients cross their login gates
+while BEAST continues to run without API authentication.
 
-[cli/claude_env.py](src/free_claude_code/cli/claude_env.py) owns the canonical
-Claude Code proxy environment used by every FCC-launched Claude process. It
+[cli/claude_env.py](src/beast/cli/claude_env.py) owns the canonical
+Beast proxy environment used by every BEAST-launched Claude process. It
 strips inherited `ANTHROPIC_*` variables, sets `ANTHROPIC_BASE_URL`, enables
 gateway model discovery, configures the auto-compact window, disables
 nonessential Anthropic traffic, and always sets `ANTHROPIC_AUTH_TOKEN`. Blank
-proxy auth uses the shared local-only sentinel so Claude Code reaches the proxy
+proxy auth uses the shared local-only sentinel so Beast reaches the proxy
 instead of stopping at its login gate.
 
-[cli/launchers/claude.py](src/free_claude_code/cli/launchers/claude.py) owns the installed
-`fcc-claude` launcher:
+[cli/launchers/claude.py](src/beast/cli/launchers/claude.py) owns the installed
+`beast` launcher:
 
-- `fcc-claude` applies the shared proxy environment without changing the user's
+- `beast` applies the shared proxy environment without changing the user's
   Claude command arguments.
 
-[cli/launchers/codex.py](src/free_claude_code/cli/launchers/codex.py) owns the installed
-`fcc-codex` launcher:
+[cli/launchers/codex.py](src/beast/cli/launchers/codex.py) owns the installed
+`beast-codex` launcher:
 
-- `fcc-codex` strips official OpenAI and Codex credential variables.
+- `beast-codex` strips official OpenAI and Codex credential variables.
 - It strips parent-only Codex thread, shell, permission, and origin context so
   each launched client owns an independent runtime identity.
 - It creates an ephemeral `fcc` model provider with `wire_api = "responses"` and
   a base URL pointing at the local proxy `/v1` path.
 - After proxy health succeeds, it fetches `/v1/models`, writes a generated Codex
   `model_catalog_json` file under `~/.fcc/`, and injects that path so Codex's
-  native `/model` picker lists FCC provider slugs. Catalog generation is
+  native `/model` picker lists BEAST provider slugs. Catalog generation is
   fail-open: launch continues with a warning if the catalog cannot be prepared.
 - The server lifecycle independently keeps that same file synchronized for
-  Codex App and IDE processes that are not launched through `fcc-codex`.
+  Codex App and IDE processes that are not launched through `beast-codex`.
 - Launcher-side catalog discovery authenticates directly with the canonical proxy
   token.
-- Inference through `fcc-codex`, Codex App, and IDE integrations uses the same
+- Inference through `beast-codex`, Codex App, and IDE integrations uses the same
   command-backed provider authentication. Codex invokes
-  `fcc-codex --print-proxy-auth-token`, which reads the canonical FCC settings,
+  `beast-codex --print-proxy-auth-token`, which reads the canonical BEAST settings,
   prints only the shared proxy-auth token (or the no-auth sentinel), and exits
   without a proxy preflight, model request, or client process. This gives every
   Codex surface one credential owner instead of competing with Codex's signed-in
   OpenAI authorization.
 
-[cli/launchers/pi.py](src/free_claude_code/cli/launchers/pi.py) owns the installed
-`fcc-pi` launcher and [cli/launchers/pi_extension.ts](src/free_claude_code/cli/launchers/pi_extension.ts)
+[cli/launchers/pi.py](src/beast/cli/launchers/pi.py) owns the installed
+`beast-pi` launcher and [cli/launchers/pi_extension.ts](src/beast/cli/launchers/pi_extension.ts)
 is its bundled Pi adapter:
 
 - Session commands load the extension from its absolute installed path and
-  scope Pi to the ephemeral `free-claude-code/**` provider, whose model IDs
-  retain FCC's nested `provider/model` routing reference.
-- The extension fetches FCC's `/v1/models` catalog before registration, projects
+  scope Pi to the ephemeral `beast/**` provider, whose model IDs
+  retain BEAST's nested `provider/model` routing reference.
+- The extension fetches BEAST's `/v1/models` catalog before registration, projects
   only routable provider-model IDs, and registers an `anthropic-messages`
   provider targeting the local proxy. Catalog failure is fail-closed so Pi never
   silently falls back to a different provider.
 - Catalog discovery and provider inference use HTTP bearer authorization. Pi's
   provider API-key field remains its process-local credential carrier.
-- FCC connection values live only in child-process `FCC_PI_*` variables. Native
+- BEAST connection values live only in child-process `BEAST_PI_*` variables. Native
   Pi credentials and persistent configuration remain untouched.
 - Pi package-management, configuration, help, and version commands pass through
-  unchanged because they do not create an FCC-backed session.
+  unchanged because they do not create an BEAST-backed session.
 
-[cli/managed/](src/free_claude_code/cli/managed/) owns managed Claude Code subprocesses used by
+[cli/managed/](src/beast/cli/managed/) owns managed Beast subprocesses used by
 Discord and Telegram messaging. Managed task invocations extend the same proxy
 environment only with non-interactive terminal settings, optional `--resume`,
 optional `--fork-session`, `--model fable`, and `--output-format stream-json`.
@@ -1172,15 +1172,15 @@ reports a count-only failure, and leaves failures available for the next cleanup
 attempt. Real-session registration is collision-safe and becomes durable tree
 state only after the manager accepts it.
 
-Codex and Pi are supported through their installed launchers. FCC does not keep
+Codex and Pi are supported through their installed launchers. BEAST does not keep
 internal managed session runners for them because no user-facing messaging
 setting selects either client for Discord or Telegram.
 
 ## Messaging Architecture
 
-Messaging is optional. [runtime/application.py](src/free_claude_code/runtime/application.py) calls
+Messaging is optional. [runtime/application.py](src/beast/runtime/application.py) calls
 `create_messaging_components()` from
-[messaging/platforms/factory.py](src/free_claude_code/messaging/platforms/factory.py) during startup.
+[messaging/platforms/factory.py](src/beast/messaging/platforms/factory.py) during startup.
 If `MESSAGING_PLATFORM` is `none`, or if the selected platform token is missing,
 the messaging bridge is skipped.
 
@@ -1194,7 +1194,7 @@ The API sees only the application-owned `TaskController` used to preserve
 `/stop` behavior.
 
 The platform factory returns a `MessagingPlatformComponents` bundle from
-[messaging/platforms/ports.py](src/free_claude_code/messaging/platforms/ports.py): a
+[messaging/platforms/ports.py](src/beast/messaging/platforms/ports.py): a
 `MessagingRuntime` with separate `quiesce()` and `close()` phases, an
 `OutboundMessenger` for queued sends/edits/deletes, an optional
 `VoiceCancellation` port for scoped and bulk voice cancellation during `/stop`
@@ -1202,8 +1202,8 @@ and `/clear`, and an optional immutable startup-notice intent. Workflow code
 depends on these ports and values, not on Telegram or Discord SDK objects.
 
 Runtime adapters in
-[messaging/platforms/telegram.py](src/free_claude_code/messaging/platforms/telegram.py) and
-[messaging/platforms/discord.py](src/free_claude_code/messaging/platforms/discord.py) own SDK client
+[messaging/platforms/telegram.py](src/beast/messaging/platforms/telegram.py) and
+[messaging/platforms/discord.py](src/beast/messaging/platforms/discord.py) own SDK client
 lifecycle, event subscription, inbound handoff, voice-note handoff, and one
 injected `MessagingRateLimiter`. The platform factory creates a fresh limiter
 for the selected runtime. `quiesce()` stops new SDK ingress and drains active
@@ -1215,12 +1215,12 @@ Telegram retries initialization and polling as separate repeatable steps; it
 never restarts an already-running SDK application after polling bootstrap fails.
 Separate application runtimes cannot share or stop each other's queue. Inbound
 normalization lives in
-[messaging/platforms/telegram_inbound.py](src/free_claude_code/messaging/platforms/telegram_inbound.py)
-and [messaging/platforms/discord_inbound.py](src/free_claude_code/messaging/platforms/discord_inbound.py).
+[messaging/platforms/telegram_inbound.py](src/beast/messaging/platforms/telegram_inbound.py)
+and [messaging/platforms/discord_inbound.py](src/beast/messaging/platforms/discord_inbound.py).
 Outbound SDK calls live in
-[messaging/platforms/telegram_io.py](src/free_claude_code/messaging/platforms/telegram_io.py) and
-[messaging/platforms/discord_io.py](src/free_claude_code/messaging/platforms/discord_io.py). Shared
-delivery policy lives in [messaging/platforms/outbox.py](src/free_claude_code/messaging/platforms/outbox.py),
+[messaging/platforms/telegram_io.py](src/beast/messaging/platforms/telegram_io.py) and
+[messaging/platforms/discord_io.py](src/beast/messaging/platforms/discord_io.py). Shared
+delivery policy lives in [messaging/platforms/outbox.py](src/beast/messaging/platforms/outbox.py),
 which requires that limiter directly and owns queued send/edit/list-based delete,
 dedup keys, and retained fire-and-forget tasks. Shutdown cancels and awaits both
 queued limiter work and arbitrary outbox work; there is no optional unthrottled
@@ -1228,10 +1228,10 @@ fallback, and both owners reject admission once close begins. Workflow and comma
 message ID lists; platform IO decides whether to use native batch deletion
 (Telegram) or internal per-message deletion (Discord).
 Shared voice-note orchestration lives in
-[messaging/platforms/voice_flow.py](src/free_claude_code/messaging/platforms/voice_flow.py), which owns
+[messaging/platforms/voice_flow.py](src/beast/messaging/platforms/voice_flow.py), which owns
 file-size validation, temp-file cleanup, transcription, error replies, and the
 handoff to `IncomingMessage`. Before status delivery it reserves an opaque claim
-in the `PendingVoiceRegistry` owned by [messaging/voice.py](src/free_claude_code/messaging/voice.py).
+in the `PendingVoiceRegistry` owned by [messaging/voice.py](src/beast/messaging/voice.py).
 That registry atomically owns optional status binding, cancellation by either
 message ID, and one child task that retains the exclusive handoff lease through
 the complete workflow callback. An explicit stop or clear atomically removes
@@ -1260,7 +1260,7 @@ credential used by an active voice backend through Admin is therefore
 restart-required, while the same provider credential remains hot-replaceable
 when voice does not use it.
 
-[messaging/workflow.py](src/free_claude_code/messaging/workflow.py) contains `MessagingWorkflow`, the
+[messaging/workflow.py](src/beast/messaging/workflow.py) contains `MessagingWorkflow`, the
 platform-agnostic coordinator. It owns dependencies, render settings, the
 state-transaction lock, global stop generation, per-chat clear generations,
 stop/clear side effects, and shutdown-visible state. Each inbound turn snapshots
@@ -1301,7 +1301,7 @@ retry. No platform I/O runs under the workflow lock. Ordinary notice-send
 failure is privacy-safe and nonfatal, while cancellation before a delivery
 receipt remains immediate and cannot create a phantom message ID.
 
-[messaging/turn_intake.py](src/free_claude_code/messaging/turn_intake.py) owns slash command dispatch,
+[messaging/turn_intake.py](src/beast/messaging/turn_intake.py) owns slash command dispatch,
 status-echo filtering, initial status messages, and rendering detached frozen
 admission/queue effects. The workflow records each accepted inbound prompt,
 voice note, or command before intake performs external status I/O. Intake asks
@@ -1312,7 +1312,7 @@ concurrent clear removes is instead rejected as `PARENT_REMOVED`; intake then
 best-effort deletes both the stale child prompt and its provisional status.
 Duplicate delivery deletes only its provisional status.
 
-[messaging/node_runner.py](src/free_claude_code/messaging/node_runner.py) owns managed CLI session
+[messaging/node_runner.py](src/beast/messaging/node_runner.py) owns managed CLI session
 lifecycle for queued nodes: parent-session fork/resume, session registration,
 CLI event parsing, transcript/status updates, cancellation, error propagation,
 and session cleanup. It executes an immutable `NodeClaim`; session, completion,
@@ -1322,23 +1322,23 @@ propagates to queued descendants; a later successful exit is authoritative for
 the same live, non-cancelled claim. A stale runner receives no snapshot and
 cannot restore a branch removed by `/clear`.
 
-[messaging/event_parser.py](src/free_claude_code/messaging/event_parser.py) normalizes managed Claude
+[messaging/event_parser.py](src/beast/messaging/event_parser.py) normalizes managed Claude
 JSON events into low-level transcript events.
-[messaging/transcript/](src/free_claude_code/messaging/transcript/) owns transcript assembly and
+[messaging/transcript/](src/beast/messaging/transcript/) owns transcript assembly and
 rendering: open content-block tracking, Task/subagent display state, segment
 models, render context, and truncation. Platform markdown details stay in
-[messaging/rendering/](src/free_claude_code/messaging/rendering/).
+[messaging/rendering/](src/beast/messaging/rendering/).
 
-[messaging/command_context.py](src/free_claude_code/messaging/command_context.py) defines the typed
+[messaging/command_context.py](src/beast/messaging/command_context.py) defines the typed
 dependency surface for `/stop`, `/clear`, and `/stats`; commands should not
 depend on the concrete workflow object or on platform SDK runtimes.
 
-[messaging/trees/runtime.py](src/free_claude_code/messaging/trees/runtime.py) contains the
+[messaging/trees/runtime.py](src/beast/messaging/trees/runtime.py) contains the
 `MessageTree` aggregate. Its lock is private, and complete operations own every
 graph/queue/claim invariant: add-and-admit, enqueue-or-claim,
 finish-and-claim-next, semantic state writes, cancellation, and atomic branch
 removal. Logical `parent_id` owns execution/session ancestry, while
-`parent_reference_id` records the exact prompt or FCC status that received the
+`parent_reference_id` records the exact prompt or BEAST status that received the
 platform reply. The aggregate derives literal reference adjacency from those
 canonical fields instead of maintaining a second graph. Removing a prompt
 therefore removes its status and every literal descendant; removing a status
@@ -1353,12 +1353,12 @@ success from reviving a stopped node. Only the matching finish transition may
 select the FIFO successor. Duplicate node/status admission and terminal-node
 re-admission are rejected without changing active state.
 
-[messaging/trees/transitions.py](src/free_claude_code/messaging/trees/transitions.py) owns frozen,
+[messaging/trees/transitions.py](src/beast/messaging/trees/transitions.py) owns frozen,
 slotted claims, queue entries, read views, and cancellation/removal effects.
 These values copy the UI and execution facts callers need and never contain a
 mutable `MessageNode`, lock, or `asyncio.Task`.
 
-[messaging/trees/manager.py](src/free_claude_code/messaging/trees/manager.py) is the only external
+[messaging/trees/manager.py](src/beast/messaging/trees/manager.py) is the only external
 tree facade. It keeps one structural lock across aggregate membership changes
 and repository index publication/removal, registers node and status references
 together under `MessageScope`, coordinates cross-tree requests, and returns
@@ -1376,9 +1376,9 @@ literal message subtree before any survivor can advance. Separate scopes and
 trees still progress independently. Subtree transitions return exact reference
 IDs for both repository unindexing and authorized platform deletion, including
 user-authored messages selected by the explicit command.
-[messaging/trees/repository.py](src/free_claude_code/messaging/trees/repository.py)
+[messaging/trees/repository.py](src/beast/messaging/trees/repository.py)
 is manager-private and owns only aggregate/reference indexes.
-[messaging/trees/processor.py](src/free_claude_code/messaging/trees/processor.py) owns every
+[messaging/trees/processor.py](src/beast/messaging/trees/processor.py) owns every
 `asyncio.Task`, keyed by globally unique claim ID. It publishes a task slot
 before task creation, which is safe under Python's eager task factory, then
 launches claims returned by the aggregate, cancels the exact matching task,
@@ -1395,12 +1395,12 @@ cleanup is still active. A failed aggregate-completion callback releases its
 finished task slot, records the failure, and hands it to the terminal waiter
 exactly once; a failed close therefore retains the workflow for reconciliation
 instead of hanging on ownership that no longer exists.
-[messaging/trees/node.py](src/free_claude_code/messaging/trees/node.py) owns
+[messaging/trees/node.py](src/beast/messaging/trees/node.py) owns
 `MessageNode` and `MessageState`; each node keeps only the copied scope and
 prompt needed by the aggregate rather than retaining a mutable ingress value,
-[messaging/trees/graph.py](src/free_claude_code/messaging/trees/graph.py) owns parent/child and
+[messaging/trees/graph.py](src/beast/messaging/trees/graph.py) owns parent/child and
 status-message lookup state, and
-[messaging/trees/snapshot.py](src/free_claude_code/messaging/trees/snapshot.py) owns typed persisted
+[messaging/trees/snapshot.py](src/beast/messaging/trees/snapshot.py) owns typed persisted
 conversation snapshots. New snapshots serialize scoped trees as a list, while
 loading derives scope from existing pre-scope `sessions.json` tree roots. Nodes
 persist logical and exact-reference parent relations; runtime child indexes are
@@ -1412,12 +1412,12 @@ A malformed tree carrying neither current scope nor legacy root ingress is
 reported and skipped because assigning it to an inferred chat would violate the
 same ownership boundary.
 
-[messaging/session/](src/free_claude_code/messaging/session/) persists typed conversation snapshots
+[messaging/session/](src/beast/messaging/session/) persists typed conversation snapshots
 and message IDs to a JSON file under the managed messaging state directory.
 `SessionStore` reads existing `sessions.json` files but exposes typed snapshot
 APIs to runtime code and deep-copies snapshot ingress and egress so no caller
 shares mutable persisted state. Debounced atomic writes live in
-[messaging/session/persistence.py](src/free_claude_code/messaging/session/persistence.py). One writer
+[messaging/session/persistence.py](src/beast/messaging/session/persistence.py). One writer
 lock serializes physical replaces, and a generation check under that lock
 prevents an older timer snapshot from landing after a newer flush or clear.
 Timer-triggered saves are best effort and leave the store dirty on failure;
@@ -1427,21 +1427,21 @@ snapshot and is the only operation that marks it clean.
 Standalone `/clear` detaches and drains only the invoking scope, then writes an
 authoritative scoped removal while other chats remain intact. Per-chat deletion
 ownership lives in
-[messaging/session/managed_message_log.py](src/free_claude_code/messaging/session/managed_message_log.py).
+[messaging/session/managed_message_log.py](src/beast/messaging/session/managed_message_log.py).
 The registry accepts managed inbound prompts, voice notes, and commands as well
-as FCC output. It migrates legacy `message_log` entries and persists the final
+as BEAST output. It migrates legacy `message_log` entries and persists the final
 shape as `managed_messages`. Startup notices use the same registry. An incoming
 standalone `/clear` defers insertion because the command handler already owns its
 ID on success; this prevents the command from evicting an older deletion target
 when an explicit cap is configured. Failed or cancelled clear attempts record
 the command before propagating so a later clear can discover it.
 
-`/clear` commits FCC state cleanup first and then best-effort deletes the exact
+`/clear` commits BEAST state cleanup first and then best-effort deletes the exact
 authorized message-ID set through the list-based outbound port. Standalone clear
-deletes every tracked user and FCC message in its chat; reply clear deletes only
+deletes every tracked user and BEAST message in its chat; reply clear deletes only
 the selected literal reply subtree plus its command. Discord/Telegram can still
 reject individual deletions for platform reasons such as permissions, age, or
-missing messages; such failures never restore cleared FCC state.
+missing messages; such failures never restore cleared BEAST state.
 
 ```mermaid
 sequenceDiagram
@@ -1468,7 +1468,7 @@ sequenceDiagram
 
 ## Observability, Diagnostics, And Safety
 
-[core/trace.py](src/free_claude_code/core/trace.py) emits structured trace events across stages such
+[core/trace.py](src/beast/core/trace.py) emits structured trace events across stages such
 as ingress, routing, provider, egress, messaging, and client CLI execution. Trace
 payloads are intended to connect API, provider, CLI, and messaging activity
 without requiring raw transport logs by default.
@@ -1545,9 +1545,9 @@ when maintainers want branch-level assurance.
 
 ### Add An Admin Setting
 
-1. Add or expose the setting in [config/settings.py](src/free_claude_code/config/settings.py).
+1. Add or expose the setting in [config/settings.py](src/beast/config/settings.py).
 2. Add the template key to [.env.example](.env.example) if users configure it.
-3. Add a `ConfigFieldSpec` under [config/admin/](src/free_claude_code/config/admin/), or add
+3. Add a `ConfigFieldSpec` under [config/admin/](src/beast/config/admin/), or add
    provider catalog metadata when the setting is provider credential, configurable base URL,
    proxy, or display-name metadata.
 4. Mark `restart_required` or `session_sensitive` when runtime state cannot be
@@ -1557,38 +1557,38 @@ when maintainers want branch-level assurance.
 ### Add Or Change A Client Surface
 
 1. For an installed wrapper, add or update a launcher under
-   [cli/launchers/](src/free_claude_code/cli/launchers/) and keep credential stripping local to that
+   [cli/launchers/](src/beast/cli/launchers/) and keep credential stripping local to that
    client.
-2. For messaging-managed execution, update [cli/managed/](src/free_claude_code/cli/managed/) only
+2. For messaging-managed execution, update [cli/managed/](src/beast/cli/managed/) only
    when Discord or Telegram should actually run a different managed client.
 3. Ensure managed task parsing emits the event shapes expected by
-   [messaging/event_parser.py](src/free_claude_code/messaging/event_parser.py) and
-   [messaging/node_event_pipeline.py](src/free_claude_code/messaging/node_event_pipeline.py).
+   [messaging/event_parser.py](src/beast/messaging/event_parser.py) and
+   [messaging/node_event_pipeline.py](src/beast/messaging/node_event_pipeline.py).
 4. Add launcher, managed-session, and customer-flow tests under
    [tests/cli/](tests/cli/) and [tests/messaging/](tests/messaging/).
 
 ### Add A Messaging Platform
 
 1. Implement a `MessagingRuntime`, `OutboundMessenger`, and inbound normalizer
-   under [messaging/platforms/](src/free_claude_code/messaging/platforms/).
-2. Reuse [messaging/platforms/outbox.py](src/free_claude_code/messaging/platforms/outbox.py) for
+   under [messaging/platforms/](src/beast/messaging/platforms/).
+2. Reuse [messaging/platforms/outbox.py](src/beast/messaging/platforms/outbox.py) for
    queued outbound delivery and
-   [messaging/platforms/voice_flow.py](src/free_claude_code/messaging/platforms/voice_flow.py) for
+   [messaging/platforms/voice_flow.py](src/beast/messaging/platforms/voice_flow.py) for
    voice-note handoff when the platform supports audio.
 3. Add construction logic to
-   [messaging/platforms/factory.py](src/free_claude_code/messaging/platforms/factory.py).
+   [messaging/platforms/factory.py](src/beast/messaging/platforms/factory.py).
 4. Add settings and admin fields for tokens, allowlists, and platform-specific
    runtime options.
 5. Add rendering profile support in
-   [messaging/rendering/profiles.py](src/free_claude_code/messaging/rendering/profiles.py) if needed.
+   [messaging/rendering/profiles.py](src/beast/messaging/rendering/profiles.py) if needed.
 6. Add deterministic runtime/outbound/workflow tests and optional live smoke
    targets.
 
 ### Add Protocol Behavior
 
-1. Put shared Anthropic behavior under [src/free_claude_code/core/anthropic/](src/free_claude_code/core/anthropic/).
+1. Put shared Anthropic behavior under [src/beast/core/anthropic/](src/beast/core/anthropic/).
 2. Put OpenAI Responses behavior under
-   [src/free_claude_code/core/openai_responses/](src/free_claude_code/core/openai_responses/).
+   [src/beast/core/openai_responses/](src/beast/core/openai_responses/).
 3. Keep provider-specific request quirks inside the provider profile or specialized
    provider subclass.
 4. Add stream contract tests under [tests/contracts/](tests/contracts/) or

@@ -6,14 +6,14 @@ from pathlib import Path
 
 import pytest
 
-FCC_COMMANDS = (
-    "fcc-desktop",
-    "fcc-server",
-    "fcc-claude",
-    "fcc-codex",
-    "fcc-pi",
-    "fcc-init",
-    "free-claude-code",
+BEAST_COMMANDS = (
+    "beast-desktop",
+    "start",
+    "beast",
+    "beast-codex",
+    "beast-pi",
+    "beast-init",
+    "beast",
 )
 
 
@@ -39,8 +39,8 @@ def _create_windows_shortcut(
 ) -> None:
     shortcut_path.parent.mkdir(parents=True, exist_ok=True)
     env = os.environ | {
-        "FCC_TEST_SHORTCUT": str(shortcut_path),
-        "FCC_TEST_TARGET": str(target_path),
+        "BEAST_TEST_SHORTCUT": str(shortcut_path),
+        "BEAST_TEST_TARGET": str(target_path),
     }
     subprocess.run(
         [
@@ -49,8 +49,8 @@ def _create_windows_shortcut(
             "-Command",
             (
                 "$shell = New-Object -ComObject WScript.Shell; "
-                "$shortcut = $shell.CreateShortcut($env:FCC_TEST_SHORTCUT); "
-                "$shortcut.TargetPath = $env:FCC_TEST_TARGET; "
+                "$shortcut = $shell.CreateShortcut($env:BEAST_TEST_SHORTCUT); "
+                "$shortcut.TargetPath = $env:BEAST_TEST_TARGET; "
                 "$shortcut.Save()"
             ),
         ],
@@ -66,7 +66,7 @@ class PosixUninstallHarness:
     home: Path
     bin_dir: Path
     tool_bin: Path
-    fcc_home: Path
+    beast_home: Path
     log: Path
     env: dict[str, str]
 
@@ -93,7 +93,7 @@ class PosixUninstallHarness:
         return self.log.read_text(encoding="utf-8").splitlines()
 
     def remove_entry_points(self) -> None:
-        for name in FCC_COMMANDS:
+        for name in BEAST_COMMANDS:
             (self.tool_bin / name).unlink(missing_ok=True)
 
     def use_process_list_fallback(self, process_line: str) -> None:
@@ -102,14 +102,14 @@ class PosixUninstallHarness:
         _write_executable(
             fallback_bin / "ps",
             """#!/bin/sh
-printf '%s\n' "$FCC_PS_OUTPUT"
+printf '%s\n' "$BEAST_PS_OUTPUT"
 """,
         )
         awk = shutil.which("awk", path=self.env["PATH"])
         if awk is None:
             pytest.skip("awk is required for the POSIX process fallback scenario")
         shutil.copy2(awk, fallback_bin / "awk")
-        self.env["FCC_PS_OUTPUT"] = process_line
+        self.env["BEAST_PS_OUTPUT"] = process_line
         self.env["PATH"] = str(fallback_bin)
 
 
@@ -121,12 +121,12 @@ def posix_uninstall_harness(tmp_path: Path) -> PosixUninstallHarness:
     home = tmp_path / "home"
     bin_dir = home / ".local" / "bin"
     tool_bin = tmp_path / "tool-bin"
-    fcc_home = home / ".fcc"
+    beast_home = home / ".fcc"
     log = tmp_path / "calls.log"
-    for path in (bin_dir, tool_bin, fcc_home):
+    for path in (bin_dir, tool_bin, beast_home):
         path.mkdir(parents=True)
-    (fcc_home / "config.json").write_text("{}", encoding="utf-8")
-    for name in FCC_COMMANDS:
+    (beast_home / "config.json").write_text("{}", encoding="utf-8")
+    for name in BEAST_COMMANDS:
         _write_executable(tool_bin / name, "#!/bin/sh\nexit 0\n")
 
     _write_executable(bin_dir / "claude", "#!/bin/sh\nexit 0\n")
@@ -150,13 +150,13 @@ if [ "${1:-}" = "tool" ] && [ "${2:-}" = "uninstall" ]; then
         exit 42
     fi
     if [ "$FAIL_STEP" = "missing" ] || [ "$FAIL_STEP" = "stale-entrypoint" ]; then
-        echo 'Tool `free-claude-code` is not installed' >&2
+        echo 'Tool `beast` is not installed' >&2
         exit 2
     fi
-    for name in fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-init free-claude-code; do
+    for name in beast-desktop start beast beast-codex beast-pi beast-init beast; do
         /bin/rm -f "$FAKE_TOOL_BIN/$name"
     done
-    echo "Uninstalled free-claude-code"
+    echo "Uninstalled beast"
     exit 0
 fi
 exit 43
@@ -180,16 +180,16 @@ printf '%s\n' "$FAKE_UNAME"
 """,
     )
 
-    app = home / "Applications" / "Free Claude Code.app"
+    app = home / "Applications" / "Beast.app"
     contents = app / "Contents"
     contents.mkdir(parents=True)
-    (contents / ".free-claude-code-owner").write_text(
-        "io.github.alishahryar1.free-claude-code\n",
+    (contents / ".beast-owner").write_text(
+        "io.github.alishahryar1.beast\n",
         encoding="utf-8",
     )
     desktop = home / "Desktop"
     desktop.mkdir()
-    (desktop / "Free Claude Code.app").symlink_to(app, target_is_directory=True)
+    (desktop / "Beast.app").symlink_to(app, target_is_directory=True)
 
     env = os.environ.copy()
     env.update(
@@ -203,7 +203,7 @@ printf '%s\n' "$FAKE_UNAME"
         }
     )
     env.pop("XDG_BIN_HOME", None)
-    return PosixUninstallHarness(home, bin_dir, tool_bin, fcc_home, log, env)
+    return PosixUninstallHarness(home, bin_dir, tool_bin, beast_home, log, env)
 
 
 def test_uninstall_sh_removes_and_verifies_only_fcc(
@@ -212,10 +212,11 @@ def test_uninstall_sh_removes_and_verifies_only_fcc(
     result = posix_uninstall_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "Free Claude Code has been removed and verified." in result.stdout
-    assert not posix_uninstall_harness.fcc_home.exists()
+    assert "Beast has been removed and verified." in result.stdout
+    assert not posix_uninstall_harness.beast_home.exists()
     assert all(
-        not (posix_uninstall_harness.tool_bin / name).exists() for name in FCC_COMMANDS
+        not (posix_uninstall_harness.tool_bin / name).exists()
+        for name in BEAST_COMMANDS
     )
     assert (posix_uninstall_harness.bin_dir / "uv").exists()
     assert (posix_uninstall_harness.bin_dir / "claude").exists()
@@ -223,10 +224,10 @@ def test_uninstall_sh_removes_and_verifies_only_fcc(
     assert (posix_uninstall_harness.bin_dir / "pi").exists()
     assert posix_uninstall_harness.calls() == [
         "uv:tool dir --bin",
-        "uv:tool uninstall free-claude-code",
-        f"rm:-f {posix_uninstall_harness.home / 'Desktop' / 'Free Claude Code.app'}",
-        f"rm:-rf {posix_uninstall_harness.home / 'Applications' / 'Free Claude Code.app'}",
-        f"rm:-rf {posix_uninstall_harness.fcc_home}",
+        "uv:tool uninstall beast",
+        f"rm:-f {posix_uninstall_harness.home / 'Desktop' / 'Beast.app'}",
+        f"rm:-rf {posix_uninstall_harness.home / 'Applications' / 'Beast.app'}",
+        f"rm:-rf {posix_uninstall_harness.beast_home}",
     ]
 
 
@@ -238,14 +239,14 @@ def test_uninstall_sh_is_idempotent_when_tool_is_already_absent(
     result = posix_uninstall_harness.run(fail_step="missing")
 
     assert result.returncode == 0, result.stderr
-    assert not posix_uninstall_harness.fcc_home.exists()
+    assert not posix_uninstall_harness.beast_home.exists()
     assert "already absent" in result.stdout
 
 
 def test_uninstall_sh_preserves_unrelated_macos_desktop_link(
     posix_uninstall_harness: PosixUninstallHarness,
 ) -> None:
-    desktop_link = posix_uninstall_harness.home / "Desktop" / "Free Claude Code.app"
+    desktop_link = posix_uninstall_harness.home / "Desktop" / "Beast.app"
     desktop_link.unlink()
     unrelated = posix_uninstall_harness.home / "Unrelated.app"
     unrelated.mkdir()
@@ -254,24 +255,24 @@ def test_uninstall_sh_preserves_unrelated_macos_desktop_link(
     result = posix_uninstall_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "non-FCC link" in result.stdout
+    assert "non-BEAST link" in result.stdout
     assert desktop_link.readlink() == unrelated
 
 
 def test_uninstall_sh_preserves_unowned_macos_app_bundle(
     posix_uninstall_harness: PosixUninstallHarness,
 ) -> None:
-    app = posix_uninstall_harness.home / "Applications" / "Free Claude Code.app"
-    owner_file = app / "Contents" / ".free-claude-code-owner"
+    app = posix_uninstall_harness.home / "Applications" / "Beast.app"
+    owner_file = app / "Contents" / ".beast-owner"
     owner_file.unlink()
     sentinel = app / "foreign.txt"
     sentinel.write_text("keep", encoding="utf-8")
-    desktop_link = posix_uninstall_harness.home / "Desktop" / "Free Claude Code.app"
+    desktop_link = posix_uninstall_harness.home / "Desktop" / "Beast.app"
 
     result = posix_uninstall_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "not managed by Free Claude Code" in result.stdout
+    assert "not managed by Beast" in result.stdout
     assert sentinel.read_text(encoding="utf-8") == "keep"
     assert desktop_link.is_symlink()
 
@@ -280,8 +281,8 @@ def test_uninstall_sh_does_not_touch_macos_paths_on_linux(
     posix_uninstall_harness: PosixUninstallHarness,
 ) -> None:
     posix_uninstall_harness.env["FAKE_UNAME"] = "Linux"
-    app = posix_uninstall_harness.home / "Applications" / "Free Claude Code.app"
-    desktop_link = posix_uninstall_harness.home / "Desktop" / "Free Claude Code.app"
+    app = posix_uninstall_harness.home / "Applications" / "Beast.app"
+    desktop_link = posix_uninstall_harness.home / "Desktop" / "Beast.app"
 
     result = posix_uninstall_harness.run()
 
@@ -298,8 +299,8 @@ def test_uninstall_sh_preserves_config_when_tool_removal_is_unconfirmed(
     result = posix_uninstall_harness.run(fail_step=failure)
 
     assert result.returncode != 0
-    assert posix_uninstall_harness.fcc_home.exists()
-    assert "Free Claude Code has been removed and verified." not in result.stdout
+    assert posix_uninstall_harness.beast_home.exists()
+    assert "Beast has been removed and verified." not in result.stdout
     assert not any(call.startswith("rm:") for call in posix_uninstall_harness.calls())
 
 
@@ -309,7 +310,7 @@ def test_uninstall_sh_requires_uv_before_deleting_config(
     result = posix_uninstall_harness.run(include_uv=False)
 
     assert result.returncode != 0
-    assert posix_uninstall_harness.fcc_home.exists()
+    assert posix_uninstall_harness.beast_home.exists()
     assert "uv is required" in result.stderr
     assert posix_uninstall_harness.calls() == []
 
@@ -320,11 +321,12 @@ def test_uninstall_sh_reports_purge_failure_after_verified_tool_removal(
     result = posix_uninstall_harness.run(fail_step="purge")
 
     assert result.returncode != 0
-    assert posix_uninstall_harness.fcc_home.exists()
+    assert posix_uninstall_harness.beast_home.exists()
     assert all(
-        not (posix_uninstall_harness.tool_bin / name).exists() for name in FCC_COMMANDS
+        not (posix_uninstall_harness.tool_bin / name).exists()
+        for name in BEAST_COMMANDS
     )
-    assert "Free Claude Code has been removed and verified." not in result.stdout
+    assert "Beast has been removed and verified." not in result.stdout
 
 
 def test_uninstall_sh_dry_run_is_non_mutating(
@@ -333,9 +335,9 @@ def test_uninstall_sh_dry_run_is_non_mutating(
     result = posix_uninstall_harness.run("--dry-run")
 
     assert result.returncode == 0, result.stderr
-    assert posix_uninstall_harness.fcc_home.exists()
+    assert posix_uninstall_harness.beast_home.exists()
     assert all(
-        (posix_uninstall_harness.tool_bin / name).exists() for name in FCC_COMMANDS
+        (posix_uninstall_harness.tool_bin / name).exists() for name in BEAST_COMMANDS
     )
     assert posix_uninstall_harness.calls() == []
     assert "Dry run complete. No changes were made." in result.stdout
@@ -347,15 +349,15 @@ def test_uninstall_sh_rejects_invalid_options_before_mutation(
     result = posix_uninstall_harness.run("--unknown")
 
     assert result.returncode != 0
-    assert posix_uninstall_harness.fcc_home.exists()
+    assert posix_uninstall_harness.beast_home.exists()
     assert posix_uninstall_harness.calls() == []
 
 
 @pytest.mark.parametrize(
     ("command_name", "process_args"),
     (
-        ("free-claude-code", "/home/user/.local/bin/free-claude-code"),
-        ("fcc-server", "/usr/bin/python3 /home/user/.local/bin/fcc-server"),
+        ("beast", "/home/user/.local/bin/beast"),
+        ("start", "/usr/bin/python3 /home/user/.local/bin/start"),
     ),
 )
 def test_uninstall_sh_process_fallback_reads_full_command_line(
@@ -368,7 +370,7 @@ def test_uninstall_sh_process_fallback_reads_full_command_line(
     result = posix_uninstall_harness.run()
 
     assert result.returncode != 0
-    assert posix_uninstall_harness.fcc_home.exists()
+    assert posix_uninstall_harness.beast_home.exists()
     assert posix_uninstall_harness.calls() == []
     assert command_name in result.stderr
 
@@ -378,7 +380,7 @@ class PowerShellUninstallHarness:
     home: Path
     bin_dir: Path
     tool_bin: Path
-    fcc_home: Path
+    beast_home: Path
     log: Path
     env: dict[str, str]
     powershell: str
@@ -419,7 +421,7 @@ class PowerShellUninstallHarness:
         return self.log.read_text(encoding="utf-8").splitlines()
 
     def remove_entry_points(self) -> None:
-        for name in FCC_COMMANDS:
+        for name in BEAST_COMMANDS:
             (self.tool_bin / f"{name}.cmd").unlink(missing_ok=True)
 
 
@@ -438,20 +440,20 @@ def powershell_uninstall_harness(
     home = tmp_path / "home"
     bin_dir = home / ".local" / "bin"
     tool_bin = tmp_path / "tool-bin"
-    fcc_home = home / ".fcc"
+    beast_home = home / ".fcc"
     app_data = tmp_path / "app-data"
     log = tmp_path / "calls.log"
-    for path in (bin_dir, tool_bin, fcc_home, app_data):
+    for path in (bin_dir, tool_bin, beast_home, app_data):
         path.mkdir(parents=True)
-    (fcc_home / "config.json").write_text("{}", encoding="utf-8")
-    for name in FCC_COMMANDS:
+    (beast_home / "config.json").write_text("{}", encoding="utf-8")
+    for name in BEAST_COMMANDS:
         (tool_bin / f"{name}.cmd").write_text(
             "@echo off\nexit /b 0\n", encoding="utf-8"
         )
     for name in ("claude", "codex", "pi"):
         (bin_dir / f"{name}.cmd").write_text("@echo off\nexit /b 0\n", encoding="utf-8")
 
-    uv_commands = " ".join(FCC_COMMANDS)
+    uv_commands = " ".join(BEAST_COMMANDS)
     (bin_dir / "uv.cmd").write_text(
         rf"""@echo off
 echo uv:%*>>"%CALL_LOG%"
@@ -464,10 +466,10 @@ echo %FAKE_TOOL_BIN%
 exit /b 0
 :uninstall
 if "%FAIL_STEP%"=="uninstall" echo permission denied while removing tool 1>&2 & exit /b 52
-if "%FAIL_STEP%"=="missing" echo Tool `free-claude-code` is not installed 1>&2 & exit /b 2
-if "%FAIL_STEP%"=="stale-entrypoint" echo Tool `free-claude-code` is not installed 1>&2 & exit /b 2
+if "%FAIL_STEP%"=="missing" echo Tool `beast` is not installed 1>&2 & exit /b 2
+if "%FAIL_STEP%"=="stale-entrypoint" echo Tool `beast` is not installed 1>&2 & exit /b 2
 for %%C in ({uv_commands}) do del /q "%FAKE_TOOL_BIN%\%%C.cmd" 2>nul
-echo Uninstalled free-claude-code
+echo Uninstalled beast
 exit /b 0
 """,
         encoding="utf-8",
@@ -493,7 +495,7 @@ function Remove-Item {
     }
     Microsoft.PowerShell.Management\Remove-Item @PSBoundParameters
 }
-$installer = [scriptblock]::Create([IO.File]::ReadAllText($env:FCC_UNINSTALLER))
+$installer = [scriptblock]::Create([IO.File]::ReadAllText($env:BEAST_UNINSTALLER))
 if ($env:UNINSTALL_DRY_RUN -eq "1") {
     & $installer -DryRun
 }
@@ -504,20 +506,15 @@ else {
         encoding="utf-8",
     )
 
-    desktop_shortcut = home / "Desktop" / "Free Claude Code.lnk"
+    desktop_shortcut = home / "Desktop" / "Beast.lnk"
     start_shortcut = (
-        app_data
-        / "Microsoft"
-        / "Windows"
-        / "Start Menu"
-        / "Programs"
-        / "Free Claude Code.lnk"
+        app_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Beast.lnk"
     )
     for shortcut in (desktop_shortcut, start_shortcut):
         _create_windows_shortcut(
             powershell,
             shortcut,
-            tool_bin / "fcc-desktop.cmd",
+            tool_bin / "beast-desktop.cmd",
         )
 
     system_root = os.environ["SYSTEMROOT"]
@@ -533,13 +530,13 @@ else {
             "APPDATA": str(app_data),
             "CALL_LOG": str(log),
             "FAKE_TOOL_BIN": str(tool_bin),
-            "FCC_UNINSTALLER": str(_repo_root() / "scripts" / "uninstall.ps1"),
+            "BEAST_UNINSTALLER": str(_repo_root() / "scripts" / "uninstall.ps1"),
             "FAIL_STEP": "",
             "UNINSTALL_DRY_RUN": "0",
         }
     )
     return PowerShellUninstallHarness(
-        home, bin_dir, tool_bin, fcc_home, log, env, powershell, wrapper
+        home, bin_dir, tool_bin, beast_home, log, env, powershell, wrapper
     )
 
 
@@ -549,11 +546,11 @@ def test_uninstall_ps1_removes_and_verifies_only_fcc(
     result = powershell_uninstall_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "Free Claude Code has been removed and verified." in result.stdout
-    assert not powershell_uninstall_harness.fcc_home.exists()
+    assert "Beast has been removed and verified." in result.stdout
+    assert not powershell_uninstall_harness.beast_home.exists()
     assert all(
         not (powershell_uninstall_harness.tool_bin / f"{name}.cmd").exists()
-        for name in FCC_COMMANDS
+        for name in BEAST_COMMANDS
     )
     assert (powershell_uninstall_harness.bin_dir / "uv.cmd").exists()
     assert (powershell_uninstall_harness.bin_dir / "claude.cmd").exists()
@@ -561,10 +558,10 @@ def test_uninstall_ps1_removes_and_verifies_only_fcc(
     assert (powershell_uninstall_harness.bin_dir / "pi.cmd").exists()
     assert powershell_uninstall_harness.calls() == [
         "uv:tool dir --bin",
-        "uv:tool uninstall free-claude-code",
-        f"remove:{Path(powershell_uninstall_harness.env['USERPROFILE']) / 'Desktop' / 'Free Claude Code.lnk'}",
-        f"remove:{Path(powershell_uninstall_harness.env['APPDATA']) / 'Microsoft' / 'Windows' / 'Start Menu' / 'Programs' / 'Free Claude Code.lnk'}",
-        f"remove:{powershell_uninstall_harness.fcc_home}",
+        "uv:tool uninstall beast",
+        f"remove:{Path(powershell_uninstall_harness.env['USERPROFILE']) / 'Desktop' / 'Beast.lnk'}",
+        f"remove:{Path(powershell_uninstall_harness.env['APPDATA']) / 'Microsoft' / 'Windows' / 'Start Menu' / 'Programs' / 'Beast.lnk'}",
+        f"remove:{powershell_uninstall_harness.beast_home}",
     ]
 
 
@@ -572,9 +569,7 @@ def test_uninstall_ps1_preserves_unowned_desktop_shortcut(
     powershell_uninstall_harness: PowerShellUninstallHarness,
 ) -> None:
     desktop_shortcut = (
-        Path(powershell_uninstall_harness.env["USERPROFILE"])
-        / "Desktop"
-        / "Free Claude Code.lnk"
+        Path(powershell_uninstall_harness.env["USERPROFILE"]) / "Desktop" / "Beast.lnk"
     )
     unrelated_target = powershell_uninstall_harness.home / "unrelated.cmd"
     unrelated_target.write_text("@echo off\n", encoding="utf-8")
@@ -588,7 +583,7 @@ def test_uninstall_ps1_preserves_unowned_desktop_shortcut(
     result = powershell_uninstall_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "not managed by Free Claude Code" in result.stdout
+    assert "not managed by Beast" in result.stdout
     assert desktop_shortcut.read_bytes() == original_shortcut
 
 
@@ -600,7 +595,7 @@ def test_uninstall_ps1_is_idempotent_when_tool_is_already_absent(
     result = powershell_uninstall_harness.run(fail_step="missing")
 
     assert result.returncode == 0, result.stderr
-    assert not powershell_uninstall_harness.fcc_home.exists()
+    assert not powershell_uninstall_harness.beast_home.exists()
     assert "already absent" in result.stdout
 
 
@@ -612,8 +607,8 @@ def test_uninstall_ps1_preserves_config_when_tool_removal_is_unconfirmed(
     result = powershell_uninstall_harness.run(fail_step=failure)
 
     assert result.returncode != 0
-    assert powershell_uninstall_harness.fcc_home.exists()
-    assert "Free Claude Code has been removed and verified." not in result.stdout
+    assert powershell_uninstall_harness.beast_home.exists()
+    assert "Beast has been removed and verified." not in result.stdout
     assert not any(
         call.startswith("remove:") for call in powershell_uninstall_harness.calls()
     )
@@ -625,7 +620,7 @@ def test_uninstall_ps1_requires_uv_before_deleting_config(
     result = powershell_uninstall_harness.run(include_uv=False)
 
     assert result.returncode != 0
-    assert powershell_uninstall_harness.fcc_home.exists()
+    assert powershell_uninstall_harness.beast_home.exists()
     assert "uv is required" in result.stderr
     assert powershell_uninstall_harness.calls() == []
 
@@ -636,12 +631,12 @@ def test_uninstall_ps1_reports_purge_failure_after_verified_tool_removal(
     result = powershell_uninstall_harness.run(fail_step="purge")
 
     assert result.returncode != 0
-    assert powershell_uninstall_harness.fcc_home.exists()
+    assert powershell_uninstall_harness.beast_home.exists()
     assert all(
         not (powershell_uninstall_harness.tool_bin / f"{name}.cmd").exists()
-        for name in FCC_COMMANDS
+        for name in BEAST_COMMANDS
     )
-    assert "Free Claude Code has been removed and verified." not in result.stdout
+    assert "Beast has been removed and verified." not in result.stdout
 
 
 def test_uninstall_ps1_dry_run_is_non_mutating(
@@ -650,10 +645,10 @@ def test_uninstall_ps1_dry_run_is_non_mutating(
     result = powershell_uninstall_harness.run(dry_run=True)
 
     assert result.returncode == 0, result.stderr
-    assert powershell_uninstall_harness.fcc_home.exists()
+    assert powershell_uninstall_harness.beast_home.exists()
     assert all(
         (powershell_uninstall_harness.tool_bin / f"{name}.cmd").exists()
-        for name in FCC_COMMANDS
+        for name in BEAST_COMMANDS
     )
     assert powershell_uninstall_harness.calls() == []
     assert "Dry run complete. No changes were made." in result.stdout
@@ -668,7 +663,7 @@ def test_uninstallers_guard_running_commands_and_preserve_shared_owners() -> Non
     assert "pgrep" in shell
     assert "Get-Process" in powershell
     for text in (shell, powershell):
-        for command in FCC_COMMANDS:
+        for command in BEAST_COMMANDS:
             assert command in text
         assert "npm uninstall" not in text
         assert "uv self uninstall" not in text

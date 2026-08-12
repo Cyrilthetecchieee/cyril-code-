@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from free_claude_code.config.provider_catalog import VERCEL_AI_GATEWAY_DEFAULT_BASE
-from free_claude_code.providers.base import ProviderConfig
+from beast.config.provider_catalog import VERCEL_AI_GATEWAY_DEFAULT_BASE
+from beast.providers.base import ProviderConfig
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission, profiled_provider
 
@@ -39,9 +39,7 @@ def test_default_base_url_constant():
 
 
 def test_init_uses_default_base_url_and_api_key(vercel_config):
-    with patch(
-        "free_claude_code.providers.openai_chat.provider.AsyncOpenAI"
-    ) as mock_openai:
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = profiled_provider(
             "vercel",
             vercel_config,
@@ -56,7 +54,7 @@ def test_init_uses_default_base_url_and_api_key(vercel_config):
 def test_init_strips_trailing_slash(vercel_config):
     config = replace(vercel_config, base_url=f"{VERCEL_AI_GATEWAY_DEFAULT_BASE}/")
 
-    with patch("free_claude_code.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
         provider = profiled_provider(
             "vercel",
             config,
@@ -68,7 +66,7 @@ def test_init_strips_trailing_slash(vercel_config):
 
 def test_build_request_body_keeps_max_tokens(vercel_provider):
     with patch(
-        "free_claude_code.providers.openai_chat.request_policy.build_base_request_body"
+        "beast.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "openai/gpt-5.5",

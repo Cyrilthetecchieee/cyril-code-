@@ -7,12 +7,12 @@ import httpx
 import openai
 import pytest
 
-from beast.core.diagnostics import (
+from cyril_code.core.diagnostics import (
     ERROR_DETAIL_DISPLAY_CAP_BYTES,
     attach_upstream_error_body,
 )
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.providers.failure_policy import (
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.providers.failure_policy import (
     ProviderRecoveryExhausted,
     classify_provider_failure,
     is_retryable_provider_error,

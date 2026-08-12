@@ -70,7 +70,7 @@ def test_pi_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None:
     if not uv_bin:
         pytest.skip("missing_env: uv not found")
     provider_model = ProviderMatrixDriver(smoke_config).first_model()
-    auth_token = "beast-pi-smoke-token"
+    auth_token = "cyril-pi-smoke-token"
 
     with SmokeServerDriver(
         smoke_config,
@@ -86,7 +86,7 @@ def test_pi_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None:
             {
                 "HOST": "127.0.0.1",
                 "PORT": str(server.port),
-                "BEAST_OPEN_BROWSER": "0",
+                "CYRIL_OPEN_BROWSER": "0",
                 "ANTHROPIC_AUTH_TOKEN": auth_token,
                 "PI_CODING_AGENT_DIR": str(tmp_path / "pi-agent"),
             }
@@ -98,11 +98,11 @@ def test_pi_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None:
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "beast-pi",
+                "cyril-pi",
                 "--no-session",
                 "--no-approve",
                 "--print",
-                "Reply with exactly BEAST_SMOKE_PI",
+                "Reply with exactly CYRIL_SMOKE_PI",
             ],
             cwd=tmp_path,
             env=env,
@@ -114,7 +114,7 @@ def test_pi_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None:
         server_log = server.log_path.read_text(encoding="utf-8", errors="replace")
 
     assert result.returncode == 0, result.stderr or result.stdout
-    assert "BEAST_SMOKE_PI" in result.stdout
+    assert "CYRIL_SMOKE_PI" in result.stdout
     assert "POST /v1/messages" in server_log
 
 
@@ -140,7 +140,7 @@ def test_claude_cli_adaptive_thinking_e2e(
             server=server,
             config=smoke_config,
             cwd=tmp_path,
-            prompt="think hard, then reply with exactly BEAST_SMOKE_CLI",
+            prompt="think hard, then reply with exactly CYRIL_SMOKE_CLI",
         )
         server_log = server.log_path.read_text(encoding="utf-8", errors="replace")
 
@@ -149,7 +149,7 @@ def test_claude_cli_adaptive_thinking_e2e(
     assert " 422 " not in server_log
     assert 'HTTP/1.1" 422' not in server_log
     assert "400 Bad Request" not in result.stdout
-    assert "BEAST_SMOKE_CLI" in result.stdout
+    assert "CYRIL_SMOKE_CLI" in result.stdout
 
 
 @pytest.mark.smoke_target("cli")
@@ -159,7 +159,7 @@ def test_claude_cli_provider_error_e2e(
     claude_bin = shutil.which(smoke_config.claude_bin)
     if not claude_bin:
         pytest.skip(f"missing_env: Claude CLI not found: {smoke_config.claude_bin}")
-    broken_model = "lmstudio/beast-smoke-failing-model"
+    broken_model = "lmstudio/cyril_code-smoke-failing-model"
 
     with (
         _deliberately_failing_openai_provider() as (
@@ -185,7 +185,7 @@ def test_claude_cli_provider_error_e2e(
             server=server,
             config=smoke_config,
             cwd=tmp_path,
-            prompt="Reply with exactly BEAST_SMOKE_UNREACHABLE.",
+            prompt="Reply with exactly CYRIL_SMOKE_UNREACHABLE.",
             model="claude-sonnet-4-5-20250929",
         )
         server_log = server.log_path.read_text(encoding="utf-8", errors="replace")
@@ -219,7 +219,7 @@ def _deliberately_failing_openai_provider() -> Iterator[tuple[str, list[str]]]:
                         "object": "list",
                         "data": [
                             {
-                                "id": "beast-smoke-failing-model",
+                                "id": "cyril_code-smoke-failing-model",
                                 "object": "model",
                             }
                         ],
@@ -240,8 +240,8 @@ def _deliberately_failing_openai_provider() -> Iterator[tuple[str, list[str]]]:
                 {
                     "error": {
                         "type": "invalid_request_error",
-                        "code": "beast_smoke_failure",
-                        "message": "BEAST smoke provider rejected the request deliberately.",
+                        "code": "cyril_smoke_failure",
+                        "message": "CYRIL smoke provider rejected the request deliberately.",
                     }
                 },
             )

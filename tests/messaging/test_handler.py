@@ -3,11 +3,11 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
 
-from beast.messaging.command_context import ReplyClearResult, StopOutcome
-from beast.messaging.models import MessageScope
-from beast.messaging.platforms.ports import MessagingStartupNotice
-from beast.messaging.session import SessionStore
-from beast.messaging.trees import (
+from cyril_code.messaging.command_context import ReplyClearResult, StopOutcome
+from cyril_code.messaging.models import MessageScope
+from cyril_code.messaging.platforms.ports import MessagingStartupNotice
+from cyril_code.messaging.session import SessionStore
+from cyril_code.messaging.trees import (
     CancellationReason,
     CancellationResult,
     CancellationUiOwner,
@@ -23,9 +23,9 @@ from beast.messaging.trees import (
     TreeQueueManager,
     TreeSnapshot,
 )
-from beast.messaging.trees.transitions import CancellationEffect
-from beast.messaging.voice import VoiceCancellationResult
-from beast.messaging.workflow import MessagingWorkflow
+from cyril_code.messaging.trees.transitions import CancellationEffect
+from cyril_code.messaging.voice import VoiceCancellationResult
+from cyril_code.messaging.workflow import MessagingWorkflow
 
 _SCOPE = MessageScope(platform="telegram", chat_id="chat_1")
 _OTHER_SCOPE = MessageScope(platform="telegram", chat_id="other_chat")
@@ -121,7 +121,7 @@ async def test_handle_message_turn_trace_always_includes_full_message_text(
     incoming = incoming_message_factory(text=text)
     with (
         patch.object(workflow.turn_intake, "handle_message", new_callable=AsyncMock),
-        patch("beast.messaging.workflow.trace_event") as trace_mock,
+        patch("cyril_code.messaging.workflow.trace_event") as trace_mock,
     ):
         await workflow.handle_message(incoming)
 
@@ -894,7 +894,7 @@ async def test_terminal_close_waits_past_interactive_drain_timeout(
     incoming_message_factory,
 ) -> None:
     monkeypatch.setattr(
-        "beast.messaging.trees.manager.CANCEL_TASK_DRAIN_TIMEOUT_S",
+        "cyril_code.messaging.trees.manager.CANCEL_TASK_DRAIN_TIMEOUT_S",
         0.01,
     )
     runner_started = asyncio.Event()
@@ -1065,7 +1065,7 @@ async def test_session_info_rejects_unregistered_real_session_without_recording_
     handler,
     mock_cli_manager,
 ) -> None:
-    from beast.messaging.node_event_pipeline import (
+    from cyril_code.messaging.node_event_pipeline import (
         handle_session_info_event,
     )
 
@@ -1406,7 +1406,7 @@ async def test_startup_notice_is_published_and_recorded_for_clear(
 
     mock_platform.queue_send_message.assert_awaited_once_with(
         _SCOPE.chat_id,
-        "🚀 *Beast Proxy is online\\!* \\(Bot API\\)",
+        "🚀 *Cyril Code Proxy is online\\!* \\(Bot API\\)",
         parse_mode="MarkdownV2",
         fire_and_forget=False,
     )

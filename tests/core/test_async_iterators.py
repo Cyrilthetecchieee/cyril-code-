@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from beast.core.async_iterators import (
+from cyril_code.core.async_iterators import (
     AsyncCloseable,
     try_close_async_iterator,
 )

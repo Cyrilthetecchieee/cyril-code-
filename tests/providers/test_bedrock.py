@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.provider_catalog import BEDROCK_DEFAULT_BASE
-from beast.providers.base import ProviderConfig
-from beast.providers.openai_chat import OpenAIChatProvider
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.provider_catalog import BEDROCK_DEFAULT_BASE
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.openai_chat import OpenAIChatProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission, profiled_provider
 
@@ -43,7 +43,7 @@ def _provider(base_url: str = BEDROCK_DEFAULT_BASE) -> OpenAIChatProvider:
 def test_init_uses_bearer_key_and_normalizes_regional_openai_base(
     configured: str, expected: str
 ) -> None:
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
         provider = _provider(configured)
 
     assert provider._provider_name == "BEDROCK"

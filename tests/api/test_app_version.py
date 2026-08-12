@@ -2,7 +2,7 @@ import warnings
 
 from fastapi.testclient import TestClient
 
-from beast.core.version import package_version
+from cyril_code.core.version import package_version
 from tests.api.support import create_test_app
 
 

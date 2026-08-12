@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, patch
 import httpx
 import pytest
 
-from beast.application.errors import ApplicationUnavailableError
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.provider_catalog import CLOUDFLARE_AI_REST_ROOT
-from beast.core.anthropic.models import Message, MessagesRequest
-from beast.core.anthropic.stream_contracts import parse_sse_text
-from beast.providers.base import ProviderConfig
-from beast.providers.cloudflare import (
+from cyril_code.application.errors import ApplicationUnavailableError
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.provider_catalog import CLOUDFLARE_AI_REST_ROOT
+from cyril_code.core.anthropic.models import Message, MessagesRequest
+from cyril_code.core.anthropic.stream_contracts import parse_sse_text
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.cloudflare import (
     CloudflareProvider,
     cloudflare_ai_base_url,
 )
@@ -82,7 +82,7 @@ def test_init_composes_account_scoped_openai_chat_base_url(
     cloudflare_config: ProviderConfig,
 ) -> None:
     with (
-        patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai,
+        patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai,
         patch("httpx.AsyncClient") as mock_httpx_client,
     ):
         provider = CloudflareProvider(

@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from beast.application.errors import InvalidRequestError
-from beast.config.provider_catalog import LMSTUDIO_DEFAULT_BASE
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.lmstudio import LMStudioProvider
+from cyril_code.application.errors import InvalidRequestError
+from cyril_code.config.provider_catalog import LMSTUDIO_DEFAULT_BASE
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.lmstudio import LMStudioProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     REASONING_OFF,
@@ -40,7 +40,7 @@ def lmstudio_provider(lmstudio_config):
 
 def test_init(lmstudio_config):
     """Test provider initialization."""
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = LMStudioProvider(lmstudio_config, admission=immediate_admission())
         assert provider._api_key == "lm-studio"
         assert provider._base_url == LMSTUDIO_DEFAULT_BASE
@@ -215,7 +215,7 @@ def test_preflight_context_budget_rejects_request_over_90_percent(lmstudio_provi
     with (
         patch.object(lmstudio_provider, "_loaded_context_length", return_value=1000),
         patch(
-            "beast.providers.lmstudio.client.get_token_count",
+            "cyril_code.providers.lmstudio.client.get_token_count",
             return_value=901,
         ),
         pytest.raises(ExecutionFailure) as exc_info,
@@ -244,7 +244,7 @@ def test_loaded_context_length_reads_max_across_loaded_models(lmstudio_provider)
         ]
     }
     with patch(
-        "beast.providers.lmstudio.client.httpx.get", return_value=response
+        "cyril_code.providers.lmstudio.client.httpx.get", return_value=response
     ) as mock_get:
         value = lmstudio_provider._loaded_context_length()
 
@@ -255,7 +255,7 @@ def test_loaded_context_length_reads_max_across_loaded_models(lmstudio_provider)
 
 def test_loaded_context_length_fails_open_on_error(lmstudio_provider):
     with patch(
-        "beast.providers.lmstudio.client.httpx.get",
+        "cyril_code.providers.lmstudio.client.httpx.get",
         side_effect=httpx.ConnectError("refused"),
     ):
         assert lmstudio_provider._loaded_context_length() is None
@@ -268,7 +268,7 @@ def test_loaded_context_length_is_cached_within_ttl(lmstudio_provider):
         "data": [{"state": "loaded", "loaded_context_length": 40960}]
     }
     with patch(
-        "beast.providers.lmstudio.client.httpx.get", return_value=response
+        "cyril_code.providers.lmstudio.client.httpx.get", return_value=response
     ) as mock_get:
         first = lmstudio_provider._loaded_context_length()
         second = lmstudio_provider._loaded_context_length()

@@ -3,9 +3,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from beast.messaging.models import MessageScope
-from beast.messaging.trees import MessageState
-from beast.messaging.workflow import MessagingWorkflow
+from cyril_code.messaging.models import MessageScope
+from cyril_code.messaging.trees import MessageState
+from cyril_code.messaging.workflow import MessagingWorkflow
 
 _SCOPE = MessageScope(platform="telegram", chat_id="chat_1")
 

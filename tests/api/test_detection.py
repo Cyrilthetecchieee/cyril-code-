@@ -2,14 +2,14 @@
 
 from unittest.mock import patch
 
-from beast.api.detection import (
+from cyril_code.api.detection import (
     is_filepath_extraction_request,
     is_prefix_detection_request,
     is_quota_check_request,
     is_safety_classifier_request,
     is_title_generation_request,
 )
-from beast.core.anthropic.models import Message, MessagesRequest
+from cyril_code.core.anthropic.models import Message, MessagesRequest
 
 
 def _make_request(
@@ -81,7 +81,7 @@ class TestIsPrefixDetectionRequest:
                 raise TypeError("bad slice")
 
         with patch(
-            "beast.api.detection.extract_text_from_content",
+            "cyril_code.api.detection.extract_text_from_content",
             return_value=BadStr("<policy_spec> Command: x"),
         ):
             is_req, cmd = is_prefix_detection_request(req)

@@ -1,11 +1,11 @@
 import pytest
 from pydantic import ValidationError
 
-from beast.core.anthropic.conversion import (
+from cyril_code.core.anthropic.conversion import (
     OpenAIConversionError,
     build_base_request_body,
 )
-from beast.core.anthropic.models import (
+from cyril_code.core.anthropic.models import (
     ContentBlockDocument,
     ContentBlockWebFetchToolResult,
     Message,

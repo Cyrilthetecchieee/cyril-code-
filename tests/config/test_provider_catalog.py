@@ -2,7 +2,7 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from beast.config.provider_catalog import (
+from cyril_code.config.provider_catalog import (
     PROVIDER_CATALOG,
     ProviderAuthKind,
     ProviderDescriptor,

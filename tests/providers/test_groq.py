@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.config.provider_catalog import GROQ_DEFAULT_BASE
-from beast.providers.base import ProviderConfig
-from beast.providers.groq import GroqProvider
+from cyril_code.config.provider_catalog import GROQ_DEFAULT_BASE
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.groq import GroqProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission
 
@@ -32,7 +32,7 @@ def groq_provider(groq_config):
 
 def test_init(groq_config):
     """Test provider initialization."""
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = GroqProvider(groq_config, admission=immediate_admission())
         assert provider._api_key == "test_groq_key"
         assert provider._base_url == GROQ_DEFAULT_BASE
@@ -122,7 +122,7 @@ def test_build_request_body_global_disable_blocks_reasoning_mapping():
 
 def test_build_request_body_sanitizes_and_remaps_via_mock_converter(groq_provider):
     with patch(
-        "beast.providers.openai_chat.request_policy.build_base_request_body"
+        "cyril_code.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "llama-3.3-70b-versatile",
@@ -155,7 +155,7 @@ def test_build_request_body_sanitizes_and_remaps_via_mock_converter(groq_provide
 
 def test_build_request_body_prefers_existing_max_completion_tokens(groq_provider):
     with patch(
-        "beast.providers.openai_chat.request_policy.build_base_request_body"
+        "cyril_code.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "llama-3.3-70b-versatile",

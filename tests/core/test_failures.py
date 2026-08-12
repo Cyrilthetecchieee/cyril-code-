@@ -4,7 +4,7 @@ from dataclasses import FrozenInstanceError, fields, is_dataclass
 
 import pytest
 
-from beast.core.failures import (
+from cyril_code.core.failures import (
     ExecutionFailure,
     FailureKind,
     find_execution_failure,

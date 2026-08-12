@@ -4,7 +4,7 @@ from typing import Any
 
 import httpx
 
-from beast.core.anthropic.stream_contracts import SSEEvent, parse_sse_lines
+from cyril_code.core.anthropic.stream_contracts import SSEEvent, parse_sse_lines
 
 from .config import SmokeConfig, auth_headers, redacted
 from .server import RunningServer

@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from beast.core.anthropic.stream_contracts import parse_sse_text
-from beast.core.anthropic.streaming import format_sse_event
-from beast.core.async_iterators import AsyncCloseable
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.core.openai_responses import (
+from cyril_code.core.anthropic.stream_contracts import parse_sse_text
+from cyril_code.core.anthropic.streaming import format_sse_event
+from cyril_code.core.async_iterators import AsyncCloseable
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.openai_responses import (
     OpenAIResponsesAdapter,
     OpenAIResponsesRequest,
 )
-from beast.core.openai_responses.anthropic_sse import (
+from cyril_code.core.openai_responses.anthropic_sse import (
     AnthropicSseEvent,
     iter_sse_events,
 )
@@ -121,7 +121,7 @@ async def test_responses_transform_closes_direct_event_source_on_early_close() -
         ]
     )
     with patch(
-        "beast.core.openai_responses.stream.iter_sse_events",
+        "cyril_code.core.openai_responses.stream.iter_sse_events",
         return_value=events,
     ):
         stream = _responses_sse(
@@ -145,7 +145,7 @@ async def test_responses_transform_preserves_direct_source_failure() -> None:
     )
     with (
         patch(
-            "beast.core.openai_responses.stream.iter_sse_events",
+            "cyril_code.core.openai_responses.stream.iter_sse_events",
             return_value=events,
         ),
         pytest.raises(RuntimeError) as exc_info,
@@ -297,24 +297,24 @@ async def test_anthropic_tool_stream_converts_to_function_call_item() -> None:
     assert function_call["type"] == "function_call"
     assert function_call["call_id"] == "toolu_1"
     assert function_call["name"] == "echo"
-    assert function_call["arguments"] == '{"value":"BEAST"}'
+    assert function_call["arguments"] == '{"value":"CYRIL"}'
 
 
 @pytest.mark.asyncio
 async def test_anthropic_function_tool_arguments_are_normalized() -> None:
     response = await _completed_response_from_sse(
-        _aiter(_anthropic_tool_stream(partial_json='{ "value" : "BEAST" }')),
+        _aiter(_anthropic_tool_stream(partial_json='{ "value" : "CYRIL" }')),
         {"model": "nvidia_nim/test-model", "stream": True},
     )
 
-    assert response["output"][0]["arguments"] == '{"value":"BEAST"}'
+    assert response["output"][0]["arguments"] == '{"value":"CYRIL"}'
 
 
 @pytest.mark.asyncio
 async def test_anthropic_malformed_function_tool_arguments_fail_response() -> None:
     text = await _collect_sse(
         _responses_sse(
-            _aiter(_anthropic_tool_stream(partial_json='{"value":"BEAST" "bad"}')),
+            _aiter(_anthropic_tool_stream(partial_json='{"value":"CYRIL" "bad"}')),
             {"model": "nvidia_nim/test-model", "stream": True},
         )
     )
@@ -335,7 +335,7 @@ async def test_anthropic_malformed_function_tool_arguments_fail_response() -> No
 @pytest.mark.asyncio
 async def test_anthropic_malformed_function_tool_arguments_fail_on_eof() -> None:
     stream = _anthropic_tool_stream(
-        partial_json='{"value":"BEAST" "bad"}',
+        partial_json='{"value":"CYRIL" "bad"}',
         include_block_stop=False,
     )
     text = await _collect_sse(
@@ -706,9 +706,9 @@ async def test_text_only_usage_omits_reasoning_usage_detail() -> None:
         (
             {"model": "nvidia_nim/test-model", "stream": True},
             "echo",
-            '{"value":"BEAST"}',
+            '{"value":"CYRIL"}',
             "function_call",
-            ("arguments", '{"value":"BEAST"}'),
+            ("arguments", '{"value":"CYRIL"}'),
         ),
         (
             {
@@ -774,7 +774,7 @@ async def test_overlapping_text_and_tool_blocks_keep_reserved_output_indexes() -
         "function_call",
     ]
     assert completed["output"][0]["content"][0]["text"] == "text"
-    assert completed["output"][1]["arguments"] == '{"value":"BEAST"}'
+    assert completed["output"][1]["arguments"] == '{"value":"CYRIL"}'
 
 
 @pytest.mark.asyncio
@@ -855,7 +855,7 @@ def _anthropic_text_stream(text: str, *, stop_reason: str = "end_turn") -> list[
 
 def _anthropic_tool_stream(
     tool_name: str = "echo",
-    partial_json: str = '{"value":"BEAST"}',
+    partial_json: str = '{"value":"CYRIL"}',
     *,
     include_block_stop: bool = True,
 ) -> list[str]:
@@ -991,7 +991,7 @@ def _overlapping_text_tool_stream() -> list[str]:
                 "index": 1,
                 "delta": {
                     "type": "input_json_delta",
-                    "partial_json": '{"value":"BEAST"}',
+                    "partial_json": '{"value":"CYRIL"}',
                 },
             },
         ),

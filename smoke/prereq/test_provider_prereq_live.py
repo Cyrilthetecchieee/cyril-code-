@@ -3,7 +3,7 @@ import time
 import httpx
 import pytest
 
-from beast.core.anthropic.stream_contracts import (
+from cyril_code.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     text_content,
     thinking_content,
@@ -62,7 +62,7 @@ def test_configured_provider_models_stream_successfully(
         ) as server:
             events = collect_message_stream(
                 server,
-                message_payload(smoke_config.prompt, model="beast-smoke-default"),
+                message_payload(smoke_config.prompt, model="cyril_code-smoke-default"),
                 smoke_config,
             )
             skip_if_upstream_unavailable_events(events)
@@ -98,7 +98,7 @@ def test_client_disconnect_mid_stream_does_not_crash_server(
             "POST",
             f"{server.base_url}/v1/messages",
             headers=auth_headers(),
-            json=message_payload(smoke_config.prompt, model="beast-smoke-default"),
+            json=message_payload(smoke_config.prompt, model="cyril_code-smoke-default"),
             timeout=smoke_config.timeout_s,
         ) as response:
             assert response.status_code == 200, response.read()

@@ -7,10 +7,10 @@ import openai
 import pytest
 from httpx import Request, Response
 
-from beast.config.nim import NimSettings
-from beast.core.failures import ExecutionFailure
-from beast.providers.base import ProviderConfig
-from beast.providers.nvidia_nim import NvidiaNimProvider
+from cyril_code.config.nim import NimSettings
+from cyril_code.core.failures import ExecutionFailure
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.nvidia_nim import NvidiaNimProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission
 
@@ -146,7 +146,7 @@ async def test_nim_stream_connection_error_exhausted_emits_cause_chain():
             new_callable=AsyncMock,
             side_effect=error,
         ) as mock_create,
-        patch("beast.providers.openai_chat.provider.trace_event") as trace,
+        patch("cyril_code.providers.openai_chat.provider.trace_event") as trace,
         pytest.raises(ExecutionFailure) as exc_info,
     ):
         [e async for e in provider.stream_response(req, request_id="req_conn")]

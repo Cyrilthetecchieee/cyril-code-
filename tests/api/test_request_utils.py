@@ -4,14 +4,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from beast.api.command_utils import extract_command_prefix
-from beast.api.detection import (
+from cyril_code.api.command_utils import extract_command_prefix
+from cyril_code.api.detection import (
     is_prefix_detection_request,
     is_quota_check_request,
     is_title_generation_request,
 )
-from beast.core.anthropic import get_token_count
-from beast.core.anthropic.models import (
+from cyril_code.core.anthropic import get_token_count
+from cyril_code.core.anthropic.models import (
     Message,
     MessagesRequest,
     SystemContent,

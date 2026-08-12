@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from beast.messaging.models import MessageScope
-from beast.messaging.voice import (
+from cyril_code.messaging.models import MessageScope
+from cyril_code.messaging.voice import (
     PendingVoiceClaim,
     PendingVoiceRegistry,
     VoiceCancellationResult,

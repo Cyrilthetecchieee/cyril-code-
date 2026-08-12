@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.config.provider_catalog import CEREBRAS_DEFAULT_BASE
-from beast.providers.base import ProviderConfig
+from cyril_code.config.provider_catalog import CEREBRAS_DEFAULT_BASE
+from cyril_code.providers.base import ProviderConfig
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     REASONING_OFF,
@@ -70,7 +70,7 @@ def cerebras_provider(cerebras_config):
 
 def test_init(cerebras_config):
     """Test provider initialization."""
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = profiled_provider(
             "cerebras", cerebras_config, admission=immediate_admission()
         )
@@ -142,7 +142,7 @@ def test_replay_is_independent_of_current_turn_reasoning_control():
 def test_build_request_body_remaps_max_tokens_preserves_message_name(cerebras_provider):
     """Cerebras does not strip message ``name``; ``max_tokens`` maps to completion field."""
     with patch(
-        "beast.providers.openai_chat.request_policy.build_base_request_body"
+        "cyril_code.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "llama3.1-8b",
@@ -159,7 +159,7 @@ def test_build_request_body_remaps_max_tokens_preserves_message_name(cerebras_pr
 
 def test_build_request_body_prefers_existing_max_completion_tokens(cerebras_provider):
     with patch(
-        "beast.providers.openai_chat.request_policy.build_base_request_body"
+        "cyril_code.providers.openai_chat.request_policy.build_base_request_body"
     ) as mock_convert:
         mock_convert.return_value = {
             "model": "llama3.1-8b",

@@ -4,14 +4,14 @@ from collections.abc import Mapping, MutableMapping
 
 from fastapi import FastAPI
 
-from beast.api.app import create_app
-from beast.api.ports import ApiServices
-from beast.application.connected_accounts import ConnectedAccountPort
-from beast.config.settings import Settings
-from beast.providers.base import BaseProvider
-from beast.providers.runtime import ProviderRuntime
-from beast.runtime.application import ApplicationRuntime, RestartCallback
-from beast.runtime.provider_manager import ProviderRuntimeManager
+from cyril_code.api.app import create_app
+from cyril_code.api.ports import ApiServices
+from cyril_code.application.connected_accounts import ConnectedAccountPort
+from cyril_code.config.settings import Settings
+from cyril_code.providers.base import BaseProvider
+from cyril_code.providers.runtime import ProviderRuntime
+from cyril_code.runtime.application import ApplicationRuntime, RestartCallback
+from cyril_code.runtime.provider_manager import ProviderRuntimeManager
 
 
 def create_test_app(

@@ -4,8 +4,8 @@ import asyncio
 
 import pytest
 
-from beast.messaging.models import IncomingMessage, MessageScope
-from beast.messaging.trees import (
+from cyril_code.messaging.models import IncomingMessage, MessageScope
+from cyril_code.messaging.trees import (
     ConversationSnapshot,
     MessageState,
     NodeClaim,
@@ -13,8 +13,8 @@ from beast.messaging.trees import (
     TreeQueueManager,
     TreeSnapshot,
 )
-from beast.messaging.trees.node import MessageNode
-from beast.messaging.trees.snapshot import node_to_snapshot
+from cyril_code.messaging.trees.node import MessageNode
+from cyril_code.messaging.trees.snapshot import node_to_snapshot
 
 TELEGRAM_CHAT = MessageScope(platform="telegram", chat_id="chat")
 ROOT_IDENTITY = TreeIdentity(scope=TELEGRAM_CHAT, root_id="root")

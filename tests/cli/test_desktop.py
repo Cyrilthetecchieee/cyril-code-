@@ -4,10 +4,10 @@ import threading
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from beast.cli.commands import ServerStatus, ServerSupervisor
-from beast.cli.desktop import DesktopController
-from beast.config.settings import Settings
-from beast.core.interprocess_lock import InterprocessFileLock
+from cyril_code.cli.commands import ServerStatus, ServerSupervisor
+from cyril_code.cli.desktop import DesktopController
+from cyril_code.config.settings import Settings
+from cyril_code.core.interprocess_lock import InterprocessFileLock
 
 
 def _settings() -> Settings:
@@ -35,11 +35,11 @@ def test_supervisor_accepts_restart_during_scheduled_startup() -> None:
 
     with (
         patch(
-            "beast.cli.commands.load_server_settings",
+            "cyril_code.cli.commands.load_server_settings",
             return_value=settings,
         ),
         patch.object(supervisor, "_run_once", return_value=False) as run_once,
-        patch("beast.cli.commands.kill_all_best_effort"),
+        patch("cyril_code.cli.commands.kill_all_best_effort"),
     ):
         assert supervisor.schedule_run() is True
         assert supervisor.status is ServerStatus.STARTING
@@ -207,7 +207,7 @@ def test_restart_during_server_startup_is_accepted_without_waiting() -> None:
 
 
 def test_second_desktop_launch_opens_existing_admin_without_new_server() -> None:
-    from beast.cli import desktop
+    from cyril_code.cli import desktop
 
     settings = _settings()
     instance_lock = MagicMock()
@@ -227,7 +227,7 @@ def test_second_desktop_launch_opens_existing_admin_without_new_server() -> None
 
 
 def test_desktop_attaches_to_terminal_server_instead_of_binding_twice() -> None:
-    from beast.cli import desktop
+    from cyril_code.cli import desktop
 
     settings = _settings()
     instance_lock = MagicMock()
@@ -248,7 +248,7 @@ def test_desktop_attaches_to_terminal_server_instead_of_binding_twice() -> None:
 
 
 def test_fresh_desktop_launch_disables_console_and_automatic_browser() -> None:
-    from beast.cli import desktop
+    from cyril_code.cli import desktop
 
     settings = _settings()
     instance_lock = MagicMock()

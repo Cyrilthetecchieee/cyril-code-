@@ -1,12 +1,12 @@
 import pytest
 
-from beast.application.reasoning import (
+from cyril_code.application.reasoning import (
     client_reasoning_policy,
     resolve_reasoning_policy,
 )
-from beast.config.reasoning import ReasoningPreference
-from beast.core.anthropic.models import MessagesRequest
-from beast.core.reasoning import (
+from cyril_code.config.reasoning import ReasoningPreference
+from cyril_code.core.anthropic.models import MessagesRequest
+from cyril_code.core.reasoning import (
     ReasoningControl,
     ReasoningEffort,
     ReasoningPolicy,
@@ -140,7 +140,7 @@ def test_reasoning_budget_requires_explicit_on_control() -> None:
         (ReasoningEffort.MAX, 8_192),
     ),
 )
-def test_reasoning_effort_has_one_beast_numeric_budget(
+def test_reasoning_effort_has_one_cyril_numeric_budget(
     effort: ReasoningEffort, expected: int
 ) -> None:
     assert ReasoningPolicy.on(effort=effort).numeric_budget_tokens == expected

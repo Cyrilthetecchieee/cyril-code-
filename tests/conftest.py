@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from beast.config.settings import Settings
+from cyril_code.config.settings import Settings
 from tests.providers.support import immediate_admission
 
 # Set mock environment BEFORE any imports that use Settings
@@ -31,7 +31,7 @@ def _isolate_from_dotenv(monkeypatch):
 
 @pytest.fixture
 def provider_config():
-    from beast.providers.base import ProviderConfig
+    from cyril_code.providers.base import ProviderConfig
 
     return ProviderConfig(
         api_key="test_key",
@@ -43,8 +43,8 @@ def provider_config():
 
 @pytest.fixture
 def nim_provider(provider_config):
-    from beast.config.nim import NimSettings
-    from beast.providers.nvidia_nim import NvidiaNimProvider
+    from cyril_code.config.nim import NimSettings
+    from cyril_code.providers.nvidia_nim import NvidiaNimProvider
 
     return NvidiaNimProvider(
         provider_config,
@@ -55,15 +55,15 @@ def nim_provider(provider_config):
 
 @pytest.fixture
 def open_router_provider(provider_config):
-    from beast.providers.open_router import OpenRouterProvider
+    from cyril_code.providers.open_router import OpenRouterProvider
 
     return OpenRouterProvider(provider_config, admission=immediate_admission())
 
 
 @pytest.fixture
 def lmstudio_provider(provider_config):
-    from beast.providers.base import ProviderConfig
-    from beast.providers.lmstudio import LMStudioProvider
+    from cyril_code.providers.base import ProviderConfig
+    from cyril_code.providers.lmstudio import LMStudioProvider
 
     lmstudio_config = ProviderConfig(
         api_key="lm-studio",
@@ -76,8 +76,8 @@ def lmstudio_provider(provider_config):
 
 @pytest.fixture
 def llamacpp_provider(provider_config):
-    from beast.providers.base import ProviderConfig
-    from beast.providers.openai_chat import create_openai_chat_provider
+    from cyril_code.providers.base import ProviderConfig
+    from cyril_code.providers.openai_chat import create_openai_chat_provider
 
     llamacpp_config = ProviderConfig(
         api_key="llamacpp",
@@ -94,7 +94,7 @@ def llamacpp_provider(provider_config):
 
 @pytest.fixture
 def mock_cli_session():
-    from beast.messaging.managed_protocols import (
+    from cyril_code.messaging.managed_protocols import (
         ManagedClaudeSessionProtocol,
     )
 
@@ -106,7 +106,7 @@ def mock_cli_session():
 
 @pytest.fixture
 def mock_cli_manager():
-    from beast.messaging.managed_protocols import (
+    from cyril_code.messaging.managed_protocols import (
         ManagedClaudeSessionManagerProtocol,
     )
 
@@ -121,7 +121,7 @@ def mock_cli_manager():
 
 @pytest.fixture
 def mock_platform():
-    from beast.messaging.platforms.ports import OutboundMessenger
+    from cyril_code.messaging.platforms.ports import OutboundMessenger
 
     platform = MagicMock(spec=OutboundMessenger)
     platform.send_message = AsyncMock(return_value="msg_123")
@@ -146,7 +146,7 @@ def mock_platform():
 
 @pytest.fixture
 def mock_session_store():
-    from beast.messaging.session import SessionStore
+    from cyril_code.messaging.session import SessionStore
 
     store = MagicMock(spec=SessionStore)
     store.save_tree = MagicMock()
@@ -178,7 +178,7 @@ def incoming_message_factory():
     )
 
     def _create(**kwargs):
-        from beast.messaging.models import IncomingMessage
+        from cyril_code.messaging.models import IncomingMessage
 
         defaults: dict[str, Any] = {
             "text": "hello",

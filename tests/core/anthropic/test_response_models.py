@@ -1,6 +1,6 @@
 """Tests for Anthropic protocol response models."""
 
-from beast.core.anthropic.models import (
+from cyril_code.core.anthropic.models import (
     ContentBlockText,
     ContentBlockThinking,
     ContentBlockToolUse,

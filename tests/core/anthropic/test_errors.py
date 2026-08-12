@@ -1,6 +1,6 @@
 import pytest
 
-from beast.core.anthropic import (
+from cyril_code.core.anthropic import (
     anthropic_error_payload,
     anthropic_status_for_error_type,
 )

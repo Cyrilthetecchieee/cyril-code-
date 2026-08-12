@@ -10,15 +10,15 @@ from unittest.mock import patch
 import httpx
 import pytest
 
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.providers.admission import (
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.providers.admission import (
     UPSTREAM_TRANSIENT_TOTAL_ATTEMPTS,
     ProviderAdmissionController,
     ProviderRetrySession,
     _retry_after_seconds,
 )
-from beast.providers.failure_policy import ProviderRecoveryExhausted
-from beast.providers.stream_recovery import TruncatedProviderStreamError
+from cyril_code.providers.failure_policy import ProviderRecoveryExhausted
+from cyril_code.providers.stream_recovery import TruncatedProviderStreamError
 
 
 def _controller(
@@ -225,7 +225,7 @@ async def test_recovery_traces_keep_the_logical_request_id() -> None:
             raise _status_error(503)
         return "recovered"
 
-    with patch("beast.providers.admission.trace_event") as trace:
+    with patch("cyril_code.providers.admission.trace_event") as trace:
         result = await controller.run_with_retry(recover, request_id="req_trace")
 
     assert result == "recovered"
@@ -254,7 +254,7 @@ async def test_direct_exhaustion_trace_keeps_the_logical_request_id() -> None:
         raise error
 
     with (
-        patch("beast.providers.admission.trace_event") as trace,
+        patch("cyril_code.providers.admission.trace_event") as trace,
         pytest.raises(httpx.HTTPStatusError),
     ):
         await controller.run_with_retry(fail, request_id="req_terminal")
@@ -356,7 +356,7 @@ async def test_one_leader_backs_off_while_followers_coalesce() -> None:
         await release_sleep.wait()
 
     with patch(
-        "beast.providers.admission.asyncio.sleep",
+        "cyril_code.providers.admission.asyncio.sleep",
         side_effect=controlled_sleep,
     ):
         leader_probe_task = asyncio.create_task(controller.open_attempt(leader_session))
@@ -439,7 +439,7 @@ async def test_cancelled_backoff_leader_transfers_to_a_waiter() -> None:
         await release_second_sleep.wait()
 
     with patch(
-        "beast.providers.admission.asyncio.sleep",
+        "cyril_code.providers.admission.asyncio.sleep",
         side_effect=controlled_sleep,
     ):
         leader_task = asyncio.create_task(controller.open_attempt(leader_session))
@@ -698,7 +698,7 @@ async def test_retry_after_is_a_minimum_backoff() -> None:
         return "ok"
 
     with patch(
-        "beast.providers.admission.asyncio.sleep",
+        "cyril_code.providers.admission.asyncio.sleep",
         return_value=None,
     ) as sleep:
         assert await controller.run_with_retry(recover) == "ok"

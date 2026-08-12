@@ -3,9 +3,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.core.reasoning import ReasoningPolicy
-from beast.providers.nvidia_nim import NvidiaNimProvider
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.reasoning import ReasoningPolicy
+from cyril_code.providers.nvidia_nim import NvidiaNimProvider
 from tests.api.support import create_test_app
 
 app = create_test_app()
@@ -61,7 +61,7 @@ def client():
     """HTTP client with provider resolution stubbed; patch only for this file."""
     with (
         patch(
-            "beast.api.routes.resolve_provider",
+            "cyril_code.api.routes.resolve_provider",
             return_value=mock_provider,
         ),
         TestClient(app) as test_client,
@@ -199,8 +199,8 @@ def test_create_message_pre_start_provider_error_returns_terminal_json(
     }
 
     with (
-        patch("beast.api.response_streams.trace_event") as trace,
-        patch("beast.application.execution.trace_event") as execution_trace,
+        patch("cyril_code.api.response_streams.trace_event") as trace,
+        patch("cyril_code.application.execution.trace_event") as execution_trace,
     ):
         response = client.post("/v1/messages", json=payload)
 
@@ -211,17 +211,17 @@ def test_create_message_pre_start_provider_error_returns_terminal_json(
     route_trace = next(
         call.kwargs
         for call in execution_trace.call_args_list
-        if call.kwargs.get("event") == "beast.api.route.resolved"
+        if call.kwargs.get("event") == "cyril_code.api.route.resolved"
     )
     assert route_trace["request_id"] == request_id
     terminal_trace = next(
         call.kwargs
         for call in trace.call_args_list
-        if call.kwargs.get("event") == "beast.api.response.terminal_execution_error"
+        if call.kwargs.get("event") == "cyril_code.api.response.terminal_execution_error"
     )
     assert terminal_trace == {
         "stage": "egress",
-        "event": "beast.api.response.terminal_execution_error",
+        "event": "cyril_code.api.response.terminal_execution_error",
         "source": "api",
         "wire_api": "messages",
         "request_id": request_id,

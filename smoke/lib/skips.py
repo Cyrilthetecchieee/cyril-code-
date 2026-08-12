@@ -3,7 +3,7 @@
 import httpx
 import pytest
 
-from beast.core.anthropic.stream_contracts import SSEEvent, text_content
+from cyril_code.core.anthropic.stream_contracts import SSEEvent, text_content
 from smoke.lib.outcomes import is_upstream_unavailable_text
 
 

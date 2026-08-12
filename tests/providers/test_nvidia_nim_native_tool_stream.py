@@ -3,8 +3,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from beast.providers.nvidia_nim import native_tool_stream
-from beast.providers.nvidia_nim.native_tool_stream import (
+from cyril_code.providers.nvidia_nim import native_tool_stream
+from cyril_code.providers.nvidia_nim.native_tool_stream import (
     NimNativeToolProtocolError,
     normalize_nim_native_tool_stream,
 )

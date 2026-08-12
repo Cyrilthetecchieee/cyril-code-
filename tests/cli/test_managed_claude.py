@@ -1,7 +1,7 @@
 import os
 
-from beast.cli.claude_env import build_claude_proxy_env
-from beast.cli.managed.claude import (
+from cyril_code.cli.claude_env import build_claude_proxy_env
+from cyril_code.cli.managed.claude import (
     MANAGED_CLAUDE_MODEL_TIER,
     ManagedClaudeConfig,
     ManagedClaudeParseState,
@@ -11,7 +11,7 @@ from beast.cli.managed.claude import (
     extract_managed_claude_session_id,
     parse_managed_claude_stdout_line,
 )
-from beast.cli.managed.diagnostics import classify_managed_claude_stderr
+from cyril_code.cli.managed.diagnostics import classify_managed_claude_stderr
 
 
 def _config(**overrides: object) -> ManagedClaudeConfig:
@@ -134,7 +134,7 @@ def test_managed_claude_env_uses_sentinel_when_proxy_auth_blank() -> None:
         base_env={"ANTHROPIC_AUTH_TOKEN": "stale"},
     )
 
-    assert env["ANTHROPIC_AUTH_TOKEN"] == "beast-no-auth"
+    assert env["ANTHROPIC_AUTH_TOKEN"] == "cyril_code-no-auth"
 
 
 def test_managed_claude_env_adds_noninteractive_process_policy() -> None:

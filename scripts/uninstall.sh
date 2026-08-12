@@ -1,12 +1,12 @@
 #!/bin/sh
 set -eu
 
-PACKAGE_NAME="beast"
-BEAST_HOME_DIRNAME=".fcc"
-BEAST_MACOS_BUNDLE_ID="io.github.alishahryar1.beast"
-BEAST_MACOS_OWNER_FILE=".beast-owner"
+PACKAGE_NAME="cyril_code"
+CYRIL_HOME_DIRNAME=".fcc"
+CYRIL_MACOS_BUNDLE_ID="io.github.alishahryar1.cyril_code"
+CYRIL_MACOS_OWNER_FILE=".cyril_code-owner"
 # Include retired entry points so older installations are fully stopped and removed.
-BEAST_COMMANDS="beast-desktop start beast beast-codex beast-pi beast-init beast"
+CYRIL_COMMANDS="cyril-desktop start cyril_code cyril-codex cyril-pi cyril-init cyril_code"
 
 dry_run=0
 uv_tool_bin=""
@@ -15,8 +15,8 @@ show_usage() {
     cat <<'USAGE'
 Usage: uninstall.sh [options]
 
-Removes the Beast uv tool and deletes ~/.fcc/ after removal is verified.
-Does not remove uv, Beast, Codex, Pi, the uv-managed Python runtime, or shared PATH entries.
+Removes the Cyril Code uv tool and deletes ~/.fcc/ after removal is verified.
+Does not remove uv, Cyril Code, Codex, Pi, the uv-managed Python runtime, or shared PATH entries.
 
 Options:
   --dry-run                Print commands without running them.
@@ -94,7 +94,7 @@ add_known_uv_paths() {
     hash -r 2>/dev/null || true
 }
 
-beast_process_ids() {
+cyril_process_ids() {
     command_name=$1
 
     if command -v pgrep >/dev/null 2>&1; then
@@ -120,20 +120,20 @@ beast_process_ids() {
         ' || true
 }
 
-is_beast_command_running() {
-    [ -n "$(beast_process_ids "$1")" ]
+is_cyril_command_running() {
+    [ -n "$(cyril_process_ids "$1")" ]
 }
 
-assert_no_beast_processes_running() {
+assert_no_cyril_processes_running() {
     running=""
-    for command_name in $BEAST_COMMANDS; do
-        if is_beast_command_running "$command_name"; then
+    for command_name in $CYRIL_COMMANDS; do
+        if is_cyril_command_running "$command_name"; then
             running="${running} ${command_name}"
         fi
     done
 
     if [ -n "$running" ]; then
-        fail "Beast is still running (${running# }). Stop those processes, then rerun uninstall."
+        fail "Cyril Code is still running (${running# }). Stop those processes, then rerun uninstall."
     fi
 }
 
@@ -146,7 +146,7 @@ initialize_uv_context() {
     fi
 
     if ! command -v uv >/dev/null 2>&1; then
-        fail "uv is required to remove the Beast tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
+        fail "uv is required to remove the Cyril Code tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
     fi
 
     print_command uv tool dir --bin
@@ -175,7 +175,7 @@ uninstall_beast() {
     fi
 
     if is_missing_uv_tool_error "$output"; then
-        printf 'Beast uv tool is already absent; verifying its entry points.\n'
+        printf 'Cyril Code uv tool is already absent; verifying its entry points.\n'
         return 0
     fi
     if [ -n "$output" ]; then
@@ -184,45 +184,45 @@ uninstall_beast() {
     fail "uv tool uninstall $PACKAGE_NAME failed with exit code $status; ~/.fcc was not deleted."
 }
 
-verify_beast_commands_removed() {
+verify_cyril_commands_removed() {
     if [ "$dry_run" -eq 1 ]; then
-        printf '+ verify all Beast entry points are absent from the uv tool bin directory\n'
+        printf '+ verify all Cyril Code entry points are absent from the uv tool bin directory\n'
         return 0
     fi
 
     remaining=""
-    for command_name in $BEAST_COMMANDS; do
+    for command_name in $CYRIL_COMMANDS; do
         command_path="$uv_tool_bin/$command_name"
         if [ -e "$command_path" ] || [ -L "$command_path" ]; then
             remaining="${remaining} ${command_path}"
         fi
     done
     if [ -n "$remaining" ]; then
-        fail "Beast entry points remain after uv uninstall:${remaining}; ~/.fcc was not deleted."
+        fail "Cyril Code entry points remain after uv uninstall:${remaining}; ~/.fcc was not deleted."
     fi
 }
 
-macos_app_is_beast_owned() {
+macos_app_is_cyril_owned() {
     app_dir=$1
-    owner_file="$app_dir/Contents/$BEAST_MACOS_OWNER_FILE"
+    owner_file="$app_dir/Contents/$CYRIL_MACOS_OWNER_FILE"
     [ -d "$app_dir" ] &&
         [ ! -L "$app_dir" ] &&
         [ -f "$owner_file" ] &&
-        [ "$(cat "$owner_file")" = "$BEAST_MACOS_BUNDLE_ID" ]
+        [ "$(cat "$owner_file")" = "$CYRIL_MACOS_BUNDLE_ID" ]
 }
 
 remove_macos_desktop_app() {
     [ "$(uname -s)" = "Darwin" ] || return 0
 
-    app_dir="$HOME/Applications/Beast.app"
-    desktop_link="$HOME/Desktop/Beast.app"
+    app_dir="$HOME/Applications/Cyril Code.app"
+    desktop_link="$HOME/Desktop/Cyril Code.app"
 
-    if ! macos_app_is_beast_owned "$app_dir"; then
+    if ! macos_app_is_cyril_owned "$app_dir"; then
         if [ -e "$app_dir" ] || [ -L "$app_dir" ]; then
-            printf 'An app not managed by Beast exists at %s; leaving it unchanged.\n' "$app_dir"
+            printf 'An app not managed by Cyril Code exists at %s; leaving it unchanged.\n' "$app_dir"
         fi
         if [ -e "$desktop_link" ] || [ -L "$desktop_link" ]; then
-            printf 'The Beast desktop item cannot be verified; leaving it unchanged.\n'
+            printf 'The Cyril Code desktop item cannot be verified; leaving it unchanged.\n'
         fi
         return 0
     fi
@@ -231,26 +231,26 @@ remove_macos_desktop_app() {
         if [ "$(readlink "$desktop_link")" = "$app_dir" ]; then
             run rm -f "$desktop_link"
         else
-            printf 'A non-BEAST link exists at %s; leaving it unchanged.\n' "$desktop_link"
+            printf 'A non-CYRIL link exists at %s; leaving it unchanged.\n' "$desktop_link"
         fi
     elif [ -e "$desktop_link" ]; then
-        printf 'A non-BEAST item exists at %s; leaving it unchanged.\n' "$desktop_link"
+        printf 'A non-CYRIL item exists at %s; leaving it unchanged.\n' "$desktop_link"
     fi
     if [ -e "$app_dir" ]; then
         run rm -rf "$app_dir"
     fi
 }
 
-purge_beast_home() {
-    beast_home="$HOME/$BEAST_HOME_DIRNAME"
-    if [ ! -e "$beast_home" ]; then
-        printf 'No BEAST config directory at %s; skipping purge.\n' "$beast_home"
+purge_cyril_home() {
+    cyril_home="$HOME/$CYRIL_HOME_DIRNAME"
+    if [ ! -e "$cyril_home" ]; then
+        printf 'No CYRIL config directory at %s; skipping purge.\n' "$cyril_home"
         return 0
     fi
 
-    run rm -rf "$beast_home"
-    if [ "$dry_run" -eq 0 ] && [ -e "$beast_home" ]; then
-        fail "BEAST config directory still exists after deletion: $beast_home"
+    run rm -rf "$cyril_home"
+    if [ "$dry_run" -eq 0 ] && [ -e "$cyril_home" ]; then
+        fail "CYRIL config directory still exists after deletion: $cyril_home"
     fi
 }
 
@@ -274,29 +274,29 @@ parse_args() {
 }
 
 parse_args "$@"
-[ -n "${HOME:-}" ] || fail "HOME is not set; cannot locate Beast data."
+[ -n "${HOME:-}" ] || fail "HOME is not set; cannot locate Cyril Code data."
 
-step "Checking for running Beast processes"
-assert_no_beast_processes_running
+step "Checking for running Cyril Code processes"
+assert_no_cyril_processes_running
 
-step "Locating the uv-managed Beast installation"
+step "Locating the uv-managed Cyril Code installation"
 initialize_uv_context
 
-step "Removing the Beast uv tool"
+step "Removing the Cyril Code uv tool"
 uninstall_beast
 
-step "Verifying Beast entry points were removed"
-verify_beast_commands_removed
+step "Verifying Cyril Code entry points were removed"
+verify_cyril_commands_removed
 
-step "Removing the Beast desktop launcher"
+step "Removing the Cyril Code desktop launcher"
 remove_macos_desktop_app
 
-step "Purging BEAST config and data from ~/.fcc"
-purge_beast_home
+step "Purging CYRIL config and data from ~/.fcc"
+purge_cyril_home
 
 if [ "$dry_run" -eq 1 ]; then
     printf '\nDry run complete. No changes were made.\n'
 else
-    printf '\nBeast has been removed and verified.\n'
-    printf 'uv, Beast, Codex, Pi, the uv-managed Python runtime, and shared PATH entries were left installed.\n'
+    printf '\nCyril Code has been removed and verified.\n'
+    printf 'uv, Cyril Code, Codex, Pi, the uv-managed Python runtime, and shared PATH entries were left installed.\n'
 fi

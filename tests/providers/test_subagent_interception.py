@@ -3,12 +3,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from beast.config.nim import NimSettings
-from beast.config.provider_catalog import NVIDIA_NIM_DEFAULT_BASE
-from beast.core.anthropic import StreamBlockLedger
-from beast.providers.base import ProviderConfig
-from beast.providers.nvidia_nim import NvidiaNimProvider
-from beast.providers.openai_chat.tool_calls import (
+from cyril_code.config.nim import NimSettings
+from cyril_code.config.provider_catalog import NVIDIA_NIM_DEFAULT_BASE
+from cyril_code.core.anthropic import StreamBlockLedger
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.nvidia_nim import NvidiaNimProvider
+from cyril_code.providers.openai_chat.tool_calls import (
     OpenAIToolCallAssembler,
 )
 from tests.providers.support import immediate_admission

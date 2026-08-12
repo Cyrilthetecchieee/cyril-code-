@@ -10,10 +10,10 @@ PI_INSTALL_URL="https://pi.dev/install.sh"
 RTK_VERSION="0.44.2"
 RTK_RELEASE_BASE_URL="https://github.com/rtk-ai/rtk/releases/download/v$RTK_VERSION"
 UV_INSTALL_URL="https://astral.sh/uv/install.sh"
-BEAST_MACOS_BUNDLE_ID="io.github.alishahryar1.beast"
-BEAST_MACOS_OWNER_FILE=".beast-owner"
-# Include retired entry points so updates reject older BEAST processes before replacement.
-BEAST_COMMANDS="beast-desktop start beast beast-codex beast-pi beast-init beast"
+CYRIL_MACOS_BUNDLE_ID="io.github.alishahryar1.cyril_code"
+CYRIL_MACOS_OWNER_FILE=".cyril_code-owner"
+# Include retired entry points so updates reject older CYRIL processes before replacement.
+CYRIL_COMMANDS="cyril-desktop start cyril_code cyril-codex cyril-pi cyril-init cyril_code"
 
 dry_run=0
 voice_nim=0
@@ -34,7 +34,7 @@ show_usage() {
     cat <<'USAGE'
 Usage: install.sh [options]
 
-Installs or updates Beast and lets you choose which coding agents to install or verify.
+Installs or updates Cyril Code and lets you choose which coding agents to install or verify.
 
 Options:
   --voice-nim              Install NVIDIA NIM voice transcription support.
@@ -91,17 +91,17 @@ choose_coding_agents() {
     exec 4>"$selection_output"
 
     while :; do
-        if prompt_yes_no "Install or verify Beast for beast?"; then
+        if prompt_yes_no "Install or verify Cyril Code for cyril_code?"; then
             install_claude=1
         else
             install_claude=0
         fi
-        if prompt_yes_no "Install or verify Codex for beast-codex?"; then
+        if prompt_yes_no "Install or verify Codex for cyril-codex?"; then
             install_codex=1
         else
             install_codex=0
         fi
-        if prompt_yes_no "Install or verify Pi for beast-pi?"; then
+        if prompt_yes_no "Install or verify Pi for cyril-pi?"; then
             install_pi=1
         else
             install_pi=0
@@ -211,7 +211,7 @@ add_pi_bin_directories() {
     fi
 }
 
-beast_process_ids() {
+cyril_process_ids() {
     command_name=$1
 
     if command -v pgrep >/dev/null 2>&1; then
@@ -237,10 +237,10 @@ beast_process_ids() {
         ' || true
 }
 
-assert_no_beast_processes_running() {
+assert_no_cyril_processes_running() {
     running=""
-    for command_name in $BEAST_COMMANDS; do
-        process_ids=$(beast_process_ids "$command_name")
+    for command_name in $CYRIL_COMMANDS; do
+        process_ids=$(cyril_process_ids "$command_name")
         [ -n "$process_ids" ] || continue
 
         for process_id in $process_ids; do
@@ -254,7 +254,7 @@ assert_no_beast_processes_running() {
     done
 
     if [ -n "$running" ]; then
-        fail "Beast is still running ($running). Stop those processes, then rerun the installer."
+        fail "Cyril Code is still running ($running). Stop those processes, then rerun the installer."
     fi
 }
 
@@ -282,7 +282,7 @@ download_and_run() {
         return 0
     fi
 
-    temporary_file=$(mktemp "${TMPDIR:-/tmp}/beast-install.XXXXXX") || fail "Unable to create a temporary file for $label."
+    temporary_file=$(mktemp "${TMPDIR:-/tmp}/cyril_code-install.XXXXXX") || fail "Unable to create a temporary file for $label."
     print_command curl -fsSL "$url" -o "$temporary_file"
     if curl -fsSL "$url" -o "$temporary_file"; then
         :
@@ -415,7 +415,7 @@ install_rtk() {
     fi
 
     [ -n "${HOME:-}" ] || fail "HOME is required to install RTK."
-    temporary_file=$(mktemp "${TMPDIR:-/tmp}/beast-rtk.XXXXXX") || fail "Unable to create a temporary RTK archive."
+    temporary_file=$(mktemp "${TMPDIR:-/tmp}/cyril_code-rtk.XXXXXX") || fail "Unable to create a temporary RTK archive."
     print_command curl -fsSL "$rtk_archive_url" -o "$temporary_file"
     if curl -fsSL "$rtk_archive_url" -o "$temporary_file"; then
         :
@@ -491,7 +491,7 @@ ensure_rtk_claude_config_directory() {
     if [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
         rtk_claude_config_directory=$CLAUDE_CONFIG_DIR
     else
-        [ -n "${HOME:-}" ] || fail "HOME is required to configure RTK for Beast."
+        [ -n "${HOME:-}" ] || fail "HOME is required to configure RTK for Cyril Code."
         rtk_claude_config_directory="$HOME/.claude"
     fi
     run mkdir -p "$rtk_claude_config_directory"
@@ -517,13 +517,13 @@ configure_rtk_for_selected_agents() {
 
 ensure_claude() {
     if command -v claude >/dev/null 2>&1; then
-        printf 'Beast already found on PATH; verifying it.\n'
+        printf 'Cyril Code already found on PATH; verifying it.\n'
     else
-        download_and_run "$CLAUDE_INSTALL_URL" bash "Beast"
+        download_and_run "$CLAUDE_INSTALL_URL" bash "Cyril Code"
         add_known_bin_directories
     fi
 
-    verify_command claude "Beast"
+    verify_command claude "Cyril Code"
 }
 
 ensure_codex() {
@@ -571,7 +571,7 @@ ensure_pi() {
 
 ensure_selected_coding_agents() {
     if [ "$install_claude" -eq 1 ]; then
-        step "Ensuring Beast is installed"
+        step "Ensuring Cyril Code is installed"
         ensure_claude
     fi
 
@@ -746,24 +746,24 @@ package_spec() {
     fi
 
     if [ "$include_nim" -eq 1 ] && [ "$include_local" -eq 1 ]; then
-        printf 'beast[voice,voice_local] @ %s' "$REPO_ARCHIVE_URL"
+        printf 'cyril_code[voice,voice_local] @ %s' "$REPO_ARCHIVE_URL"
     elif [ "$include_nim" -eq 1 ]; then
-        printf 'beast[voice] @ %s' "$REPO_ARCHIVE_URL"
+        printf 'cyril_code[voice] @ %s' "$REPO_ARCHIVE_URL"
     elif [ "$include_local" -eq 1 ]; then
-        printf 'beast[voice_local] @ %s' "$REPO_ARCHIVE_URL"
+        printf 'cyril_code[voice_local] @ %s' "$REPO_ARCHIVE_URL"
     else
-        printf 'beast @ %s' "$REPO_ARCHIVE_URL"
+        printf 'cyril-code @ %s' "$REPO_ARCHIVE_URL"
     fi
 }
 
 install_beast() {
-    assert_no_beast_processes_running
+    assert_no_cyril_processes_running
     spec=$(package_spec)
 
     if [ -n "$torch_backend" ]; then
-        run uv tool install --force --refresh-package beast --python "$PYTHON_VERSION" --torch-backend "$torch_backend" "$spec"
+        run uv tool install --force --refresh-package cyril_code --python "$PYTHON_VERSION" --torch-backend "$torch_backend" "$spec"
     else
-        run uv tool install --force --refresh-package beast --python "$PYTHON_VERSION" "$spec"
+        run uv tool install --force --refresh-package cyril_code --python "$PYTHON_VERSION" "$spec"
     fi
 }
 
@@ -772,7 +772,7 @@ configure_and_verify_beast() {
 
     if [ "$dry_run" -eq 1 ]; then
         print_command uv tool dir --bin
-        printf '+ verify beast-desktop, start, beast, beast-codex, and beast-pi in the uv tool bin directory\n'
+        printf '+ verify cyril-desktop, start, cyril_code, cyril-codex, and cyril-pi in the uv tool bin directory\n'
         print_command start --version
         return 0
     fi
@@ -790,8 +790,8 @@ configure_and_verify_beast() {
     export PATH
     hash -r 2>/dev/null || true
 
-    for command_name in beast-desktop start beast beast-codex beast-pi; do
-        [ -x "$tool_bin/$command_name" ] || fail "Beast installation did not create $tool_bin/$command_name."
+    for command_name in cyril-desktop start cyril_code cyril-codex cyril-pi; do
+        [ -x "$tool_bin/$command_name" ] || fail "Cyril Code installation did not create $tool_bin/$command_name."
     done
 
     run "$tool_bin/start" --version
@@ -802,60 +802,60 @@ shell_quote() {
     printf "'%s'" "$escaped"
 }
 
-macos_app_is_beast_owned() {
+macos_app_is_cyril_owned() {
     app_dir=$1
-    owner_file="$app_dir/Contents/$BEAST_MACOS_OWNER_FILE"
+    owner_file="$app_dir/Contents/$CYRIL_MACOS_OWNER_FILE"
     [ -d "$app_dir" ] &&
         [ ! -L "$app_dir" ] &&
         [ -f "$owner_file" ] &&
-        [ "$(cat "$owner_file")" = "$BEAST_MACOS_BUNDLE_ID" ]
+        [ "$(cat "$owner_file")" = "$CYRIL_MACOS_BUNDLE_ID" ]
 }
 
 install_macos_desktop_app() {
     [ "$(uname -s)" = "Darwin" ] || return 0
 
-    app_dir="$HOME/Applications/Beast.app"
+    app_dir="$HOME/Applications/Cyril Code.app"
     contents_dir="$app_dir/Contents"
-    owner_file="$contents_dir/$BEAST_MACOS_OWNER_FILE"
+    owner_file="$contents_dir/$CYRIL_MACOS_OWNER_FILE"
     executable_dir="$contents_dir/MacOS"
-    executable_path="$executable_dir/beast-desktop"
+    executable_path="$executable_dir/cyril-desktop"
     resources_dir="$contents_dir/Resources"
     icon_path="$resources_dir/AppIcon.icns"
     desktop_dir="$HOME/Desktop"
-    desktop_link="$desktop_dir/Beast.app"
+    desktop_link="$desktop_dir/Cyril Code.app"
 
     if [ -e "$app_dir" ] || [ -L "$app_dir" ]; then
-        macos_app_is_beast_owned "$app_dir" ||
-            fail "An app not managed by Beast already exists at $app_dir. Move it, then rerun the installer."
+        macos_app_is_cyril_owned "$app_dir" ||
+            fail "An app not managed by Cyril Code already exists at $app_dir. Move it, then rerun the installer."
     fi
 
     if [ "$dry_run" -eq 1 ]; then
         print_command mkdir -p "$executable_dir" "$resources_dir" "$desktop_dir"
-        print_command beast-desktop --export-icon "$icon_path"
+        print_command cyril-desktop --export-icon "$icon_path"
         printf '+ write %s, %s, and %s\n' "$owner_file" "$contents_dir/Info.plist" "$executable_path"
         print_command ln -s "$app_dir" "$desktop_link"
         return 0
     fi
 
     mkdir -p "$executable_dir" "$resources_dir" "$desktop_dir"
-    run "$tool_bin/beast-desktop" --export-icon "$icon_path"
-    [ -f "$icon_path" ] || fail "Beast did not export its macOS app icon to $icon_path."
-    printf '%s\n' "$BEAST_MACOS_BUNDLE_ID" > "$owner_file"
+    run "$tool_bin/cyril-desktop" --export-icon "$icon_path"
+    [ -f "$icon_path" ] || fail "Cyril Code did not export its macOS app icon to $icon_path."
+    printf '%s\n' "$CYRIL_MACOS_BUNDLE_ID" > "$owner_file"
     cat > "$contents_dir/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>CFBundleDisplayName</key>
-    <string>Beast</string>
+    <string>Cyril Code</string>
     <key>CFBundleExecutable</key>
-    <string>beast-desktop</string>
+    <string>cyril-desktop</string>
     <key>CFBundleIdentifier</key>
-    <string>io.github.alishahryar1.beast</string>
+    <string>io.github.alishahryar1.cyril_code</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleName</key>
-    <string>Beast</string>
+    <string>Cyril Code</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>LSMultipleInstancesProhibited</key>
@@ -865,7 +865,7 @@ install_macos_desktop_app() {
 </dict>
 </plist>
 PLIST
-    desktop_command=$(shell_quote "$tool_bin/beast-desktop")
+    desktop_command=$(shell_quote "$tool_bin/cyril-desktop")
     {
         printf '%s\n' '#!/bin/sh'
         printf 'exec %s\n' "$desktop_command"
@@ -876,11 +876,11 @@ PLIST
         if [ "$(readlink "$desktop_link")" = "$app_dir" ]; then
             rm -f "$desktop_link"
         else
-            printf 'A non-BEAST link already exists at %s; leaving it unchanged.\n' "$desktop_link"
+            printf 'A non-CYRIL link already exists at %s; leaving it unchanged.\n' "$desktop_link"
             return 0
         fi
     elif [ -e "$desktop_link" ]; then
-        printf 'A non-BEAST item already exists at %s; leaving it unchanged.\n' "$desktop_link"
+        printf 'A non-CYRIL item already exists at %s; leaving it unchanged.\n' "$desktop_link"
         return 0
     fi
     ln -s "$app_dir" "$desktop_link"
@@ -890,8 +890,8 @@ parse_args "$@"
 validate_args
 add_known_bin_directories
 
-step "Checking for running Beast processes"
-assert_no_beast_processes_running
+step "Checking for running Cyril Code processes"
+assert_no_cyril_processes_running
 
 if installer_is_interactive; then
     step "Choosing coding agents"
@@ -920,14 +920,14 @@ configure_rtk_for_selected_agents
 step "Ensuring uv $MIN_UV_VERSION or newer is installed"
 ensure_uv
 
-step "Installing or updating Beast"
+step "Installing or updating Cyril Code"
 install_beast
 
-step "Configuring PATH and verifying Beast"
+step "Configuring PATH and verifying Cyril Code"
 configure_and_verify_beast
 
 if [ "$(uname -s)" = "Darwin" ]; then
-    step "Installing the Beast desktop launcher"
+    step "Installing the Cyril Code desktop launcher"
     install_macos_desktop_app
 fi
 
@@ -935,18 +935,18 @@ if [ "$dry_run" -eq 1 ]; then
     printf '\nDry run complete. No changes were made.\n'
 else
     if [ "$(uname -s)" = "Darwin" ]; then
-        printf '\nBeast is installed and verified. Open Beast from Applications or the desktop to run it in the background.\n'
+        printf '\nCyril Code is installed and verified. Open Cyril Code from Applications or the desktop to run it in the background.\n'
         printf 'For terminal use, start the proxy with: start\n'
     else
-        printf '\nBeast is installed and verified. Start the proxy with: start\n'
+        printf '\nCyril Code is installed and verified. Start the proxy with: start\n'
     fi
     if [ "$install_claude" -eq 1 ]; then
-        printf 'Run Beast with: beast\n'
+        printf 'Run Cyril Code with: cyril_code\n'
     fi
     if [ "$install_codex" -eq 1 ]; then
-        printf 'Run Codex with: beast-codex\n'
+        printf 'Run Codex with: cyril-codex\n'
     fi
     if [ "$pi_available" -eq 1 ]; then
-        printf 'Run Pi with: beast-pi\n'
+        printf 'Run Pi with: cyril-pi\n'
     fi
 fi

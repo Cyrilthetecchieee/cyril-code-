@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from beast.cli.managed.session import ManagedClaudeSession
+from cyril_code.cli.managed.session import ManagedClaudeSession
 
 
 def test_cli_session_owns_typed_runner_config(tmp_path: Path) -> None:

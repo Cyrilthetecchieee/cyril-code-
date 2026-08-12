@@ -1,6 +1,6 @@
 import pytest
 
-from beast.core.anthropic.stream_contracts import (
+from cyril_code.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     has_tool_use,
 )
@@ -24,8 +24,8 @@ def test_live_tool_use_when_configured_model_supports_tools(
     provider_model = models[0]
 
     payload = message_payload(
-        "Use the echo_smoke tool once with value BEAST_SMOKE_TOOL.",
-        model="beast-smoke-default",
+        "Use the echo_smoke tool once with value CYRIL_SMOKE_TOOL.",
+        model="cyril_code-smoke-default",
         max_tokens=256,
         extra={
             "tools": [

@@ -2,14 +2,14 @@ import json
 
 import pytest
 
-from beast.core.anthropic import (
+from cyril_code.core.anthropic import (
     AnthropicToOpenAIConverter,
     OpenAIConversionError,
     ReasoningReplayMode,
     build_base_request_body,
     is_synthetic_openai_tool_turn_boundary,
 )
-from beast.core.anthropic.models import MessagesRequest
+from cyril_code.core.anthropic.models import MessagesRequest
 
 # --- Mock Classes ---
 
@@ -882,7 +882,7 @@ def test_convert_mixed_blocks_and_types_and_roles():
 
 def test_get_block_attr_defaults():
     # Test helper directly
-    from beast.core.anthropic import get_block_attr
+    from cyril_code.core.anthropic import get_block_attr
 
     assert get_block_attr({}, "missing", "default") == "default"
     assert get_block_attr(object(), "missing", "default") == "default"

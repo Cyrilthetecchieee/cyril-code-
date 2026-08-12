@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "beast"
+name = "cyril_code"
 version = "4.20.0"
 description = "Local proxy connecting coding agents to OpenAI-compatible AI providers"
 readme = "README.md"
@@ -30,13 +30,13 @@ dependencies = [
 ]
 
 [project.scripts]
-start = "beast.cli.entrypoints:serve"
-beast = "beast.cli.launchers.claude:launch"
-beast-codex = "beast.cli.launchers.codex:launch"
-beast-pi = "beast.cli.launchers.pi:launch"
+start = "cyril_code.cli.entrypoints:serve"
+cyril = "cyril_code.cli.launchers.claude:launch"
+cyril-codex = "cyril_code.cli.launchers.codex:launch"
+cyril-pi = "cyril_code.cli.launchers.pi:launch"
 
 [project.gui-scripts]
-beast-desktop = "beast.cli.desktop_entrypoint:launch"
+cyril-desktop = "cyril_code.cli.desktop_entrypoint:launch"
 
 [project.optional-dependencies]
 voice = [
@@ -52,10 +52,10 @@ voice_local = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/beast"]
+packages = ["src/cyril_code"]
 
 [tool.hatch.build.targets.wheel.force-include]
-".env.example" = "beast/config/env.example"
+".env.example" = "cyril_code/config/env.example"
 
 [tool.uv]
 required-version = ">=0.11.16"
@@ -102,7 +102,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["beast", "smoke"]
+known-first-party = ["cyril_code", "smoke"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -123,7 +123,7 @@ markers = [
     "clients: client compatibility checks",
     "voice: voice transcription checks",
     "contract: deterministic feature contract checks",
-    "smoke_target(name): route a smoke test behind BEAST_SMOKE_TARGETS",
+    "smoke_target(name): route a smoke test behind CYRIL_SMOKE_TARGETS",
     "xdist_group(name): group smoke provider items under pytest-xdist --dist=loadgroup",
 ]
 

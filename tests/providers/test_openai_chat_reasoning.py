@@ -1,5 +1,5 @@
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.openai_chat.reasoning import (
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.openai_chat.reasoning import (
     ChatTemplateReasoning,
     LlamaCppReasoning,
     NamedEffortReasoning,

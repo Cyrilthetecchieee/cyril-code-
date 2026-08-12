@@ -4,25 +4,25 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-import beast.messaging.session.persistence as persistence_module
-from beast.application.connected_accounts import (
+import cyril_code.messaging.session.persistence as persistence_module
+from cyril_code.application.connected_accounts import (
     ConnectedAccountState,
     ConnectedAccountStatus,
 )
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.admin.persistence import PreparedAdminUpdate
-from beast.config.settings import Settings
-from beast.messaging.command_context import StopOutcome
-from beast.messaging.platforms.ports import (
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.admin.persistence import PreparedAdminUpdate
+from cyril_code.config.settings import Settings
+from cyril_code.messaging.command_context import StopOutcome
+from cyril_code.messaging.platforms.ports import (
     InboundMessageHandler,
     MessagingPlatformComponents,
     MessagingStartupNotice,
 )
-from beast.messaging.session import SessionStore
-from beast.messaging.workflow import MessagingWorkflow
-from beast.providers.runtime import ProviderRuntime
-from beast.runtime.application import ApplicationRuntime
-from beast.runtime.provider_manager import ProviderRuntimeManager
+from cyril_code.messaging.session import SessionStore
+from cyril_code.messaging.workflow import MessagingWorkflow
+from cyril_code.providers.runtime import ProviderRuntime
+from cyril_code.runtime.application import ApplicationRuntime
+from cyril_code.runtime.provider_manager import ProviderRuntimeManager
 
 
 class TrackingRuntime(ProviderRuntime):
@@ -201,11 +201,11 @@ async def test_provider_apply_constructs_before_commit_then_publishes(tmp_path) 
 
     with (
         patch(
-            "beast.runtime.application.prepare_admin_update",
+            "cyril_code.runtime.application.prepare_admin_update",
             return_value=prepared,
         ),
         patch(
-            "beast.runtime.application.commit_prepared_admin_update",
+            "cyril_code.runtime.application.commit_prepared_admin_update",
             side_effect=commit,
         ),
     ):
@@ -236,10 +236,10 @@ async def test_candidate_failure_never_commits_and_preserves_current(tmp_path) -
 
     with (
         patch(
-            "beast.runtime.application.prepare_admin_update",
+            "cyril_code.runtime.application.prepare_admin_update",
             return_value=prepared,
         ),
-        patch("beast.runtime.application.commit_prepared_admin_update") as commit,
+        patch("cyril_code.runtime.application.commit_prepared_admin_update") as commit,
         pytest.raises(RuntimeError, match="candidate failed"),
     ):
         await runtime.apply_admin_config({"MODEL": "nvidia_nim/new"})
@@ -264,11 +264,11 @@ async def test_persistence_failure_closes_candidate_and_preserves_current(
 
     with (
         patch(
-            "beast.runtime.application.prepare_admin_update",
+            "cyril_code.runtime.application.prepare_admin_update",
             return_value=prepared,
         ),
         patch(
-            "beast.runtime.application.commit_prepared_admin_update",
+            "cyril_code.runtime.application.commit_prepared_admin_update",
             side_effect=OSError("disk full"),
         ),
         pytest.raises(OSError, match="disk full"),
@@ -302,11 +302,11 @@ async def test_restart_required_apply_commits_without_hot_publication(tmp_path) 
 
     with (
         patch(
-            "beast.runtime.application.prepare_admin_update",
+            "cyril_code.runtime.application.prepare_admin_update",
             return_value=prepared,
         ),
         patch(
-            "beast.runtime.application.commit_prepared_admin_update",
+            "cyril_code.runtime.application.commit_prepared_admin_update",
             return_value=_applied_response(("PORT",)),
         ) as commit,
     ):
@@ -780,7 +780,7 @@ async def test_public_start_retries_transient_partial_messaging_cleanup() -> Non
         ),
         patch.object(manager, "start_model_list_refresh"),
         patch(
-            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
+            "cyril_code.runtime.application.messaging_platform_factory.create_messaging_components",
             return_value=components,
         ),
         patch.object(
@@ -842,7 +842,7 @@ async def test_public_start_retains_persistently_unclean_partial_messaging_graph
         ),
         patch.object(manager, "start_model_list_refresh"),
         patch(
-            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
+            "cyril_code.runtime.application.messaging_platform_factory.create_messaging_components",
             return_value=components,
         ),
         patch.object(
@@ -886,7 +886,7 @@ async def test_messaging_start_failure_is_nonfatal_after_complete_cleanup() -> N
 
     with (
         patch(
-            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
+            "cyril_code.runtime.application.messaging_platform_factory.create_messaging_components",
             side_effect=RuntimeError("messaging unavailable"),
         ),
         patch.object(runtime, "_cleanup_messaging", AsyncMock(return_value=True)),
@@ -905,7 +905,7 @@ async def test_messaging_start_failure_fails_closed_when_cleanup_is_incomplete()
 
     with (
         patch(
-            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
+            "cyril_code.runtime.application.messaging_platform_factory.create_messaging_components",
             side_effect=RuntimeError("messaging unavailable"),
         ),
         patch.object(runtime, "_cleanup_messaging", AsyncMock(return_value=False)),
@@ -931,7 +931,7 @@ async def test_composition_records_runtime_before_workspace_setup() -> None:
 
     with (
         patch(
-            "beast.runtime.application.os.makedirs",
+            "cyril_code.runtime.application.os.makedirs",
             side_effect=OSError("workspace failed"),
         ),
         pytest.raises(OSError, match="workspace failed"),
@@ -976,12 +976,12 @@ async def test_composition_publishes_startup_notice_after_runtime_and_repair() -
 
     with (
         patch(
-            "beast.runtime.application.cli_managed.ManagedClaudeSessionManager",
+            "cyril_code.runtime.application.cli_managed.ManagedClaudeSessionManager",
             return_value=cli_manager,
         ) as manager_constructor,
-        patch("beast.runtime.application.messaging_session.SessionStore"),
+        patch("cyril_code.runtime.application.messaging_session.SessionStore"),
         patch(
-            "beast.runtime.application.messaging_workflow_module.MessagingWorkflow",
+            "cyril_code.runtime.application.messaging_workflow_module.MessagingWorkflow",
             return_value=workflow,
         ),
     ):

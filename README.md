@@ -2,8 +2,8 @@
 
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="assets/beast-wordmark-light.svg">
-    <img src="assets/beast-wordmark-dark.svg" alt="Beast" width="610">
+    <source media="(prefers-color-scheme: light)" srcset="assets/cyril_code-wordmark-light.svg">
+    <img src="assets/cyril_code-wordmark-dark.svg" alt="Cyril Code" width="610">
   </picture>
 </h1>
 
@@ -21,7 +21,7 @@
 
 ## What You Get
 
-- **Use your preferred coding agent.** Run Beast, Codex, or Pi with BEAST.
+- **Use your preferred coding agent.** Run Cyril Code, Codex, or Pi with CYRIL.
 - **Choose your own models.** Connect free, paid, or local providers and search their models from one Admin UI.
 - **Route work your way.** Set one default model or map Fable, Opus, Sonnet, and Haiku separately.
 - **Save time and tokens.** Five built-in optimizations handle quota probes, command-prefix detection, title generation, suggestion mode, and filepath extraction locally instead of calling your provider; optionally enable [RTK](https://github.com/rtk-ai/rtk) to filter noisy terminal output before it reaches the model.
@@ -29,8 +29,8 @@
 - **Work where you want.** Launch from your desktop, connect supported IDEs, or use optional Discord and Telegram bots with voice notes.
 
 <div align="center">
-  <img src="assets/pic.png" alt="Beast running with Beast" width="700">
-  <p><em>Beast running with BEAST.</em></p>
+  <img src="assets/pic.png" alt="Cyril Code running with Cyril Code" width="700">
+  <p><em>Cyril Code running with CYRIL.</em></p>
 </div>
 
 ## Quick Start
@@ -55,15 +55,15 @@ Re-run the same command whenever you want to update. You can review the installe
 
 The installer asks which coding agents to install or verify. Choose at least one; skipped agents are left unchanged. It can also install and configure RTK globally for the selected agents; RTK is off by default.
 
-### 2. Start BEAST
+### 2. Start CYRIL
 
 #### Windows
 
-Open **Beast** from your desktop or Start menu.
+Open **Cyril Code** from your desktop or Start menu.
 
 #### macOS
 
-Open **Beast** from your desktop or Applications folder.
+Open **Cyril Code** from your desktop or Applications folder.
 
 #### Linux
 
@@ -73,11 +73,11 @@ Run:
 start
 ```
 
-On Windows and macOS, BEAST runs in the system tray or menu bar without opening a
+On Windows and macOS, CYRIL runs in the system tray or menu bar without opening a
 terminal. Use its menu to open Admin, check server status, restart, or quit. On
 Windows, left-clicking the tray icon opens Admin directly.
 
-To print the installed Beast version without starting the server,
+To print the installed Cyril Code version without starting the server,
 run `start --version`.
 
 When using `start`, keep the terminal open. The Admin UI opens in your
@@ -100,42 +100,42 @@ Use the port shown in your terminal if it differs from `8082`.
 5. Click **Validate**, then **Apply**.
 
 <div align="center">
-  <img src="assets/admin-page.png" alt="Beast Admin UI" width="700">
+  <img src="assets/admin-page.png" alt="Cyril Code Admin UI" width="700">
 </div>
 
 ### 4. Run Your Coding Agent
 
-Beast:
+Cyril Code:
 
 ```bash
-beast
+cyril_code
 ```
 
 Codex:
 
 ```bash
-beast-codex
+cyril-codex
 ```
 
 Pi:
 
 ```bash
-beast-pi
+cyril-pi
 ```
 
-All three launchers use the current Admin UI settings. Use the agent's model picker to choose from the models BEAST exposes. Normal CLI arguments still work, for example:
+All three launchers use the current Admin UI settings. Use the agent's model picker to choose from the models CYRIL exposes. Normal CLI arguments still work, for example:
 
 ```bash
-beast-codex exec "hello"
+cyril-codex exec "hello"
 ```
 
-`beast-pi` registers BEAST only for that Pi process; your existing Pi settings, sessions, credentials, and extensions remain unchanged.
+`cyril-pi` registers CYRIL only for that Pi process; your existing Pi settings, sessions, credentials, and extensions remain unchanged.
 
 <a id="model-picker"></a>
 
 <div align="center">
-  <img src="assets/cc-model-picker.png" alt="Beast model picker showing BEAST models" width="700">
-  <p><em>Select an BEAST model from Beast's native <code>/model</code> picker.</em></p>
+  <img src="assets/cc-model-picker.png" alt="Cyril Code model picker showing CYRIL models" width="700">
+  <p><em>Select an CYRIL model from Cyril Code's native <code>/model</code> picker.</em></p>
 </div>
 
 ## Choose A Provider
@@ -228,7 +228,7 @@ Start LM Studio's local server, load a tool-capable model, and use the model ide
 
 ### llama.cpp
 
-Start `llama-server` with its OpenAI-compatible Chat Completions API and enough context for the model. Use the local model ID with the `llamacpp/` prefix. `LLAMACPP_BASE_URL` defaults to `http://localhost:8080/v1`; BEAST accepts either the server root or an explicit `/v1` suffix.
+Start `llama-server` with its OpenAI-compatible Chat Completions API and enough context for the model. Use the local model ID with the `llamacpp/` prefix. `LLAMACPP_BASE_URL` defaults to `http://localhost:8080/v1`; CYRIL accepts either the server root or an explicit `/v1` suffix.
 
 ### Ollama
 
@@ -237,14 +237,14 @@ ollama pull llama3.1
 ollama serve
 ```
 
-Use the tag shown by `ollama list` with the `ollama/` prefix. `OLLAMA_BASE_URL` defaults to `http://localhost:11434`; BEAST accepts either the root URL or an explicit `/v1` suffix.
+Use the tag shown by `ollama list` with the `ollama/` prefix. `OLLAMA_BASE_URL` defaults to `http://localhost:11434`; CYRIL accepts either the root URL or an explicit `/v1` suffix.
 
 </details>
 
 <details>
 <summary><strong>Optional model-tier routing</strong></summary>
 
-`MODEL` is the fallback for every request. Select a model for `MODEL_FABLE`, `MODEL_OPUS`, `MODEL_SONNET`, or `MODEL_HAIKU` to override an individual Beast tier; select **None** to use `MODEL`.
+`MODEL` is the fallback for every request. Select a model for `MODEL_FABLE`, `MODEL_OPUS`, `MODEL_SONNET`, or `MODEL_HAIKU` to override an individual Cyril Code tier; select **None** to use `MODEL`.
 
 For example, route Opus to `nvidia_nim/nvidia/nemotron-3-super-120b-a12b`, Sonnet to `open_router/openrouter/free`, Haiku to `lmstudio/qwen3.5-coder`, and keep `MODEL` on `zai/glm-5.2`.
 
@@ -257,7 +257,7 @@ Open **Admin UI → Model Config → Reasoning** and select the behavior you wan
 
 | Selection | Behavior |
 | --- | --- |
-| **From client** (default) | Use the effort sent by Beast, Codex, or Pi. If none is sent, keep the provider default. |
+| **From client** (default) | Use the effort sent by Cyril Code, Codex, or Pi. If none is sent, keep the provider default. |
 | **Off** | Request reasoning to be disabled. |
 | **Low**, **Medium**, **High**, **X-High**, or **Max** | Override the client with the selected reasoning level. |
 | **Inherit** (Fable, Opus, Sonnet, and Haiku only) | Use the root Reasoning selection. |
@@ -270,12 +270,12 @@ Providers that do not support a selected control retain their own behavior.
 
 ## Connect Your Client
 
-For terminal use, start `start`, then run `beast`, `beast-codex`, or `beast-pi`. Use the guides below for editor integrations.
+For terminal use, start `start`, then run `cyril_code`, `cyril-codex`, or `cyril-pi`. Use the guides below for editor integrations.
 
 <details>
-<summary><strong>Beast in VS Code</strong></summary>
+<summary><strong>Cyril Code in VS Code</strong></summary>
 
-Install the [Beast extension](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code). Open VS Code's user settings as JSON and add:
+Install the [Cyril Code extension](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code). Open VS Code's user settings as JSON and add:
 
 ```json
 "claudeCode.disableLoginPrompt": true,
@@ -297,7 +297,7 @@ Match the port and authentication token to the Admin UI, then reload the extensi
 <details>
 <summary><strong>Codex App</strong></summary>
 
-Start BEAST, then edit your Codex configuration:
+Start CYRIL, then edit your Codex configuration:
 
 - Windows: `%USERPROFILE%\.codex\config.toml`
 - macOS: `~/.codex/config.toml`
@@ -316,25 +316,25 @@ macOS:
 model_catalog_json = "/Users/YOUR_USERNAME/.fcc/codex-model-catalog.json"
 ```
 
-Then add the shared BEAST settings:
+Then add the shared CYRIL settings:
 
 ```toml
 model_provider = "fcc"
 model = "nvidia_nim/nvidia/nemotron-3-super-120b-a12b"
 
 [model_providers.fcc]
-name = "Beast"
+name = "Cyril Code"
 base_url = "http://127.0.0.1:8082/v1"
 wire_api = "responses"
 
 [model_providers.fcc.auth]
-command = "beast-codex"
+command = "cyril-codex"
 args = ["--print-proxy-auth-token"]
 ```
 
-Match the model and port to the Admin UI. The auth command reads BEAST's current
+Match the model and port to the Admin UI. The auth command reads CYRIL's current
 proxy token automatically. Restart the Codex App after setup or model changes,
-then select an BEAST model from its model picker.
+then select an CYRIL model from its model picker.
 
 </details>
 
@@ -348,23 +348,23 @@ model_provider = "fcc"
 model = "nvidia_nim/nvidia/nemotron-3-super-120b-a12b"
 
 [model_providers.fcc]
-name = "Beast"
+name = "Cyril Code"
 base_url = "http://127.0.0.1:8082/v1"
 wire_api = "responses"
 
 [model_providers.fcc.auth]
-command = "beast-codex"
+command = "cyril-codex"
 args = ["--print-proxy-auth-token"]
 ```
 
-Match `model` and the port to the Admin UI. The auth command reads BEAST's current
+Match `model` and the port to the Admin UI. The auth command reads CYRIL's current
 proxy token automatically. Restart VS Code after setup or model changes. For
 WSL-backed Codex, edit the file inside WSL.
 
 </details>
 
 <details>
-<summary><strong>Beast in JetBrains ACP</strong></summary>
+<summary><strong>Cyril Code in JetBrains ACP</strong></summary>
 
 Edit the installed Claude ACP configuration:
 
@@ -390,9 +390,9 @@ Match the port and token to the Admin UI, then restart the IDE.
 </details>
 
 <details>
-<summary><strong>Beast still asks you to log in</strong></summary>
+<summary><strong>Cyril Code still asks you to log in</strong></summary>
 
-If Beast asks you to log in after you configure the BEAST URL and token, open its state file:
+If Cyril Code asks you to log in after you configure the CYRIL URL and token, open its state file:
 
 - Windows: `%USERPROFILE%\.claude.json`
 - macOS/Linux/WSL: `~/.claude.json`
@@ -411,7 +411,7 @@ If the file does not exist, create it with a complete JSON object:
 }
 ```
 
-Restart Beast or the IDE after saving the file.
+Restart Cyril Code or the IDE after saving the file.
 
 </details>
 
@@ -453,7 +453,7 @@ Configure integrations from **Admin UI → Messaging**, then click **Validate** 
 | `/stats` | Show session state. |
 | Standalone `/stop` | Cancel all work. |
 | Reply with `/stop` | Cancel only the selected request while other queued requests continue. |
-| Standalone `/clear` | Reset all BEAST state and remove every tracked message in that chat, including user prompts, voice notes, BEAST replies, Telegram's online notice, and the clear command itself. |
+| Standalone `/clear` | Reset all CYRIL state and remove every tracked message in that chat, including user prompts, voice notes, CYRIL replies, Telegram's online notice, and the clear command itself. |
 | Reply with `/clear` | Delete the selected message and its literal platform reply subtree while preserving its ancestors and siblings. |
 
 <details>
@@ -495,17 +495,17 @@ Re-run the matching command from [Install Or Update](#install).
 
 ### Uninstall
 
-Stop every running BEAST command before uninstalling.
+Stop every running CYRIL command before uninstalling.
 
 **Removes**
 
-- Beast, including its desktop launcher and commands
+- Cyril Code, including its desktop launcher and commands
 - `~/.fcc/`
 
 **Keeps**
 
 - uv and Python
-- Beast, Codex, Pi, and RTK
+- Cyril Code, Codex, Pi, and RTK
 - Shared PATH entries
 
 macOS/Linux:

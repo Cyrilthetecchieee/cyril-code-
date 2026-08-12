@@ -1,6 +1,6 @@
 import pytest
 
-from beast.core.anthropic import (
+from cyril_code.core.anthropic import (
     ContentType,
     HeuristicToolParser,
     ThinkTagParser,

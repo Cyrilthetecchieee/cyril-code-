@@ -5,8 +5,8 @@ import logging
 
 import pytest
 
-from beast.messaging.models import IncomingMessage, MessageScope
-from beast.messaging.trees import (
+from cyril_code.messaging.models import IncomingMessage, MessageScope
+from cyril_code.messaging.trees import (
     CancellationReason,
     CancellationUiOwner,
     FailureResult,
@@ -15,11 +15,11 @@ from beast.messaging.trees import (
     QueueEntry,
     TreeQueueManager,
 )
-from beast.messaging.trees import manager as manager_module
-from beast.messaging.trees import processor as processor_module
-from beast.messaging.trees.node import MessageNode
-from beast.messaging.trees.processor import TreeQueueProcessor
-from beast.messaging.trees.runtime import MessageTree
+from cyril_code.messaging.trees import manager as manager_module
+from cyril_code.messaging.trees import processor as processor_module
+from cyril_code.messaging.trees.node import MessageNode
+from cyril_code.messaging.trees.processor import TreeQueueProcessor
+from cyril_code.messaging.trees.runtime import MessageTree
 
 _SCOPE = MessageScope(platform="telegram", chat_id="chat")
 

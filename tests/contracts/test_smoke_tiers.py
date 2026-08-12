@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from beast.core.anthropic.stream_contracts import SSEEvent
+from cyril_code.core.anthropic.stream_contracts import SSEEvent
 from smoke.lib.outcomes import classify_outcome, is_upstream_unavailable_text
 from smoke.lib.report_summary import format_summary, summarize_reports
 from smoke.lib.skips import skip_if_upstream_unavailable_events

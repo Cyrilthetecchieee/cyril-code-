@@ -1,12 +1,12 @@
 import pytest
 
-from beast.core.anthropic.openai_tool_names import OpenAIToolNameCodec
-from beast.core.anthropic.stream_contracts import (
+from cyril_code.core.anthropic.openai_tool_names import OpenAIToolNameCodec
+from cyril_code.core.anthropic.stream_contracts import (
     assert_anthropic_stream_contract,
     parse_sse_text,
     thinking_content,
 )
-from beast.core.openai_responses.provider_stream import (
+from cyril_code.core.openai_responses.provider_stream import (
     ResponsesProviderStream,
     ResponsesStreamFailure,
 )

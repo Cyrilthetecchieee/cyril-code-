@@ -3,7 +3,7 @@
 import httpx
 import openai
 
-from beast.providers.stream_recovery import (
+from cyril_code.providers.stream_recovery import (
     RecoveryController,
     RecoveryFailureAction,
     RecoveryHoldbackBuffer,

@@ -4,16 +4,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.config.provider_catalog import (
+from cyril_code.config.provider_catalog import (
     OLLAMA_CLOUD_DEFAULT_BASE,
     OLLAMA_DEFAULT_BASE,
 )
-from beast.core.anthropic.stream_contracts import (
+from cyril_code.core.anthropic.stream_contracts import (
     parse_sse_text,
     thinking_content,
 )
-from beast.providers.base import ProviderConfig
-from beast.providers.openai_chat import OpenAIChatProvider
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.openai_chat import OpenAIChatProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     REASONING_OFF,
@@ -54,7 +54,7 @@ def _cloud_provider() -> OpenAIChatProvider:
     ],
 )
 def test_init_normalizes_openai_base_url(configured: str, expected: str) -> None:
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
         provider = _provider(configured)
 
     assert provider._provider_name == "OLLAMA"
@@ -64,7 +64,7 @@ def test_init_normalizes_openai_base_url(configured: str, expected: str) -> None
 
 
 def test_cloud_init_uses_fixed_openai_endpoint_and_api_key() -> None:
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
         provider = _cloud_provider()
 
     assert provider._provider_name == "OLLAMA_CLOUD"

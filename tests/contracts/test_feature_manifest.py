@@ -1,25 +1,25 @@
 import re
 from pathlib import Path
 
-from beast.config.provider_catalog import PROVIDER_CATALOG
-from beast.messaging.platforms.factory import create_messaging_components
-from beast.providers.base import BaseProvider
-from beast.providers.cloudflare import CloudflareProvider
-from beast.providers.deepseek import DeepSeekProvider
-from beast.providers.gemini import GeminiProvider
-from beast.providers.github_models import GitHubModelsProvider
-from beast.providers.groq import GroqProvider
-from beast.providers.kilo import KiloProvider
-from beast.providers.lmstudio import LMStudioProvider
-from beast.providers.mistral import MistralProvider
-from beast.providers.nvidia_nim import NvidiaNimProvider
-from beast.providers.open_router import OpenRouterProvider
-from beast.providers.openai_chat import (
+from cyril_code.config.provider_catalog import PROVIDER_CATALOG
+from cyril_code.messaging.platforms.factory import create_messaging_components
+from cyril_code.providers.base import BaseProvider
+from cyril_code.providers.cloudflare import CloudflareProvider
+from cyril_code.providers.deepseek import DeepSeekProvider
+from cyril_code.providers.gemini import GeminiProvider
+from cyril_code.providers.github_models import GitHubModelsProvider
+from cyril_code.providers.groq import GroqProvider
+from cyril_code.providers.kilo import KiloProvider
+from cyril_code.providers.lmstudio import LMStudioProvider
+from cyril_code.providers.mistral import MistralProvider
+from cyril_code.providers.nvidia_nim import NvidiaNimProvider
+from cyril_code.providers.open_router import OpenRouterProvider
+from cyril_code.providers.openai_chat import (
     OPENAI_CHAT_PROFILES,
     OpenAIChatProvider,
 )
-from beast.providers.openai_codex import OpenAICodexProvider
-from beast.providers.vertex import VertexProvider
+from cyril_code.providers.openai_codex import OpenAICodexProvider
+from cyril_code.providers.vertex import VertexProvider
 from smoke.features import FEATURE_INVENTORY
 
 

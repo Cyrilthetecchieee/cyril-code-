@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.config.provider_catalog import SAMBANOVA_DEFAULT_BASE
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.base import ProviderConfig
+from cyril_code.config.provider_catalog import SAMBANOVA_DEFAULT_BASE
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission, profiled_provider
 
@@ -38,7 +38,7 @@ def test_default_base_url_constant():
 
 
 def test_init_uses_default_base_url_and_api_key(sambanova_config):
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = profiled_provider(
             "sambanova", sambanova_config, admission=immediate_admission()
         )
@@ -51,7 +51,7 @@ def test_init_uses_default_base_url_and_api_key(sambanova_config):
 def test_init_strips_trailing_slash(sambanova_config):
     config = replace(sambanova_config, base_url=f"{SAMBANOVA_DEFAULT_BASE}/")
 
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI"):
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI"):
         provider = profiled_provider(
             "sambanova", config, admission=immediate_admission()
         )

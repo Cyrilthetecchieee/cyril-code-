@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import pytest
 
-from beast.application.model_metadata import ProviderModelInfo
-from beast.application.ports import (
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.application.ports import (
     RequestRuntimeLease,
     RequestRuntimePort,
 )
-from beast.config.settings import Settings
-from beast.runtime.codex_catalog import CodexModelCatalogPublisher
+from cyril_code.config.settings import Settings
+from cyril_code.runtime.codex_catalog import CodexModelCatalogPublisher
 
 
 class FakeRequestRuntime(RequestRuntimePort):
@@ -90,7 +90,7 @@ def test_empty_projection_preserves_existing_catalog(tmp_path: Path) -> None:
 
     with (
         patch(
-            "beast.runtime.codex_catalog.build_codex_model_catalog",
+            "cyril_code.runtime.codex_catalog.build_codex_model_catalog",
             return_value={"models": []},
         ),
         pytest.raises(ValueError, match="no routable models"),

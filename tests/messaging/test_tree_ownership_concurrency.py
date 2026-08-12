@@ -4,10 +4,10 @@ import sys
 
 import pytest
 
-from beast.messaging.models import IncomingMessage, MessageScope
-from beast.messaging.trees import manager as manager_module
-from beast.messaging.trees.manager import TreeQueueManager
-from beast.messaging.trees.transitions import (
+from cyril_code.messaging.models import IncomingMessage, MessageScope
+from cyril_code.messaging.trees import manager as manager_module
+from cyril_code.messaging.trees.manager import TreeQueueManager
+from cyril_code.messaging.trees.transitions import (
     AdmissionRejection,
     CancellationReason,
     CancellationUiOwner,

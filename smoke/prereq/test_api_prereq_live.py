@@ -64,7 +64,7 @@ def test_count_tokens_accepts_thinking_tools_and_results(
                     {
                         "type": "tool_result",
                         "tool_use_id": "toolu_smoke",
-                        "content": "Beast",
+                        "content": "Cyril Code",
                     }
                 ],
             },

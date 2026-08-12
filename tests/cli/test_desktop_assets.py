@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from beast.cli import desktop_entrypoint
-from beast.cli.desktop_assets import app_icon_bytes, export_app_icon
+from cyril_code.cli import desktop_entrypoint
+from cyril_code.cli.desktop_assets import app_icon_bytes, export_app_icon
 
 
 def test_packaged_icons_have_native_container_headers() -> None:
@@ -54,4 +54,4 @@ def test_desktop_entrypoint_rejects_unknown_arguments(
         desktop_entrypoint.launch(["--unknown"])
 
     assert exc_info.value.code == 2
-    assert "Usage: beast-desktop" in capsys.readouterr().err
+    assert "Usage: cyril-desktop" in capsys.readouterr().err

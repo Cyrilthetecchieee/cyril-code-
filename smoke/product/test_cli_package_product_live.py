@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.cli.managed.manager import ManagedClaudeSessionManager
-from beast.cli.managed.session import ManagedClaudeSession
-from beast.core.version import package_version
-from smoke.lib.child_process import cmd_beast_version, run_captured_text
+from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
+from cyril_code.cli.managed.session import ManagedClaudeSession
+from cyril_code.core.version import package_version
+from smoke.lib.child_process import cmd_cyril_version, run_captured_text
 from smoke.lib.config import SmokeConfig
 
 pytestmark = [pytest.mark.live, pytest.mark.smoke_target("cli")]
@@ -20,7 +20,7 @@ def test_entrypoint_version_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> No
     env["USERPROFILE"] = str(tmp_path)
 
     result = run_captured_text(
-        cmd_beast_version(),
+        cmd_cyril_version(),
         cwd=smoke_config.root,
         env=env,
         timeout=smoke_config.timeout_s,
@@ -28,7 +28,7 @@ def test_entrypoint_version_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> No
     )
 
     assert result.returncode == 0
-    assert result.stdout == f"beast {package_version()}\n"
+    assert result.stdout == f"cyril_code {package_version()}\n"
     assert result.stderr == ""
     assert not (tmp_path / ".fcc" / ".env").exists()
 
@@ -89,7 +89,7 @@ async def test_cli_session_stop_kills_child_e2e(tmp_path: Path) -> None:
     process.wait = AsyncMock(side_effect=[asyncio.TimeoutError, 0])
     session.process = process
 
-    with patch("beast.cli.managed.session.kill_pid_tree_best_effort") as kill_tree:
+    with patch("cyril_code.cli.managed.session.kill_pid_tree_best_effort") as kill_tree:
         stopped = await session.stop()
 
     assert stopped is True

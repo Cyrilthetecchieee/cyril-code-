@@ -7,10 +7,10 @@ import openai
 import pytest
 from httpx import Request, Response
 
-from beast.config.provider_catalog import MISTRAL_DEFAULT_BASE
-from beast.core.failures import ExecutionFailure
-from beast.providers.base import ProviderConfig
-from beast.providers.mistral import MistralProvider
+from cyril_code.config.provider_catalog import MISTRAL_DEFAULT_BASE
+from cyril_code.core.failures import ExecutionFailure
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.mistral import MistralProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     REASONING_OFF,
@@ -40,7 +40,7 @@ def mistral_provider(mistral_config):
 
 def test_init(mistral_config):
     """Test provider initialization."""
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = MistralProvider(mistral_config, admission=immediate_admission())
         assert provider._api_key == "test_mistral_key"
         assert provider._base_url == MISTRAL_DEFAULT_BASE
@@ -493,7 +493,7 @@ async def test_stream_response_retries_without_mistral_reasoning_on_rejection(
                         "type": "tool_use",
                         "id": "toolu_reasoning",
                         "name": "echo",
-                        "input": {"value": "BEAST_TOOL"},
+                        "input": {"value": "CYRIL_TOOL"},
                     },
                 ],
             },
@@ -566,7 +566,7 @@ async def test_stream_response_reasoning_retry_preserves_visible_text_and_tools(
                         "type": "tool_use",
                         "id": "toolu_reasoning",
                         "name": "echo",
-                        "input": {"value": "BEAST_TOOL"},
+                        "input": {"value": "CYRIL_TOOL"},
                     },
                 ],
             },

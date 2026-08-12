@@ -3,9 +3,9 @@ import json
 
 import pytest
 
-from beast.messaging.models import MessageScope
-from beast.messaging.platforms.ports import MessagingStartupNotice
-from beast.messaging.trees import MessageState, TreeIdentity
+from cyril_code.messaging.models import MessageScope
+from cyril_code.messaging.platforms.ports import MessagingStartupNotice
+from cyril_code.messaging.trees import MessageState, TreeIdentity
 from smoke.lib.e2e import FakeCLISession, FakePlatformDriver, default_cli_events
 
 pytestmark = [pytest.mark.live, pytest.mark.smoke_target("messaging")]
@@ -182,7 +182,7 @@ async def test_messaging_startup_notice_is_clearable_e2e(tmp_path) -> None:
     second_startup = driver.platform.sent[-1]
     second_startup_id = second_startup["message_id"]
     assert second_startup["text"] == (
-        "🚀 *Beast Proxy is online\\!* \\(Bot API\\)"
+        "🚀 *Cyril Code Proxy is online\\!* \\(Bot API\\)"
     )
     assert second_startup["parse_mode"] == "MarkdownV2"
     assert driver.session_store.get_tracked_message_ids_for_chat(

@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.application.errors import InvalidRequestError
-from beast.config.constants import ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS
-from beast.core.anthropic.models import MessagesRequest
-from beast.core.anthropic.stream_contracts import (
+from cyril_code.application.errors import InvalidRequestError
+from cyril_code.config.constants import ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS
+from cyril_code.core.anthropic.models import MessagesRequest
+from cyril_code.core.anthropic.stream_contracts import (
     parse_sse_text,
     text_content,
     thinking_content,
 )
-from beast.providers.base import ProviderConfig
-from beast.providers.open_router import OpenRouterProvider
-from beast.providers.openai_chat import OpenAIChatProvider
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.open_router import OpenRouterProvider
+from cyril_code.providers.openai_chat import OpenAIChatProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     REASONING_OFF,

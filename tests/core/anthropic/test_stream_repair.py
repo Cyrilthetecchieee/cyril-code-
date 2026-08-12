@@ -1,6 +1,6 @@
 """Neutral Anthropic continuation and tool-repair helpers."""
 
-from beast.core.anthropic.streaming import (
+from cyril_code.core.anthropic.streaming import (
     ToolSchema,
     accept_tool_json_repair,
     continuation_suffix,

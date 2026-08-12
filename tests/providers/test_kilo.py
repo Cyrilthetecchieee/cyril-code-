@@ -6,20 +6,20 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.application.errors import InvalidRequestError
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.provider_catalog import KILO_DEFAULT_BASE
-from beast.core.anthropic.models import Message, MessagesRequest
-from beast.core.anthropic.stream_contracts import (
+from cyril_code.application.errors import InvalidRequestError
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.provider_catalog import KILO_DEFAULT_BASE
+from cyril_code.core.anthropic.models import Message, MessagesRequest
+from cyril_code.core.anthropic.stream_contracts import (
     parse_sse_text,
     text_content,
     thinking_content,
 )
-from beast.core.reasoning import ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.kilo import KiloProvider
-from beast.providers.model_listing import ModelListResponseError
-from beast.providers.openai_chat import OpenAIChatProvider
+from cyril_code.core.reasoning import ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.kilo import KiloProvider
+from cyril_code.providers.model_listing import ModelListResponseError
+from cyril_code.providers.openai_chat import OpenAIChatProvider
 from tests.providers.support import (
     immediate_admission,
     reasoning_for,

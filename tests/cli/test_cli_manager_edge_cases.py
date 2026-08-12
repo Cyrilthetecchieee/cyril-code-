@@ -5,9 +5,9 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_register_real_session_id_moves_pending_to_active_and_maps():
-    from beast.cli.managed.manager import ManagedClaudeSessionManager
+    from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
-    with patch("beast.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
+    with patch("cyril_code.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
         mock_session = MagicMock()
         mock_session.is_busy = False
         mock_session.stop = AsyncMock(return_value=True)
@@ -36,7 +36,7 @@ async def test_register_real_session_id_moves_pending_to_active_and_maps():
 
 @pytest.mark.asyncio
 async def test_register_real_session_id_missing_temp_id_returns_false():
-    from beast.cli.managed.manager import ManagedClaudeSessionManager
+    from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
     manager = ManagedClaudeSessionManager(
         workspace_path="/tmp", proxy_root_url="http://x"
@@ -47,9 +47,9 @@ async def test_register_real_session_id_missing_temp_id_returns_false():
 
 @pytest.mark.asyncio
 async def test_remove_session_pending_stops_and_returns_true():
-    from beast.cli.managed.manager import ManagedClaudeSessionManager
+    from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
-    with patch("beast.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
+    with patch("cyril_code.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
         mock_session = MagicMock()
         mock_session.is_busy = False
         mock_session.stop = AsyncMock(return_value=True)
@@ -67,9 +67,9 @@ async def test_remove_session_pending_stops_and_returns_true():
 
 @pytest.mark.asyncio
 async def test_remove_session_active_removes_temp_mapping():
-    from beast.cli.managed.manager import ManagedClaudeSessionManager
+    from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
-    with patch("beast.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
+    with patch("cyril_code.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
         mock_session = MagicMock()
         mock_session.is_busy = False
         mock_session.stop = AsyncMock(return_value=True)
@@ -92,7 +92,7 @@ async def test_remove_session_active_removes_temp_mapping():
 
 @pytest.mark.asyncio
 async def test_stop_all_reports_and_retains_stop_exceptions():
-    from beast.cli.managed.manager import ManagedClaudeSessionManager
+    from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
     manager = ManagedClaudeSessionManager(
         workspace_path="/tmp", proxy_root_url="http://x"

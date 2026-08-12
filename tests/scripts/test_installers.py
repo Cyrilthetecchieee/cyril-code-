@@ -11,14 +11,14 @@ from pathlib import Path
 
 import pytest
 
-BEAST_COMMANDS = (
-    "beast-desktop",
+CYRIL_COMMANDS = (
+    "cyril-desktop",
     "start",
-    "beast",
-    "beast-codex",
-    "beast-pi",
-    "beast-init",
-    "beast",
+    "cyril_code",
+    "cyril-codex",
+    "cyril-pi",
+    "cyril-init",
+    "cyril_code",
 )
 
 
@@ -86,8 +86,8 @@ def _posix_uv_command(version: str) -> str:
     return f"""#!/bin/sh
 echo "uv:$*" >> "$CALL_LOG"
 if [ "${{1:-}}" = "--version" ]; then
-    if [ "${{BEAST_RUNNING_PHASE:-}}" = "late" ]; then
-        : > "$BEAST_PROCESS_MARKER"
+    if [ "${{CYRIL_RUNNING_PHASE:-}}" = "late" ]; then
+        : > "$CYRIL_PROCESS_MARKER"
     fi
     if [ "$FAIL_STEP" = "uv-verify" ]; then
         exit 32
@@ -96,18 +96,18 @@ if [ "${{1:-}}" = "--version" ]; then
     exit 0
 fi
 if [ "${{1:-}}" = "tool" ] && [ "${{2:-}}" = "install" ]; then
-    if [ "$FAIL_STEP" = "beast-install" ]; then
+    if [ "$FAIL_STEP" = "cyril_code-install" ]; then
         exit 33
     fi
     mkdir -p "$FAKE_TOOL_BIN"
-    cp "$FAKE_FIXTURES/beast-command.sh" "$FAKE_TOOL_BIN/start"
-    cp "$FAKE_FIXTURES/beast-command.sh" "$FAKE_TOOL_BIN/beast-desktop"
-    cp "$FAKE_FIXTURES/beast-command.sh" "$FAKE_TOOL_BIN/beast"
-    cp "$FAKE_FIXTURES/beast-command.sh" "$FAKE_TOOL_BIN/beast-pi"
-    if [ "$FAIL_STEP" != "beast-missing" ]; then
-        cp "$FAKE_FIXTURES/beast-command.sh" "$FAKE_TOOL_BIN/beast-codex"
+    cp "$FAKE_FIXTURES/cyril_code-command.sh" "$FAKE_TOOL_BIN/start"
+    cp "$FAKE_FIXTURES/cyril_code-command.sh" "$FAKE_TOOL_BIN/cyril-desktop"
+    cp "$FAKE_FIXTURES/cyril_code-command.sh" "$FAKE_TOOL_BIN/cyril_code"
+    cp "$FAKE_FIXTURES/cyril_code-command.sh" "$FAKE_TOOL_BIN/cyril-pi"
+    if [ "$FAIL_STEP" != "cyril_code-missing" ]; then
+        cp "$FAKE_FIXTURES/cyril_code-command.sh" "$FAKE_TOOL_BIN/cyril-codex"
     fi
-    chmod +x "$FAKE_TOOL_BIN"/beast-*
+    chmod +x "$FAKE_TOOL_BIN"/cyril_code-*
     exit 0
 fi
 if [ "${{1:-}}" = "tool" ] && [ "${{2:-}}" = "update-shell" ]; then
@@ -188,14 +188,14 @@ exit 76
         _write_executable(
             fallback_bin / "ps",
             """#!/bin/sh
-printf '%s\n' "$BEAST_PS_OUTPUT"
+printf '%s\n' "$CYRIL_PS_OUTPUT"
 """,
         )
         awk = shutil.which("awk", path=self.env["PATH"])
         if awk is None:
             pytest.skip("awk is required for the POSIX process fallback scenario")
         shutil.copy2(awk, fallback_bin / "awk")
-        self.env["BEAST_PS_OUTPUT"] = process_line
+        self.env["CYRIL_PS_OUTPUT"] = process_line
         self.env["PATH"] = str(fallback_bin)
 
     def run(self, *args: str, fail_step: str = "") -> subprocess.CompletedProcess[str]:
@@ -221,13 +221,13 @@ printf '%s\n' "$BEAST_PS_OUTPUT"
 
         env = self.env | {
             "FAIL_STEP": fail_step,
-            "BEAST_INSTALLER": str(_repo_root() / "scripts" / "install.sh"),
+            "CYRIL_INSTALLER": str(_repo_root() / "scripts" / "install.sh"),
         }
         command = [
             "/bin/sh",
             "-c",
-            'cat "$BEAST_INSTALLER" | /bin/sh -s -- "$@"',
-            "beast-installer",
+            'cat "$CYRIL_INSTALLER" | /bin/sh -s -- "$@"',
+            "cyril_code-installer",
             *args,
         ]
         fork = vars(pty)["fork"]
@@ -301,12 +301,12 @@ def posix_harness(tmp_path: Path) -> PosixHarness:
     _write_executable(
         bin_dir / "pgrep",
         """#!/bin/sh
-[ -n "${BEAST_RUNNING_COMMAND:-}" ] || exit 1
-if [ "${BEAST_RUNNING_PHASE:-early}" = "late" ] && [ ! -e "$BEAST_PROCESS_MARKER" ]; then
+[ -n "${CYRIL_RUNNING_COMMAND:-}" ] || exit 1
+if [ "${CYRIL_RUNNING_PHASE:-early}" = "late" ] && [ ! -e "$CYRIL_PROCESS_MARKER" ]; then
     exit 1
 fi
 case "$*" in
-    *"$BEAST_RUNNING_COMMAND"*) printf '4242\n'; exit 0 ;;
+    *"$CYRIL_RUNNING_COMMAND"*) printf '4242\n'; exit 0 ;;
     *) exit 1 ;;
 esac
 """,
@@ -410,20 +410,20 @@ chmod +x "$HOME/.local/bin/uv"
         archive.addfile(metadata, io.BytesIO(rtk_command))
     _write_executable(fixtures / "uv-command.sh", _posix_uv_command("0.11.28"))
     _write_executable(
-        fixtures / "beast-command.sh",
+        fixtures / "cyril_code-command.sh",
         """#!/bin/sh
 name=${0##*/}
 echo "$name:$*" >> "$CALL_LOG"
-if [ "$FAIL_STEP" = "beast-verify" ]; then
+if [ "$FAIL_STEP" = "cyril_code-verify" ]; then
     exit 36
 fi
-if [ "$name" = "beast-desktop" ] && [ "${1:-}" = "--export-icon" ]; then
+if [ "$name" = "cyril-desktop" ] && [ "${1:-}" = "--export-icon" ]; then
     [ "$FAIL_STEP" = "desktop-icon-export" ] && exit 37
     mkdir -p "$(dirname "$2")"
     printf 'fake icon\n' > "$2"
 fi
 if [ "$name" = "start" ] && [ "${1:-}" = "--version" ]; then
-    echo "beast 3.5.18"
+    echo "cyril_code 3.5.18"
 fi
 """,
     )
@@ -457,9 +457,9 @@ printf '%s  %s\n' "$checksum" "$1"
             "CALL_LOG": str(log),
             "FAKE_FIXTURES": str(fixtures),
             "FAKE_TOOL_BIN": str(tool_bin),
-            "BEAST_PROCESS_MARKER": str(tmp_path / "beast-process-ready"),
-            "BEAST_RUNNING_COMMAND": "",
-            "BEAST_RUNNING_PHASE": "early",
+            "CYRIL_PROCESS_MARKER": str(tmp_path / "cyril_code-process-ready"),
+            "CYRIL_RUNNING_COMMAND": "",
+            "CYRIL_RUNNING_PHASE": "early",
             "FAKE_UNAME": "Linux",
             "CLAUDE_CONFIG_DIR": "",
             "FAIL_STEP": "",
@@ -473,7 +473,7 @@ def test_install_sh_fresh_install_is_verified(posix_harness: PosixHarness) -> No
     result = posix_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "Beast is installed and verified." in result.stdout
+    assert "Cyril Code is installed and verified." in result.stdout
     calls = posix_harness.calls()
     assert calls.index("claude-install") < calls.index("claude:--version")
     assert calls.index("codex-install:1") < calls.index("codex:--version")
@@ -481,8 +481,8 @@ def test_install_sh_fresh_install_is_verified(posix_harness: PosixHarness) -> No
     assert calls.index("uv-install") < calls.index("uv:--version")
     assert any(
         call.startswith(
-            "uv:tool install --force --refresh-package beast "
-            "--python 3.14.0 beast @ "
+            "uv:tool install --force --refresh-package cyril_code "
+            "--python 3.14.0 cyril-code @ "
             "https://github.com/Cyrilthetecchieee/cyril-code-/archive/refs/heads/main.zip"
         )
         for call in calls
@@ -620,7 +620,7 @@ def test_install_sh_stops_when_rtk_setup_fails(
     result = posix_harness.run("--rtk", fail_step=failure)
 
     assert result.returncode != 0
-    assert "Beast is installed and verified." not in result.stdout
+    assert "Cyril Code is installed and verified." not in result.stdout
     assert not any("astral.sh" in call for call in posix_harness.calls())
 
 
@@ -631,9 +631,9 @@ def test_install_sh_reprompts_then_installs_only_selected_agent(
 
     assert result.returncode == 0, result.stdout
     assert "Select at least one coding agent." in result.stdout
-    assert "Run Codex with: beast-codex" in result.stdout
-    assert "Run Beast with: beast" not in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Codex with: cyril-codex" in result.stdout
+    assert "Run Cyril Code with: cyril_code" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "codex-install:1" in calls
     assert not any("claude.ai" in call for call in calls)
@@ -661,14 +661,14 @@ def test_install_sh_creates_native_macos_app_and_desktop_link(
     result = posix_harness.run()
 
     assert result.returncode == 0, result.stderr
-    app = posix_harness.root / "home" / "Applications" / "Beast.app"
+    app = posix_harness.root / "home" / "Applications" / "Cyril Code.app"
     plist = app / "Contents" / "Info.plist"
-    owner_file = app / "Contents" / ".beast-owner"
-    launcher = app / "Contents" / "MacOS" / "beast-desktop"
+    owner_file = app / "Contents" / ".cyril_code-owner"
+    launcher = app / "Contents" / "MacOS" / "cyril-desktop"
     icon = app / "Contents" / "Resources" / "AppIcon.icns"
-    desktop_link = posix_harness.root / "home" / "Desktop" / "Beast.app"
+    desktop_link = posix_harness.root / "home" / "Desktop" / "Cyril Code.app"
     assert owner_file.read_text(encoding="utf-8").strip() == (
-        "io.github.alishahryar1.beast"
+        "io.github.alishahryar1.cyril_code"
     )
     plist_text = plist.read_text(encoding="utf-8")
     assert "<key>CFBundleIconFile</key>" in plist_text
@@ -677,12 +677,12 @@ def test_install_sh_creates_native_macos_app_and_desktop_link(
     assert "<key>LSMultipleInstancesProhibited</key>" in plist_text
     assert icon.read_bytes() == b"fake icon\n"
     assert launcher.stat().st_mode & 0o111
-    expected_command = str(tool_bin / "beast-desktop").replace("'", "'\\''")
+    expected_command = str(tool_bin / "cyril-desktop").replace("'", "'\\''")
     assert f"exec '{expected_command}'" in launcher.read_text(encoding="utf-8")
     assert desktop_link.is_symlink()
     assert desktop_link.readlink() == app
     assert any(
-        call == f"beast-desktop:--export-icon {icon}" for call in posix_harness.calls()
+        call == f"cyril-desktop:--export-icon {icon}" for call in posix_harness.calls()
     )
 
 
@@ -695,14 +695,14 @@ def test_install_sh_stops_if_macos_icon_export_fails(
 
     assert result.returncode != 0
     assert "Command failed with exit code 37" in result.stderr
-    assert not (posix_harness.root / "home" / "Desktop" / "Beast.app").exists()
+    assert not (posix_harness.root / "home" / "Desktop" / "Cyril Code.app").exists()
 
 
 def test_install_sh_rejects_unowned_macos_app_bundle(
     posix_harness: PosixHarness,
 ) -> None:
     posix_harness.env["FAKE_UNAME"] = "Darwin"
-    app = posix_harness.root / "home" / "Applications" / "Beast.app"
+    app = posix_harness.root / "home" / "Applications" / "Cyril Code.app"
     contents = app / "Contents"
     contents.mkdir(parents=True)
     plist = contents / "Info.plist"
@@ -711,9 +711,9 @@ def test_install_sh_rejects_unowned_macos_app_bundle(
     result = posix_harness.run()
 
     assert result.returncode != 0
-    assert "not managed by Beast" in result.stderr
+    assert "not managed by Cyril Code" in result.stderr
     assert plist.read_text(encoding="utf-8") == "foreign app"
-    assert not (contents / ".beast-owner").exists()
+    assert not (contents / ".cyril_code-owner").exists()
 
 
 def test_install_sh_preserves_unrelated_macos_desktop_link(
@@ -724,13 +724,13 @@ def test_install_sh_preserves_unrelated_macos_desktop_link(
     desktop.mkdir()
     unrelated = posix_harness.root / "Unrelated.app"
     unrelated.mkdir()
-    desktop_link = desktop / "Beast.app"
+    desktop_link = desktop / "Cyril Code.app"
     desktop_link.symlink_to(unrelated, target_is_directory=True)
 
     result = posix_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "non-BEAST link" in result.stdout
+    assert "non-CYRIL link" in result.stdout
     assert desktop_link.readlink() == unrelated
 
 
@@ -790,7 +790,7 @@ def test_install_sh_continues_when_pi_is_not_installed(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "pi-install" in calls
     assert not any(call.startswith("pi:") for call in calls)
@@ -807,7 +807,7 @@ def test_install_sh_continues_when_unrelated_pi_is_unchanged(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "unrelated-pi:--help" in calls
     assert "unrelated-pi:--version" not in calls
@@ -829,7 +829,7 @@ def test_install_sh_continues_when_pi_resolution_changes_to_unrelated_command(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "other-unrelated-pi:--help" in calls
     assert "other-unrelated-pi:--version" not in calls
@@ -881,10 +881,10 @@ def test_install_sh_replaces_prerelease_uv(
         "uv-download",
         "uv-install",
         "uv-verify",
-        "beast-install",
+        "cyril_code-install",
         "path-update",
-        "beast-missing",
-        "beast-verify",
+        "cyril_code-missing",
+        "cyril_code-verify",
     ],
 )
 def test_install_sh_stops_without_success_on_each_failure(
@@ -894,7 +894,7 @@ def test_install_sh_stops_without_success_on_each_failure(
     result = posix_harness.run(fail_step=failure)
 
     assert result.returncode != 0
-    assert "Beast is installed and verified." not in result.stdout
+    assert "Cyril Code is installed and verified." not in result.stdout
     forbidden = {
         "claude-download": "claude-install",
         "claude-install": "claude:--version",
@@ -908,9 +908,9 @@ def test_install_sh_stops_without_success_on_each_failure(
         "uv-download": "uv-install",
         "uv-install": "uv:--version",
         "uv-verify": "uv:tool install",
-        "beast-install": "uv:tool update-shell",
+        "cyril_code-install": "uv:tool update-shell",
         "path-update": "uv:tool dir --bin",
-        "beast-missing": "start:--version",
+        "cyril_code-missing": "start:--version",
     }.get(failure)
     if forbidden is not None:
         assert not any(forbidden in call for call in posix_harness.calls())
@@ -924,7 +924,7 @@ def test_install_sh_dry_run_never_executes_commands(
     assert result.returncode == 0, result.stderr
     assert posix_harness.calls() == []
     assert "Dry run complete. No changes were made." in result.stdout
-    assert "Beast is installed and verified." not in result.stdout
+    assert "Cyril Code is installed and verified." not in result.stdout
 
 
 def test_install_sh_rejects_broken_existing_client_without_replacing_it(
@@ -952,14 +952,14 @@ def test_install_sh_rejects_unparseable_existing_uv(
     assert not any("astral.sh" in call for call in posix_harness.calls())
 
 
-def test_install_sh_voice_flags_only_change_beast_spec(
+def test_install_sh_voice_flags_only_change_cyril_spec(
     posix_harness: PosixHarness,
 ) -> None:
     result = posix_harness.run("--voice-all", "--torch-backend", "cu130")
 
     assert result.returncode == 0, result.stderr
     assert any(
-        "--torch-backend cu130 beast[voice,voice_local] @ "
+        "--torch-backend cu130 cyril_code[voice,voice_local] @ "
         "https://github.com/Cyrilthetecchieee/cyril-code-/archive/refs/heads/main.zip"
         in call
         for call in posix_harness.calls()
@@ -975,12 +975,12 @@ def test_install_sh_rejects_invalid_options_before_mutation(
     assert posix_harness.calls() == []
 
 
-@pytest.mark.parametrize("command_name", BEAST_COMMANDS)
-def test_install_sh_rejects_running_beast_before_mutation(
+@pytest.mark.parametrize("command_name", CYRIL_COMMANDS)
+def test_install_sh_rejects_running_cyril_before_mutation(
     posix_harness: PosixHarness,
     command_name: str,
 ) -> None:
-    posix_harness.env["BEAST_RUNNING_COMMAND"] = command_name
+    posix_harness.env["CYRIL_RUNNING_COMMAND"] = command_name
 
     result = posix_harness.run()
 
@@ -989,15 +989,15 @@ def test_install_sh_rejects_running_beast_before_mutation(
     assert f"{command_name} (PID 4242)" in result.stderr
 
 
-def test_install_sh_rechecks_for_beast_process_before_tool_replacement(
+def test_install_sh_rechecks_for_cyril_process_before_tool_replacement(
     posix_harness: PosixHarness,
 ) -> None:
     posix_harness.add_client("claude")
     posix_harness.add_client("codex")
     posix_harness.add_client("pi")
     posix_harness.add_uv("0.11.16")
-    posix_harness.env["BEAST_RUNNING_COMMAND"] = "start"
-    posix_harness.env["BEAST_RUNNING_PHASE"] = "late"
+    posix_harness.env["CYRIL_RUNNING_COMMAND"] = "start"
+    posix_harness.env["CYRIL_RUNNING_PHASE"] = "late"
 
     result = posix_harness.run()
 
@@ -1009,7 +1009,7 @@ def test_install_sh_rechecks_for_beast_process_before_tool_replacement(
 def test_install_sh_ignores_similarly_named_process(
     posix_harness: PosixHarness,
 ) -> None:
-    posix_harness.env["BEAST_RUNNING_COMMAND"] = "start-helper"
+    posix_harness.env["CYRIL_RUNNING_COMMAND"] = "start-helper"
 
     result = posix_harness.run()
 
@@ -1019,7 +1019,7 @@ def test_install_sh_ignores_similarly_named_process(
 @pytest.mark.parametrize(
     ("command_name", "process_args"),
     (
-        ("beast", "/home/user/.local/bin/beast"),
+        ("cyril_code", "/home/user/.local/bin/cyril_code"),
         ("start", "/usr/bin/python3 /home/user/.local/bin/start"),
     ),
 )
@@ -1075,13 +1075,13 @@ def test_install_ps1_gui_icon_export_completes_before_returning(
         f"{declaration} {{{_braced_body(installer, declaration)}}}"
         for declaration in function_declarations
     )
-    installed_desktop_command = Path(sys.executable).with_name("beast-desktop.exe")
+    installed_desktop_command = Path(sys.executable).with_name("cyril-desktop.exe")
     desktop_command = tmp_path / "icon-exporter.exe"
     shutil.copy2(installed_desktop_command, desktop_command)
     destination = tmp_path / "profile with spaces" / ".fcc" / "app-icon.ico"
     env = os.environ | {
-        "BEAST_TEST_DESKTOP_COMMAND": str(desktop_command),
-        "BEAST_TEST_ICON_PATH": str(destination),
+        "CYRIL_TEST_DESKTOP_COMMAND": str(desktop_command),
+        "CYRIL_TEST_ICON_PATH": str(destination),
     }
     script = "\n".join(
         (
@@ -1090,8 +1090,8 @@ def test_install_ps1_gui_icon_export_completes_before_returning(
             functions,
             (
                 "Export-FccDesktopIcon "
-                "-DesktopCommand $env:BEAST_TEST_DESKTOP_COMMAND "
-                "-IconPath $env:BEAST_TEST_ICON_PATH"
+                "-DesktopCommand $env:CYRIL_TEST_DESKTOP_COMMAND "
+                "-IconPath $env:CYRIL_TEST_ICON_PATH"
             ),
         )
     )
@@ -1107,7 +1107,7 @@ def test_install_ps1_gui_icon_export_completes_before_returning(
     assert completed.returncode == 0, completed.stderr
     assert (
         destination.read_bytes()
-        == (_repo_root() / "src" / "beast" / "assets" / "app-icon.ico").read_bytes()
+        == (_repo_root() / "src" / "cyril_code" / "assets" / "app-icon.ico").read_bytes()
     )
 
 
@@ -1118,8 +1118,8 @@ def _create_windows_shortcut(
 ) -> None:
     shortcut_path.parent.mkdir(parents=True, exist_ok=True)
     env = os.environ | {
-        "BEAST_TEST_SHORTCUT": str(shortcut_path),
-        "BEAST_TEST_TARGET": str(target_path),
+        "CYRIL_TEST_SHORTCUT": str(shortcut_path),
+        "CYRIL_TEST_TARGET": str(target_path),
     }
     subprocess.run(
         [
@@ -1128,8 +1128,8 @@ def _create_windows_shortcut(
             "-Command",
             (
                 "$shell = New-Object -ComObject WScript.Shell; "
-                "$shortcut = $shell.CreateShortcut($env:BEAST_TEST_SHORTCUT); "
-                "$shortcut.TargetPath = $env:BEAST_TEST_TARGET; "
+                "$shortcut = $shell.CreateShortcut($env:CYRIL_TEST_SHORTCUT); "
+                "$shortcut.TargetPath = $env:CYRIL_TEST_TARGET; "
                 "$shortcut.Save()"
             ),
         ],
@@ -1141,7 +1141,7 @@ def _create_windows_shortcut(
 
 
 def _windows_shortcut_icon(powershell: str, shortcut_path: Path) -> str:
-    env = os.environ | {"BEAST_TEST_SHORTCUT": str(shortcut_path)}
+    env = os.environ | {"CYRIL_TEST_SHORTCUT": str(shortcut_path)}
     completed = subprocess.run(
         [
             powershell,
@@ -1149,7 +1149,7 @@ def _windows_shortcut_icon(powershell: str, shortcut_path: Path) -> str:
             "-Command",
             (
                 "$shell = New-Object -ComObject WScript.Shell; "
-                "$shortcut = $shell.CreateShortcut($env:BEAST_TEST_SHORTCUT); "
+                "$shortcut = $shell.CreateShortcut($env:CYRIL_TEST_SHORTCUT); "
                 "[Console]::Out.Write($shortcut.IconLocation)"
             ),
         ],
@@ -1197,18 +1197,18 @@ if "%1"=="tool" if "%2"=="update-shell" goto update_shell
 if "%1"=="tool" if "%2"=="dir" if "%3"=="--bin" goto tool_bin
 exit /b 59
 :version
-if "%BEAST_RUNNING_PHASE%"=="late" type nul > "%BEAST_PROCESS_MARKER%"
+if "%CYRIL_RUNNING_PHASE%"=="late" type nul > "%CYRIL_PROCESS_MARKER%"
 if "%FAIL_STEP%"=="uv-verify" exit /b 52
 echo uv {version}
 exit /b 0
 :install
-if "%FAIL_STEP%"=="beast-install" exit /b 53
+if "%FAIL_STEP%"=="cyril_code-install" exit /b 53
 if not exist "%FAKE_TOOL_BIN%" mkdir "%FAKE_TOOL_BIN%"
-copy /y "%FAKE_FIXTURES%\beast-command.cmd" "%FAKE_TOOL_BIN%\start.cmd" >nul
-copy /y "%FAKE_FIXTURES%\beast-command.cmd" "%FAKE_TOOL_BIN%\beast-desktop.cmd" >nul
-copy /y "%FAKE_FIXTURES%\beast-command.cmd" "%FAKE_TOOL_BIN%\beast.cmd" >nul
-copy /y "%FAKE_FIXTURES%\beast-command.cmd" "%FAKE_TOOL_BIN%\beast-pi.cmd" >nul
-if not "%FAIL_STEP%"=="beast-missing" copy /y "%FAKE_FIXTURES%\beast-command.cmd" "%FAKE_TOOL_BIN%\beast-codex.cmd" >nul
+copy /y "%FAKE_FIXTURES%\cyril_code-command.cmd" "%FAKE_TOOL_BIN%\start.cmd" >nul
+copy /y "%FAKE_FIXTURES%\cyril_code-command.cmd" "%FAKE_TOOL_BIN%\cyril-desktop.cmd" >nul
+copy /y "%FAKE_FIXTURES%\cyril_code-command.cmd" "%FAKE_TOOL_BIN%\cyril_code.cmd" >nul
+copy /y "%FAKE_FIXTURES%\cyril_code-command.cmd" "%FAKE_TOOL_BIN%\cyril-pi.cmd" >nul
+if not "%FAIL_STEP%"=="cyril_code-missing" copy /y "%FAKE_FIXTURES%\cyril_code-command.cmd" "%FAKE_TOOL_BIN%\cyril-codex.cmd" >nul
 exit /b 0
 :update_shell
 if "%FAIL_STEP%"=="path-update" exit /b 54
@@ -1330,17 +1330,17 @@ def powershell_harness(
     (fixtures / "pi-command.cmd").write_text(_batch_client("pi"), encoding="utf-8")
     (fixtures / "rtk-command.cmd").write_text(_batch_rtk(), encoding="utf-8")
     (fixtures / "uv-command.cmd").write_text(_batch_uv("0.11.28"), encoding="utf-8")
-    (fixtures / "beast-command.cmd").write_text(
+    (fixtures / "cyril_code-command.cmd").write_text(
         """@echo off
-for %%I in ("%~f0") do set "BEAST_NAME=%%~nI"
-echo %BEAST_NAME%:%*>>"%CALL_LOG%"
-if "%FAIL_STEP%"=="beast-verify" exit /b 55
-if "%BEAST_NAME%"=="beast-desktop" if "%1"=="--export-icon" if "%FAIL_STEP%"=="desktop-icon-export" exit /b 56
-if "%BEAST_NAME%"=="beast-desktop" if "%1"=="--export-icon" (
+for %%I in ("%~f0") do set "CYRIL_NAME=%%~nI"
+echo %CYRIL_NAME%:%*>>"%CALL_LOG%"
+if "%FAIL_STEP%"=="cyril_code-verify" exit /b 55
+if "%CYRIL_NAME%"=="cyril-desktop" if "%1"=="--export-icon" if "%FAIL_STEP%"=="desktop-icon-export" exit /b 56
+if "%CYRIL_NAME%"=="cyril-desktop" if "%1"=="--export-icon" (
     if not exist "%~dp2" mkdir "%~dp2"
     echo fake icon>"%~2"
 )
-if "%BEAST_NAME%"=="start" if "%1"=="--version" echo beast 3.5.18
+if "%CYRIL_NAME%"=="start" if "%1"=="--version" echo cyril_code 3.5.18
 exit /b 0
 """,
         encoding="utf-8",
@@ -1431,22 +1431,22 @@ function Get-Process {
     [CmdletBinding()]
     param([string[]] $Name)
 
-    if ([string]::IsNullOrWhiteSpace($env:BEAST_RUNNING_COMMAND)) {
+    if ([string]::IsNullOrWhiteSpace($env:CYRIL_RUNNING_COMMAND)) {
         return
     }
     if (
-        $env:BEAST_RUNNING_PHASE -eq "late" -and
-        -not (Test-Path -LiteralPath $env:BEAST_PROCESS_MARKER)
+        $env:CYRIL_RUNNING_PHASE -eq "late" -and
+        -not (Test-Path -LiteralPath $env:CYRIL_PROCESS_MARKER)
     ) {
         return
     }
     foreach ($requestedName in $Name) {
-        if ($requestedName -eq $env:BEAST_RUNNING_COMMAND) {
+        if ($requestedName -eq $env:CYRIL_RUNNING_COMMAND) {
             [pscustomobject] @{ Id = 4242; ProcessName = $requestedName }
         }
     }
 }
-$installer = [scriptblock]::Create([IO.File]::ReadAllText($env:BEAST_INSTALLER))
+$installer = [scriptblock]::Create([IO.File]::ReadAllText($env:CYRIL_INSTALLER))
 & $installer @args
 """,
         encoding="utf-8",
@@ -1467,10 +1467,10 @@ $installer = [scriptblock]::Create([IO.File]::ReadAllText($env:BEAST_INSTALLER))
             "CLAUDE_CONFIG_DIR": "",
             "FAKE_FIXTURES": str(fixtures),
             "FAKE_TOOL_BIN": str(tool_bin),
-            "BEAST_INSTALLER": str(_repo_root() / "scripts" / "install.ps1"),
-            "BEAST_PROCESS_MARKER": str(tmp_path / "beast-process-ready"),
-            "BEAST_RUNNING_COMMAND": "",
-            "BEAST_RUNNING_PHASE": "early",
+            "CYRIL_INSTALLER": str(_repo_root() / "scripts" / "install.ps1"),
+            "CYRIL_PROCESS_MARKER": str(tmp_path / "cyril_code-process-ready"),
+            "CYRIL_RUNNING_COMMAND": "",
+            "CYRIL_RUNNING_PHASE": "early",
             "FAIL_STEP": "",
         }
     )
@@ -1485,7 +1485,7 @@ def test_install_ps1_fresh_install_is_verified(
     result = powershell_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "Beast is installed and verified." in result.stdout
+    assert "Cyril Code is installed and verified." in result.stdout
     calls = powershell_harness.calls()
     assert calls.index("claude-install") < calls.index("claude:--version")
     assert calls.index("codex-install:1") < calls.index("codex:--version")
@@ -1493,9 +1493,9 @@ def test_install_ps1_fresh_install_is_verified(
     assert calls.index("uv-install") < calls.index("uv:--version")
     assert any(
         call.startswith(
-            "uv:tool install --force --refresh-package beast "
+            "uv:tool install --force --refresh-package cyril_code "
             "--python cpython-3.14.0-windows-x86_64-none "
-            '"beast @ '
+            '"cyril-code @ '
             'https://github.com/Cyrilthetecchieee/cyril-code-/archive/refs/heads/main.zip"'
         )
         for call in calls
@@ -1510,8 +1510,8 @@ def test_install_ps1_fresh_install_is_verified(
     app_data = Path(powershell_harness.env["APPDATA"])
     icon = home / ".fcc" / "app-icon.ico"
     assert icon.read_text(encoding="utf-8").strip() == "fake icon"
-    assert calls[-1] == f'beast-desktop:--export-icon "{icon}"'
-    desktop_shortcut = home / "Desktop" / "Beast.lnk"
+    assert calls[-1] == f'cyril-desktop:--export-icon "{icon}"'
+    desktop_shortcut = home / "Desktop" / "Cyril Code.lnk"
     assert desktop_shortcut.is_file()
     # assert (
     #     _windows_shortcut_icon(
@@ -1521,7 +1521,7 @@ def test_install_ps1_fresh_install_is_verified(
     #     == f"{icon},0"
     # )
     assert (
-        app_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Beast.lnk"
+        app_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Cyril Code.lnk"
     ).is_file()
 
 
@@ -1658,14 +1658,14 @@ def test_install_ps1_stops_if_windows_icon_export_fails(
     assert result.returncode != 0
     assert "Command failed with exit code 56" in result.stderr
     home = Path(powershell_harness.env["USERPROFILE"])
-    assert not (home / "Desktop" / "Beast.lnk").exists()
+    assert not (home / "Desktop" / "Cyril Code.lnk").exists()
 
 
 def test_install_ps1_preserves_unowned_desktop_shortcut(
     powershell_harness: PowerShellHarness,
 ) -> None:
     desktop_shortcut = (
-        Path(powershell_harness.env["USERPROFILE"]) / "Desktop" / "Beast.lnk"
+        Path(powershell_harness.env["USERPROFILE"]) / "Desktop" / "Cyril Code.lnk"
     )
     unrelated_target = powershell_harness.root / "unrelated.cmd"
     unrelated_target.write_text("@echo off\n", encoding="utf-8")
@@ -1679,7 +1679,7 @@ def test_install_ps1_preserves_unowned_desktop_shortcut(
     result = powershell_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "not managed by Beast" in result.stdout
+    assert "not managed by Cyril Code" in result.stdout
     assert desktop_shortcut.read_bytes() == original_shortcut
 
 
@@ -1739,7 +1739,7 @@ def test_install_ps1_continues_when_pi_is_not_installed(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = powershell_harness.calls()
     assert "pi-install" in calls
     assert not any(call.startswith("pi:") for call in calls)
@@ -1756,7 +1756,7 @@ def test_install_ps1_continues_when_unrelated_pi_is_unchanged(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = powershell_harness.calls()
     assert "unrelated-pi:--help" in calls
     assert "unrelated-pi:--version" not in calls
@@ -1778,7 +1778,7 @@ def test_install_ps1_continues_when_pi_resolution_changes_to_unrelated_command(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: beast-pi" not in result.stdout
+    assert "Run Pi with: cyril-pi" not in result.stdout
     calls = powershell_harness.calls()
     assert "other-unrelated-pi:--help" in calls
     assert "other-unrelated-pi:--version" not in calls
@@ -1832,10 +1832,10 @@ def test_install_ps1_replaces_prerelease_uv(
         "uv-download",
         "uv-install",
         "uv-verify",
-        "beast-install",
+        "cyril_code-install",
         "path-update",
-        "beast-missing",
-        "beast-verify",
+        "cyril_code-missing",
+        "cyril_code-verify",
     ],
 )
 def test_install_ps1_stops_without_success_on_each_failure(
@@ -1845,7 +1845,7 @@ def test_install_ps1_stops_without_success_on_each_failure(
     result = powershell_harness.run(fail_step=failure)
 
     assert result.returncode != 0
-    assert "Beast is installed and verified." not in result.stdout
+    assert "Cyril Code is installed and verified." not in result.stdout
     forbidden = {
         "claude-download": "claude-install",
         "claude-install": "claude:--version",
@@ -1859,9 +1859,9 @@ def test_install_ps1_stops_without_success_on_each_failure(
         "uv-download": "uv-install",
         "uv-install": "uv:--version",
         "uv-verify": "uv:tool install",
-        "beast-install": "uv:tool update-shell",
+        "cyril_code-install": "uv:tool update-shell",
         "path-update": "uv:tool dir --bin",
-        "beast-missing": "start:--version",
+        "cyril_code-missing": "start:--version",
     }.get(failure)
     if forbidden is not None:
         assert not any(forbidden in call for call in powershell_harness.calls())
@@ -1889,7 +1889,7 @@ def test_install_ps1_dry_run_never_executes_commands(
     assert result.returncode == 0, result.stderr
     assert powershell_harness.calls() == []
     assert "Dry run complete. No changes were made." in result.stdout
-    assert "Beast is installed and verified." not in result.stdout
+    assert "Cyril Code is installed and verified." not in result.stdout
 
 
 def test_install_ps1_rejects_broken_existing_client_without_replacing_it(
@@ -1917,26 +1917,26 @@ def test_install_ps1_rejects_unparseable_existing_uv(
     assert not any("astral.sh" in call for call in powershell_harness.calls())
 
 
-def test_install_ps1_voice_flags_only_change_beast_spec(
+def test_install_ps1_voice_flags_only_change_cyril_spec(
     powershell_harness: PowerShellHarness,
 ) -> None:
     result = powershell_harness.run("-VoiceAll", "-TorchBackend", "cu130")
 
     assert result.returncode == 0, result.stderr
     assert any(
-        '--torch-backend cu130 "beast[voice,voice_local] @ '
+        '--torch-backend cu130 "cyril_code[voice,voice_local] @ '
         'https://github.com/Cyrilthetecchieee/cyril-code-/archive/refs/heads/main.zip"'
         in call
         for call in powershell_harness.calls()
     )
 
 
-@pytest.mark.parametrize("command_name", BEAST_COMMANDS)
-def test_install_ps1_rejects_running_beast_before_mutation(
+@pytest.mark.parametrize("command_name", CYRIL_COMMANDS)
+def test_install_ps1_rejects_running_cyril_before_mutation(
     powershell_harness: PowerShellHarness,
     command_name: str,
 ) -> None:
-    powershell_harness.env["BEAST_RUNNING_COMMAND"] = command_name
+    powershell_harness.env["CYRIL_RUNNING_COMMAND"] = command_name
 
     result = powershell_harness.run()
 
@@ -1945,15 +1945,15 @@ def test_install_ps1_rejects_running_beast_before_mutation(
     assert f"{command_name} (PID 4242)" in result.stderr
 
 
-def test_install_ps1_rechecks_for_beast_process_before_tool_replacement(
+def test_install_ps1_rechecks_for_cyril_process_before_tool_replacement(
     powershell_harness: PowerShellHarness,
 ) -> None:
     powershell_harness.add_client("claude")
     powershell_harness.add_client("codex")
     powershell_harness.add_client("pi")
     powershell_harness.add_uv("0.11.16")
-    powershell_harness.env["BEAST_RUNNING_COMMAND"] = "start"
-    powershell_harness.env["BEAST_RUNNING_PHASE"] = "late"
+    powershell_harness.env["CYRIL_RUNNING_COMMAND"] = "start"
+    powershell_harness.env["CYRIL_RUNNING_PHASE"] = "late"
 
     result = powershell_harness.run()
 
@@ -1967,7 +1967,7 @@ def test_install_ps1_rechecks_for_beast_process_before_tool_replacement(
 def test_install_ps1_ignores_similarly_named_process(
     powershell_harness: PowerShellHarness,
 ) -> None:
-    powershell_harness.env["BEAST_RUNNING_COMMAND"] = "start-helper"
+    powershell_harness.env["CYRIL_RUNNING_COMMAND"] = "start-helper"
 
     result = powershell_harness.run()
 
@@ -1979,7 +1979,7 @@ def test_installers_use_native_clients_and_single_python_selection() -> None:
     powershell = (_repo_root() / "scripts" / "install.ps1").read_text(encoding="utf-8")
 
     for text in (shell, powershell):
-        for command_name in BEAST_COMMANDS:
+        for command_name in CYRIL_COMMANDS:
             assert command_name in text
         assert "@anthropic-ai/claude-code" not in text
         assert "@openai/codex" not in text

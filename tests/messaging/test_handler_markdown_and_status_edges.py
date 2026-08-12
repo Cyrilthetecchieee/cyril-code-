@@ -3,13 +3,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.messaging.command_context import StopOutcome
-from beast.messaging.models import IncomingMessage, MessageScope
-from beast.messaging.node_event_pipeline import process_parsed_cli_event
-from beast.messaging.rendering.telegram_markdown import (
+from cyril_code.messaging.command_context import StopOutcome
+from cyril_code.messaging.models import IncomingMessage, MessageScope
+from cyril_code.messaging.node_event_pipeline import process_parsed_cli_event
+from cyril_code.messaging.rendering.telegram_markdown import (
     render_markdown_to_mdv2,
 )
-from beast.messaging.trees import (
+from cyril_code.messaging.trees import (
     CancellationReason,
     CancellationResult,
     CancellationUiOwner,
@@ -23,8 +23,8 @@ from beast.messaging.trees import (
     TreeIdentity,
     TreeSnapshot,
 )
-from beast.messaging.trees.transitions import CancellationEffect
-from beast.messaging.workflow import MessagingWorkflow
+from cyril_code.messaging.trees.transitions import CancellationEffect
+from cyril_code.messaging.workflow import MessagingWorkflow
 
 _SCOPE = MessageScope(platform="telegram", chat_id="c")
 

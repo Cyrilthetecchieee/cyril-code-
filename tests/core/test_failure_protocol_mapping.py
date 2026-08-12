@@ -2,12 +2,12 @@
 
 import pytest
 
-from beast.core.anthropic.errors import (
+from cyril_code.core.anthropic.errors import (
     anthropic_error_type_for_failure,
     anthropic_failure_payload,
 )
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.core.openai_responses.errors import (
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.openai_responses.errors import (
     openai_error_type_for_failure,
     openai_failure_payload,
 )

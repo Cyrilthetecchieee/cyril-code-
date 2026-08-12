@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from beast.core.anthropic.streaming import (
+from cyril_code.core.anthropic.streaming import (
     AnthropicStreamLedger,
     StreamBlockLedger,
     ToolSchema,
@@ -122,5 +122,5 @@ def test_output_token_estimate_uses_encoder_when_available() -> None:
         def encode(self, text: str) -> list[int]:
             return list(range(len(text)))
 
-    with patch("beast.core.anthropic.streaming.ledger.ENCODER", Encoder()):
+    with patch("cyril_code.core.anthropic.streaming.ledger.ENCODER", Encoder()):
         assert ledger.estimate_output_tokens() == 8

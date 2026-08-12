@@ -8,8 +8,8 @@ from typing import Any, cast
 
 import pytest
 
-from beast.cli.launchers.codex import codex_config_args
-from beast.cli.launchers.codex_model_catalog import (
+from cyril_code.cli.launchers.codex import codex_config_args
+from cyril_code.cli.launchers.codex_model_catalog import (
     build_codex_model_catalog,
     write_codex_model_catalog,
 )
@@ -162,12 +162,12 @@ def test_launcher_config_composes_with_persistent_codex_config(
                 f"model_catalog_json = {json.dumps(str(catalog_path))}",
                 "",
                 "[model_providers.fcc]",
-                'name = "Beast"',
+                'name = "Cyril Code"',
                 'base_url = "http://127.0.0.1:8082/v1"',
                 'wire_api = "responses"',
                 "",
                 "[model_providers.fcc.auth]",
-                'command = "beast-codex"',
+                'command = "cyril-codex"',
                 'args = ["--print-proxy-auth-token"]',
                 "",
             )

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from beast.core.anthropic import extract_text_from_content
+from cyril_code.core.anthropic import extract_text_from_content
 
 
 class TestExtractTextFromContent:

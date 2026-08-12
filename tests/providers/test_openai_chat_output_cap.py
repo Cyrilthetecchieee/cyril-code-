@@ -9,10 +9,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from beast.config.provider_catalog import GROQ_DEFAULT_BASE
-from beast.providers.base import ProviderConfig
-from beast.providers.groq import GroqProvider
-from beast.providers.openai_chat.output_cap import (
+from cyril_code.config.provider_catalog import GROQ_DEFAULT_BASE
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.groq import GroqProvider
+from cyril_code.providers.openai_chat.output_cap import (
     clamp_output_tokens,
     parse_output_token_cap,
 )

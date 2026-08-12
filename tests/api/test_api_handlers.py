@@ -6,23 +6,23 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from beast.api.handlers import (
+from cyril_code.api.handlers import (
     MessagesHandler,
     ResponsesHandler,
     TokenCountHandler,
 )
-from beast.application.errors import InvalidRequestError
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.settings import Settings
-from beast.core.anthropic.models import (
+from cyril_code.application.errors import InvalidRequestError
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.settings import Settings
+from cyril_code.core.anthropic.models import (
     Message,
     MessagesRequest,
     TokenCountRequest,
 )
-from beast.core.anthropic.streaming import format_sse_event
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.core.openai_responses import OpenAIResponsesRequest
-from beast.core.reasoning import ReasoningPolicy
+from cyril_code.core.anthropic.streaming import format_sse_event
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.openai_responses import OpenAIResponsesRequest
+from cyril_code.core.reasoning import ReasoningPolicy
 
 _CLASSIFIER_SYSTEM = (
     "You are a security monitor. Respond with <block>yes</block> or <block>no</block>."
@@ -394,7 +394,7 @@ async def test_messages_handler_forces_no_thinking_for_safety_classifier() -> No
         messages=[Message(role="user", content=_CLASSIFIER_USER)],
     )
 
-    with patch("beast.api.handlers.messages.trace_event") as trace_mock:
+    with patch("cyril_code.api.handlers.messages.trace_event") as trace_mock:
         response = await handler.create(request)
         assert isinstance(response, StreamingResponse)
         await _streaming_body_text(response)
@@ -404,11 +404,11 @@ async def test_messages_handler_forces_no_thinking_for_safety_classifier() -> No
     assert provider.requests[0].model == "test-model"
     assert provider.requests[0].system == _CLASSIFIER_SYSTEM
     assert _trace_events(
-        trace_mock, "beast.api.optimization.safety_classifier_no_thinking"
+        trace_mock, "cyril_code.api.optimization.safety_classifier_no_thinking"
     ) == [
         {
             "stage": "routing",
-            "event": "beast.api.optimization.safety_classifier_no_thinking",
+            "event": "cyril_code.api.optimization.safety_classifier_no_thinking",
             "source": "api",
             "model": "nvidia_nim/test-model",
             "changed": True,
@@ -436,7 +436,7 @@ async def test_messages_handler_preserves_thinking_for_non_classifier() -> None:
         ],
     )
 
-    with patch("beast.api.handlers.messages.trace_event") as trace_mock:
+    with patch("cyril_code.api.handlers.messages.trace_event") as trace_mock:
         response = await handler.create(request)
         assert isinstance(response, StreamingResponse)
         await _streaming_body_text(response)
@@ -446,7 +446,7 @@ async def test_messages_handler_preserves_thinking_for_non_classifier() -> None:
     assert (
         _trace_events(
             trace_mock,
-            "beast.api.optimization.safety_classifier_no_thinking",
+            "cyril_code.api.optimization.safety_classifier_no_thinking",
         )
         == []
     )
@@ -464,7 +464,7 @@ async def test_messages_handler_keeps_existing_no_thinking_for_classifier() -> N
         messages=[Message(role="user", content=_CLASSIFIER_USER)],
     )
 
-    with patch("beast.api.handlers.messages.trace_event") as trace_mock:
+    with patch("cyril_code.api.handlers.messages.trace_event") as trace_mock:
         response = await handler.create(request)
         assert isinstance(response, StreamingResponse)
         await _streaming_body_text(response)
@@ -472,11 +472,11 @@ async def test_messages_handler_keeps_existing_no_thinking_for_classifier() -> N
     assert provider.preflight_calls[0][1] == ReasoningPolicy.off()
     assert provider.stream_kwargs[0]["reasoning"] == ReasoningPolicy.off()
     assert _trace_events(
-        trace_mock, "beast.api.optimization.safety_classifier_no_thinking"
+        trace_mock, "cyril_code.api.optimization.safety_classifier_no_thinking"
     ) == [
         {
             "stage": "routing",
-            "event": "beast.api.optimization.safety_classifier_no_thinking",
+            "event": "cyril_code.api.optimization.safety_classifier_no_thinking",
             "source": "api",
             "model": "claude-3-freecc-no-thinking/nvidia_nim/test-model",
             "changed": False,
@@ -498,7 +498,7 @@ async def test_messages_handler_optimization_intercepts_before_provider_executio
     optimized = object()
 
     with patch(
-        "beast.api.handlers.messages.try_optimizations",
+        "cyril_code.api.handlers.messages.try_optimizations",
         return_value=optimized,
     ):
         assert await handler.create(request) is optimized
@@ -512,7 +512,7 @@ async def test_responses_handler_bypasses_message_only_optimizations() -> None:
     handler = ResponsesHandler(Settings(), provider_resolver=lambda _: provider)
 
     with patch(
-        "beast.api.handlers.messages.try_optimizations",
+        "cyril_code.api.handlers.messages.try_optimizations",
         side_effect=AssertionError("Responses must not use message optimizations"),
     ):
         response = await handler.create(
@@ -533,7 +533,7 @@ async def test_responses_handler_does_not_apply_safety_classifier_policy() -> No
     provider = FakeProvider()
     handler = ResponsesHandler(Settings(), provider_resolver=lambda _: provider)
 
-    with patch("beast.api.handlers.messages.trace_event") as trace_mock:
+    with patch("cyril_code.api.handlers.messages.trace_event") as trace_mock:
         response = await handler.create(
             OpenAIResponsesRequest(
                 model="nvidia_nim/test-model",
@@ -550,7 +550,7 @@ async def test_responses_handler_does_not_apply_safety_classifier_policy() -> No
     assert (
         _trace_events(
             trace_mock,
-            "beast.api.optimization.safety_classifier_no_thinking",
+            "cyril_code.api.optimization.safety_classifier_no_thinking",
         )
         == []
     )
@@ -562,7 +562,7 @@ def test_token_count_handler_routes_and_counts_tokens() -> None:
         token_counter=lambda messages, system, tools: len(messages) + 41,
     )
 
-    with patch("beast.api.handlers.token_count.trace_event") as trace:
+    with patch("cyril_code.api.handlers.token_count.trace_event") as trace:
         response = handler.count(
             TokenCountRequest(
                 model="nvidia_nim/test-model",

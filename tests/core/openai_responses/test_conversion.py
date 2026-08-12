@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from beast.core.openai_responses import (
+from cyril_code.core.openai_responses import (
     OpenAIResponsesAdapter,
     OpenAIResponsesRequest,
 )
@@ -72,12 +72,12 @@ def test_responses_messages_tools_and_tool_results_convert() -> None:
                     "type": "function_call",
                     "call_id": "call_1",
                     "name": "echo",
-                    "arguments": '{"value":"BEAST"}',
+                    "arguments": '{"value":"CYRIL"}',
                 },
                 {
                     "type": "function_call_output",
                     "call_id": "call_1",
-                    "output": "BEAST",
+                    "output": "CYRIL",
                 },
             ],
             "tools": [
@@ -105,7 +105,7 @@ def test_responses_messages_tools_and_tool_results_convert() -> None:
                     "type": "tool_use",
                     "id": "call_1",
                     "name": "echo",
-                    "input": {"value": "BEAST"},
+                    "input": {"value": "CYRIL"},
                 }
             ],
         },
@@ -115,7 +115,7 @@ def test_responses_messages_tools_and_tool_results_convert() -> None:
                 {
                     "type": "tool_result",
                     "tool_use_id": "call_1",
-                    "content": "BEAST",
+                    "content": "CYRIL",
                 }
             ],
         },
@@ -365,12 +365,12 @@ def test_responses_prior_custom_tool_call_flattens_tool_use_name() -> None:
                     "call_id": "call_1",
                     "namespace": "mcp__shell",
                     "name": "exec",
-                    "input": "printf BEAST",
+                    "input": "printf CYRIL",
                 },
                 {
                     "type": "custom_tool_call_output",
                     "call_id": "call_1",
-                    "output": "BEAST",
+                    "output": "CYRIL",
                 },
             ],
         }
@@ -384,7 +384,7 @@ def test_responses_prior_custom_tool_call_flattens_tool_use_name() -> None:
                     "type": "tool_use",
                     "id": "call_1",
                     "name": "mcp__shell__exec",
-                    "input": {"input": "printf BEAST"},
+                    "input": {"input": "printf CYRIL"},
                 }
             ],
         },
@@ -394,7 +394,7 @@ def test_responses_prior_custom_tool_call_flattens_tool_use_name() -> None:
                 {
                     "type": "tool_result",
                     "tool_use_id": "call_1",
-                    "content": "BEAST",
+                    "content": "CYRIL",
                 }
             ],
         },
@@ -410,7 +410,7 @@ def test_responses_groups_consecutive_prior_tool_calls() -> None:
                     "type": "function_call",
                     "call_id": "call_1",
                     "name": "echo",
-                    "arguments": '{"value":"BEAST"}',
+                    "arguments": '{"value":"CYRIL"}',
                 },
                 {
                     "type": "custom_tool_call",
@@ -430,7 +430,7 @@ def test_responses_groups_consecutive_prior_tool_calls() -> None:
                     "type": "tool_use",
                     "id": "call_1",
                     "name": "echo",
-                    "input": {"value": "BEAST"},
+                    "input": {"value": "CYRIL"},
                 },
                 {
                     "type": "tool_use",
@@ -452,7 +452,7 @@ def test_responses_groups_consecutive_prior_tool_outputs() -> None:
                     "type": "function_call",
                     "call_id": "call_1",
                     "name": "echo",
-                    "arguments": '{"value":"BEAST"}',
+                    "arguments": '{"value":"CYRIL"}',
                 },
                 {
                     "type": "function_call",
@@ -463,7 +463,7 @@ def test_responses_groups_consecutive_prior_tool_outputs() -> None:
                 {
                     "type": "function_call_output",
                     "call_id": "call_1",
-                    "output": "BEAST",
+                    "output": "CYRIL",
                 },
                 {
                     "type": "function_call_output",
@@ -483,7 +483,7 @@ def test_responses_groups_consecutive_prior_tool_outputs() -> None:
             {
                 "type": "tool_result",
                 "tool_use_id": "call_1",
-                "content": "BEAST",
+                "content": "CYRIL",
             },
             {
                 "type": "tool_result",
@@ -505,7 +505,7 @@ def test_responses_reasoning_between_tool_call_and_output_attaches_to_tool_messa
                     "type": "function_call",
                     "call_id": "call_1",
                     "name": "echo",
-                    "arguments": '{"value":"BEAST"}',
+                    "arguments": '{"value":"CYRIL"}',
                 },
                 {
                     "type": "reasoning",
@@ -514,7 +514,7 @@ def test_responses_reasoning_between_tool_call_and_output_attaches_to_tool_messa
                 {
                     "type": "function_call_output",
                     "call_id": "call_1",
-                    "output": "BEAST",
+                    "output": "CYRIL",
                 },
             ],
         }
@@ -539,12 +539,12 @@ def test_responses_encrypted_reasoning_attaches_before_tool_call() -> None:
                     "type": "function_call",
                     "call_id": "call_1",
                     "name": "echo",
-                    "arguments": '{"value":"BEAST"}',
+                    "arguments": '{"value":"CYRIL"}',
                 },
                 {
                     "type": "function_call_output",
                     "call_id": "call_1",
-                    "output": "BEAST",
+                    "output": "CYRIL",
                 },
             ],
         }
@@ -558,7 +558,7 @@ def test_responses_encrypted_reasoning_attaches_before_tool_call() -> None:
             "type": "tool_use",
             "id": "call_1",
             "name": "echo",
-            "input": {"value": "BEAST"},
+            "input": {"value": "CYRIL"},
         },
     ]
     assert payload["messages"][1]["content"][0]["tool_use_id"] == "call_1"
@@ -573,7 +573,7 @@ def test_responses_empty_reasoning_attaches_to_prior_tool_call() -> None:
                     "type": "function_call",
                     "call_id": "call_1",
                     "name": "echo",
-                    "arguments": '{"value":"BEAST"}',
+                    "arguments": '{"value":"CYRIL"}',
                 },
                 {
                     "type": "reasoning",
@@ -582,7 +582,7 @@ def test_responses_empty_reasoning_attaches_to_prior_tool_call() -> None:
                 {
                     "type": "function_call_output",
                     "call_id": "call_1",
-                    "output": "BEAST",
+                    "output": "CYRIL",
                 },
             ],
         }

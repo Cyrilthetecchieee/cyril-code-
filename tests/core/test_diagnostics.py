@@ -2,7 +2,7 @@
 
 from httpx import ConnectError, HTTPStatusError, Request, Response
 
-from beast.core.diagnostics import (
+from cyril_code.core.diagnostics import (
     ERROR_DETAIL_DISPLAY_CAP_BYTES,
     UpstreamErrorDetail,
     attach_upstream_error_body,
@@ -13,7 +13,7 @@ from beast.core.diagnostics import (
     redact_sensitive_error_text,
     safe_exception_message,
 )
-from beast.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.failures import ExecutionFailure, FailureKind
 
 
 def test_redaction_preserves_context_and_covers_recognizable_credentials() -> None:

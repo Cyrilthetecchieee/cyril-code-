@@ -32,21 +32,21 @@ $script:InstallPi = $true
 $script:PiAvailable = $false
 $script:EnableRtk = $Rtk.IsPresent
 $FccCommands = @(
-    # Include retired entry points so updates reject older BEAST processes before replacement.
-    "beast-desktop",
+    # Include retired entry points so updates reject older CYRIL processes before replacement.
+    "cyril-desktop",
     "start",
-    "beast",
-    "beast-codex",
-    "beast-pi",
-    "beast-init",
-    "beast"
+    "cyril_code",
+    "cyril-codex",
+    "cyril-pi",
+    "cyril-init",
+    "cyril_code"
 )
 
 function Show-Usage {
     @"
 Usage: install.ps1 [options]
 
-Installs or updates Beast and lets you choose which coding agents to install or verify.
+Installs or updates Cyril Code and lets you choose which coding agents to install or verify.
 
 Options:
   -VoiceNim              Install NVIDIA NIM voice transcription support.
@@ -94,9 +94,9 @@ function Read-YesNo {
 
 function Select-CodingAgents {
     while ($true) {
-        $script:InstallClaudeCode = Read-YesNo "Install or verify Beast for beast?"
-        $script:InstallCodex = Read-YesNo "Install or verify Codex for beast-codex?"
-        $script:InstallPi = Read-YesNo "Install or verify Pi for beast-pi?"
+        $script:InstallClaudeCode = Read-YesNo "Install or verify Cyril Code for cyril_code?"
+        $script:InstallCodex = Read-YesNo "Install or verify Codex for cyril-codex?"
+        $script:InstallPi = Read-YesNo "Install or verify Pi for cyril-pi?"
 
         if ($script:InstallClaudeCode -or $script:InstallCodex -or $script:InstallPi) {
             break
@@ -271,7 +271,7 @@ function Assert-NoFccProcessesRunning {
     }
 
     if ($running.Count -gt 0) {
-        throw "Beast is still running ($($running -join ', ')). Stop those processes, then rerun the installer."
+        throw "Cyril Code is still running ($($running -join ', ')). Stop those processes, then rerun the installer."
     }
 }
 
@@ -289,7 +289,7 @@ function Invoke-DownloadedPowerShellInstaller {
         return
     }
 
-    $temporaryScript = Join-Path ([IO.Path]::GetTempPath()) ("beast-install-" + [guid]::NewGuid().ToString("N") + ".ps1")
+    $temporaryScript = Join-Path ([IO.Path]::GetTempPath()) ("cyril_code-install-" + [guid]::NewGuid().ToString("N") + ".ps1")
     try {
         Write-Host "+ irm $Url -OutFile $(Format-Argument $temporaryScript)"
         Invoke-RestMethod -Uri $Url -OutFile $temporaryScript -ErrorAction Stop
@@ -398,7 +398,7 @@ function Install-Rtk {
         return
     }
 
-    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("beast-rtk-" + [guid]::NewGuid().ToString("N"))
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("cyril_code-rtk-" + [guid]::NewGuid().ToString("N"))
     $archivePath = Join-Path $temporaryRoot $RtkWindowsAssetName
     $extractPath = Join-Path $temporaryRoot "extracted"
     try {
@@ -538,14 +538,14 @@ function Configure-RtkForSelectedAgents {
 
 function Ensure-ClaudeCode {
     if (Get-ApplicationCommand "claude") {
-        Write-Host "Beast already found on PATH; verifying it."
+        Write-Host "Cyril Code already found on PATH; verifying it."
     }
     else {
-        Invoke-DownloadedPowerShellInstaller -Url $ClaudeInstallUrl -Name "Beast"
+        Invoke-DownloadedPowerShellInstaller -Url $ClaudeInstallUrl -Name "Cyril Code"
         Add-KnownBinDirectories
     }
 
-    Confirm-Application -CommandName "claude" -DisplayName "Beast"
+    Confirm-Application -CommandName "claude" -DisplayName "Cyril Code"
 }
 
 function Ensure-Codex {
@@ -595,7 +595,7 @@ function Ensure-Pi {
 
 function Ensure-SelectedCodingAgents {
     if ($script:InstallClaudeCode) {
-        Write-Step "Ensuring Beast is installed"
+        Write-Step "Ensuring Cyril Code is installed"
         Ensure-ClaudeCode
     }
 
@@ -721,15 +721,15 @@ function Get-PackageSpec {
     }
 
     if ($includeNim -and $includeLocal) {
-        return "beast[voice,voice_local] @ $RepoArchiveUrl"
+        return "cyril_code[voice,voice_local] @ $RepoArchiveUrl"
     }
     if ($includeNim) {
-        return "beast[voice] @ $RepoArchiveUrl"
+        return "cyril_code[voice] @ $RepoArchiveUrl"
     }
     if ($includeLocal) {
-        return "beast[voice_local] @ $RepoArchiveUrl"
+        return "cyril_code[voice_local] @ $RepoArchiveUrl"
     }
-    return "beast @ $RepoArchiveUrl"
+    return "cyril-code @ $RepoArchiveUrl"
 }
 
 function Install-FreeClaudeCode {
@@ -740,7 +740,7 @@ function Install-FreeClaudeCode {
         "install",
         "--force",
         "--refresh-package",
-        "beast",
+        "cyril_code",
         "--python",
         $PythonRequest
     )
@@ -753,7 +753,7 @@ function Install-FreeClaudeCode {
     if (-not $DryRun) {
         $uvCommand = Get-ApplicationCommand "uv"
         if (-not $uvCommand) {
-            throw "uv is not available for the Beast installation."
+            throw "uv is not available for the Cyril Code installation."
         }
         $uvPath = $uvCommand.Source
     }
@@ -790,7 +790,7 @@ function Export-FccDesktopIcon {
         throw "Command failed with exit code ${exitCode}: $commandText"
     }
     if (-not (Test-Path -LiteralPath $IconPath -PathType Leaf)) {
-        throw "Beast did not export its Windows app icon to '$IconPath'."
+        throw "Cyril Code did not export its Windows app icon to '$IconPath'."
     }
 }
 
@@ -799,13 +799,13 @@ function Configure-AndConfirmFreeClaudeCode {
     if ($DryRun) {
         Write-Host "+ uv tool update-shell"
         Write-Host "+ uv tool dir --bin"
-        Write-Host "+ verify beast-desktop, start, beast, beast-codex, and beast-pi in the uv tool bin directory"
+        Write-Host "+ verify cyril-desktop, start, cyril_code, cyril-codex, and cyril-pi in the uv tool bin directory"
         Write-Host "+ start --version"
         Export-FccDesktopIcon `
-            -DesktopCommand "<uv-tool-bin>\beast-desktop.exe" `
+            -DesktopCommand "<uv-tool-bin>\cyril-desktop.exe" `
             -IconPath $iconPath
         Install-FccDesktopShortcuts `
-            -DesktopCommand "<uv-tool-bin>\beast-desktop.exe" `
+            -DesktopCommand "<uv-tool-bin>\cyril-desktop.exe" `
             -IconPath $iconPath
         return
     }
@@ -826,10 +826,10 @@ function Configure-AndConfirmFreeClaudeCode {
         [IO.Path]::AltDirectorySeparatorChar
     )
     $installedCommands = @{}
-    foreach ($commandName in @("beast-desktop", "start", "beast", "beast-codex", "beast-pi")) {
+    foreach ($commandName in @("cyril-desktop", "start", "cyril_code", "cyril-codex", "cyril-pi")) {
         $command = Get-ApplicationCommand $commandName
         if (-not $command) {
-            throw "Beast installation did not create '$commandName'."
+            throw "Cyril Code installation did not create '$commandName'."
         }
         $commandDirectory = ([IO.Path]::GetFullPath((Split-Path -Parent $command.Source))).TrimEnd(
             [IO.Path]::DirectorySeparatorChar,
@@ -843,10 +843,10 @@ function Configure-AndConfirmFreeClaudeCode {
 
     Invoke-NativeCommand -FilePath $installedCommands["start"] -Arguments @("--version")
     Export-FccDesktopIcon `
-        -DesktopCommand $installedCommands["beast-desktop"] `
+        -DesktopCommand $installedCommands["cyril-desktop"] `
         -IconPath $iconPath
     Install-FccDesktopShortcuts `
-        -DesktopCommand $installedCommands["beast-desktop"] `
+        -DesktopCommand $installedCommands["cyril-desktop"] `
         -IconPath $iconPath
 }
 
@@ -878,8 +878,8 @@ function Install-FccDesktopShortcuts {
     )
 
     $shortcutPaths = @(
-        (Join-Path $env:USERPROFILE "Desktop\Beast.lnk"),
-        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Beast.lnk")
+        (Join-Path $env:USERPROFILE "Desktop\Cyril Code.lnk"),
+        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Cyril Code.lnk")
     )
     foreach ($shortcutPath in $shortcutPaths) {
         Write-Host "+ create shortcut $(Format-Argument $shortcutPath) -> $(Format-Argument $DesktopCommand)"
@@ -899,7 +899,7 @@ function Install-FccDesktopShortcuts {
                 $isFccShortcut = $false
             }
             if (-not $isFccShortcut) {
-                Write-Host "A shortcut not managed by Beast already exists at $shortcutPath; leaving it unchanged."
+                Write-Host "A shortcut not managed by Cyril Code already exists at $shortcutPath; leaving it unchanged."
                 continue
             }
         }
@@ -909,7 +909,7 @@ function Install-FccDesktopShortcuts {
         $shortcut.TargetPath = $DesktopCommand
         $shortcut.WorkingDirectory = $env:USERPROFILE
         $shortcut.IconLocation = "$IconPath,0"
-        $shortcut.Description = "Run Beast in the background"
+        $shortcut.Description = "Run Cyril Code in the background"
         $shortcut.Save()
     }
 }
@@ -930,7 +930,7 @@ if ((-not [string]::IsNullOrWhiteSpace($TorchBackend)) -and (-not ($VoiceLocal -
 
 Add-KnownBinDirectories
 
-Write-Step "Checking for running Beast processes"
+Write-Step "Checking for running Cyril Code processes"
 Assert-NoFccProcessesRunning
 
 if (Test-InteractiveInstaller) {
@@ -944,10 +944,10 @@ Configure-RtkForSelectedAgents
 Write-Step "Ensuring uv $MinUvVersion or newer is installed"
 Ensure-Uv
 
-Write-Step "Installing or updating Beast"
+Write-Step "Installing or updating Cyril Code"
 Install-FreeClaudeCode
 
-Write-Step "Configuring PATH and verifying Beast"
+Write-Step "Configuring PATH and verifying Cyril Code"
 Configure-AndConfirmFreeClaudeCode
 
 Write-Host ""
@@ -955,15 +955,15 @@ if ($DryRun) {
     Write-Host "Dry run complete. No changes were made."
 }
 else {
-    Write-Host "Beast is installed and verified. Open the Beast desktop shortcut to run it in the background."
+    Write-Host "Cyril Code is installed and verified. Open the Cyril Code desktop shortcut to run it in the background."
     Write-Host "For terminal use, start the proxy with: start"
     if ($script:InstallClaudeCode) {
-        Write-Host "Run Beast with: beast"
+        Write-Host "Run Cyril Code with: cyril_code"
     }
     if ($script:InstallCodex) {
-        Write-Host "Run Codex with: beast-codex"
+        Write-Host "Run Codex with: cyril-codex"
     }
     if ($script:PiAvailable) {
-        Write-Host "Run Pi with: beast-pi"
+        Write-Host "Run Pi with: cyril-pi"
     }
 }

@@ -1,7 +1,7 @@
 import re
 
-from beast.core.anthropic.models import MessagesRequest
-from beast.core.anthropic.openai_tool_names import OpenAIToolNameCodec
+from cyril_code.core.anthropic.models import MessagesRequest
+from cyril_code.core.anthropic.openai_tool_names import OpenAIToolNameCodec
 
 _PORTABLE_NAME = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 

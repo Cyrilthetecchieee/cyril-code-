@@ -1,1 +1,1 @@
-"""Local-only live smoke tests for beast."""
+"""Local-only live smoke tests for cyril_code."""

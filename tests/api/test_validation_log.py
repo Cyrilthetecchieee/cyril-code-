@@ -1,6 +1,6 @@
 """Tests for validation log summaries (metadata only)."""
 
-from beast.api.validation_log import summarize_request_validation_body
+from cyril_code.api.validation_log import summarize_request_validation_body
 
 
 def test_summarize_lists_block_metadata_without_echoing_string_content():

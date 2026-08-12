@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from beast.providers.nvidia_nim.retry import (
+from cyril_code.providers.nvidia_nim.retry import (
     clone_body_without_reasoning_budget,
 )
 

@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Validate BEAST version
+      - name: Validate CYRIL version
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
@@ -28,7 +28,7 @@ jobs:
               ...repo,
               issue_number,
             });
-            const fieldPattern = "^### BEAST version\\r?\\n+\\s*([^\\r\\n]+)";
+            const fieldPattern = "^### CYRIL version\\r?\\n+\\s*([^\\r\\n]+)";
             const versionPattern = "(?:^|[^0-9A-Za-z_.])v?([0-9]+\\.[0-9]+\\.[0-9]+)(?![0-9A-Za-z_+-]|\\.[0-9A-Za-z_])";
             const projectVersionPattern = "^\\s*version\\s*=\\s*([\"'])([0-9]+\\.[0-9]+\\.[0-9]+)\\1\\s*(?:#.*)?$";
             const match = (issue.body || "").match(new RegExp(fieldPattern, "m"));
@@ -36,9 +36,9 @@ jobs:
             const versionMatches = [...fieldValue.matchAll(new RegExp(versionPattern, "g"))];
             const reportedVersion = versionMatches.length === 1 ? versionMatches[0][1] : undefined;
             const valid = reportedVersion !== undefined || fieldValue === "None";
-            const labelName = "needs-beast-version";
-            const invalidMarker = "<!-- beast-version-validator -->";
-            const outdatedMarker = "<!-- beast-version-outdated -->";
+            const labelName = "needs-cyril-version";
+            const invalidMarker = "<!-- cyril-version-validator -->";
+            const outdatedMarker = "<!-- cyril-version-outdated -->";
             const labels = new Set(issue.labels.map((label) => label.name));
 
             const comments = await github.paginate(
@@ -98,7 +98,7 @@ jobs:
                       ...repo,
                       name: labelName,
                       color: "d4c5f9",
-                      description: "BEAST version must contain number.number.number or be None",
+                      description: "CYRIL version must contain number.number.number or be None",
                     });
                   } catch (createError) {
                     if (createError.status !== 422) throw createError;
@@ -114,7 +114,7 @@ jobs:
                 await github.rest.issues.createComment({
                   ...repo,
                   issue_number,
-                  body: `${invalidMarker}\nPlease edit **BEAST version** so it contains one \`number.number.number\` value, such as \`1.22.333\`, or is exactly \`None\`. Run \`start --version\` to find the installed version.`,
+                  body: `${invalidMarker}\nPlease edit **CYRIL version** so it contains one \`number.number.number\` value, such as \`1.22.333\`, or is exactly \`None\`. Run \`start --version\` to find the installed version.`,
                 });
               }
               return;
@@ -159,7 +159,7 @@ jobs:
               return;
             }
 
-            const body = `${outdatedMarker}\nThis report uses BEAST \`${reportedVersion}\`, while the current version on \`${defaultBranch}\` is \`${latestVersion}\`. Please [update BEAST](${context.payload.repository.html_url}#install), restart BEAST, and check whether the issue still occurs. The update may already contain the fix.`;
+            const body = `${outdatedMarker}\nThis report uses CYRIL \`${reportedVersion}\`, while the current version on \`${defaultBranch}\` is \`${latestVersion}\`. Please [update CYRIL](${context.payload.repository.html_url}#install), restart CYRIL, and check whether the issue still occurs. The update may already contain the fix.`;
             if (outdatedComment === undefined) {
               await github.rest.issues.createComment({
                 ...repo,

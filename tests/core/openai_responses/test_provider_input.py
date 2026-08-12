@@ -2,17 +2,17 @@ import json
 
 import pytest
 
-from beast.application.reasoning import client_reasoning_policy
-from beast.core.anthropic.models import MessagesRequest
-from beast.core.openai_responses import (
+from cyril_code.application.reasoning import client_reasoning_policy
+from cyril_code.core.anthropic.models import MessagesRequest
+from cyril_code.core.openai_responses import (
     OpenAIResponsesAdapter,
     OpenAIResponsesRequest,
 )
-from beast.core.openai_responses.errors import ResponsesConversionError
-from beast.core.openai_responses.provider_input import (
+from cyril_code.core.openai_responses.errors import ResponsesConversionError
+from cyril_code.core.openai_responses.provider_input import (
     build_responses_provider_request,
 )
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
 
 _KEEP_ALL_THINKING_EDIT = {
     "type": "clear_thinking_20251015",

@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.openai_chat import OpenAIChatProvider
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.openai_chat import OpenAIChatProvider
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission, profiled_provider
 
@@ -27,7 +27,7 @@ def _provider() -> OpenAIChatProvider:
 
 
 def test_init_uses_resource_v1_url_and_api_key() -> None:
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
         provider = _provider()
 
     assert provider._provider_name == "AZURE_OPENAI"

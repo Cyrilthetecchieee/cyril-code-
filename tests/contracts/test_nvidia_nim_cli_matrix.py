@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from typing import cast
 
-from beast.config.settings import Settings
+from cyril_code.config.settings import Settings
 from smoke.lib.claude_cli_matrix import (
     ClaudeCliRun,
     _build_claude_cli_command,
@@ -26,7 +26,7 @@ def _smoke_config(tmp_path: Path) -> SmokeConfig:
         targets=DEFAULT_TARGETS,
         provider_matrix=frozenset(),
         timeout_s=45.0,
-        prompt="Reply with exactly: BEAST_SMOKE_PONG",
+        prompt="Reply with exactly: CYRIL_SMOKE_PONG",
         claude_bin="claude",
         worker_id="test-worker",
         settings=Settings.model_construct(anthropic_auth_token=""),
@@ -40,7 +40,7 @@ def test_nvidia_nim_cli_matrix_report_shape_and_redaction(
     run = ClaudeCliRun(
         command=("claude", "-p", "redacted"),
         returncode=0,
-        stdout="BEAST_NIM_BASIC secret-nim-key",
+        stdout="CYRIL_NIM_BASIC secret-nim-key",
         stderr="",
         duration_s=1.25,
     )
@@ -49,7 +49,7 @@ def test_nvidia_nim_cli_matrix_report_shape_and_redaction(
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="basic_text",
-        marker="BEAST_NIM_BASIC",
+        marker="CYRIL_NIM_BASIC",
         run=run,
         log_delta='POST /v1/messages HTTP/1.1" 200 OK secret-nim-key',
         log_path=tmp_path / "server.log",
@@ -118,7 +118,7 @@ def test_cli_matrix_normalizes_missing_captured_output(
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="basic_text",
-        marker="BEAST_NIM_BASIC",
+        marker="CYRIL_NIM_BASIC",
         run=run,
         log_delta='POST /v1/messages HTTP/1.1" 200 OK',
         log_path=tmp_path / "server.log",
@@ -137,7 +137,7 @@ def test_openrouter_free_cli_matrix_report_shape_and_redaction(
     run = ClaudeCliRun(
         command=("claude", "-p", "redacted"),
         returncode=0,
-        stdout="BEAST_OPENROUTER_FREE_BASIC secret-openrouter-key",
+        stdout="CYRIL_OPENROUTER_FREE_BASIC secret-openrouter-key",
         stderr="",
         duration_s=1.25,
     )
@@ -146,7 +146,7 @@ def test_openrouter_free_cli_matrix_report_shape_and_redaction(
         full_model="open_router/openai/gpt-oss-120b:free",
         source="openrouter_free_cli_default",
         feature="basic_text",
-        marker="BEAST_OPENROUTER_FREE_BASIC",
+        marker="CYRIL_OPENROUTER_FREE_BASIC",
         run=run,
         log_delta='POST /v1/messages HTTP/1.1" 200 OK secret-openrouter-key',
         log_path=tmp_path / "server.log",
@@ -187,7 +187,7 @@ def test_nvidia_nim_cli_matrix_regression_detection(tmp_path: Path) -> None:
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="basic_text",
-        marker="BEAST_NIM_BASIC",
+        marker="CYRIL_NIM_BASIC",
         run=run,
         log_delta='POST /v1/messages HTTP/1.1" 500 Internal Server Error',
         log_path=tmp_path / "server.log",
@@ -214,7 +214,7 @@ def test_nvidia_nim_cli_matrix_model_feature_failures_do_not_regress(
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="tool_use_roundtrip",
-        marker="BEAST_NIM_TOOL",
+        marker="CYRIL_NIM_TOOL",
         run=run,
         log_delta='POST /v1/messages HTTP/1.1" 200 OK',
         log_path=tmp_path / "server.log",
@@ -240,7 +240,7 @@ def test_nvidia_nim_cli_raw_payload_log_counts_as_proxy_request(
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="subagent_task",
-        marker="BEAST_NIM_TASK",
+        marker="CYRIL_NIM_TASK",
         run=run,
         log_delta="API_REQUEST: request_id=req_1 model=z-ai/glm-5.2 messages=2",
         log_path=tmp_path / "server.log",
@@ -265,7 +265,7 @@ def test_cli_matrix_missing_agent_catalog_is_harness_bug(tmp_path: Path) -> None
         full_model="open_router/openai/gpt-oss-120b:free",
         source="openrouter_free_cli_default",
         feature="subagent_task",
-        marker="BEAST_OPENROUTER_FREE_TASK",
+        marker="CYRIL_OPENROUTER_FREE_TASK",
         run=run,
         log_delta=(
             "API_REQUEST: request_id=req_1 model=openai/gpt-oss-120b:free "
@@ -284,7 +284,7 @@ def test_cli_matrix_missing_agent_catalog_is_harness_bug(tmp_path: Path) -> None
 def test_cli_matrix_agent_catalog_without_agent_use_is_model_feature_failure(
     tmp_path: Path,
 ) -> None:
-    marker = "BEAST_OPENROUTER_FREE_TASK"
+    marker = "CYRIL_OPENROUTER_FREE_TASK"
     run = ClaudeCliRun(
         command=("claude", "-p", "x"),
         returncode=0,
@@ -318,7 +318,7 @@ def test_cli_matrix_agent_catalog_without_agent_use_is_model_feature_failure(
 
 
 def test_cli_matrix_agent_use_result_and_marker_pass(tmp_path: Path) -> None:
-    marker = "BEAST_OPENROUTER_FREE_TASK"
+    marker = "CYRIL_OPENROUTER_FREE_TASK"
     run = ClaudeCliRun(
         command=("claude", "-p", "x"),
         returncode=0,
@@ -356,7 +356,7 @@ def test_cli_matrix_agent_use_result_and_marker_pass(tmp_path: Path) -> None:
 def test_cli_matrix_agent_prompt_text_without_tool_evidence_does_not_pass(
     tmp_path: Path,
 ) -> None:
-    marker = "BEAST_OPENROUTER_FREE_TASK"
+    marker = "CYRIL_OPENROUTER_FREE_TASK"
     run = ClaudeCliRun(
         command=("claude", "-p", "x"),
         returncode=0,
@@ -401,10 +401,10 @@ def test_cli_matrix_unclassified_provider_error_is_model_feature_failure(
         full_model="open_router/poolside/laguna-m.1:free",
         source="openrouter_free_cli_default",
         feature="tool_use_roundtrip",
-        marker="BEAST_OPENROUTER_FREE_TOOL",
+        marker="CYRIL_OPENROUTER_FREE_TOOL",
         run=run,
         log_delta=(
-            '{"event": "beast.api.request.received", "http_method": "POST", '
+            '{"event": "cyril_code.api.request.received", "http_method": "POST", '
             '"http_path": "/v1/messages"}\n'
             '{"event": "provider.response.error", "exc_type": "HTTPStatusError"}'
         ),
@@ -422,7 +422,7 @@ def test_nvidia_nim_cli_timeout_is_not_model_missing(
     run = ClaudeCliRun(
         command=("claude", "-p", "x"),
         returncode=None,
-        stdout='{"type":"assistant","content":[{"type":"text","text":"BEAST_NIM_TOOL"}]}',
+        stdout='{"type":"assistant","content":[{"type":"text","text":"CYRIL_NIM_TOOL"}]}',
         stderr="",
         duration_s=45.0,
         timed_out=True,
@@ -432,7 +432,7 @@ def test_nvidia_nim_cli_timeout_is_not_model_missing(
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="tool_use_roundtrip",
-        marker="BEAST_NIM_TOOL",
+        marker="CYRIL_NIM_TOOL",
         run=run,
         log_delta="API_REQUEST: request_id=req_1 model=z-ai/glm-5.2 messages=2",
         log_path=tmp_path / "server.log",
@@ -447,7 +447,7 @@ def test_nvidia_nim_cli_success_beats_verbose_timeout_words(tmp_path: Path) -> N
     run = ClaudeCliRun(
         command=("claude", "-p", "x"),
         returncode=0,
-        stdout="BEAST_NIM_THINK",
+        stdout="CYRIL_NIM_THINK",
         stderr="",
         duration_s=0.1,
     )
@@ -456,7 +456,7 @@ def test_nvidia_nim_cli_success_beats_verbose_timeout_words(tmp_path: Path) -> N
         full_model="nvidia_nim/z-ai/glm-5.2",
         source="nvidia_nim_cli_default",
         feature="thinking",
-        marker="BEAST_NIM_THINK",
+        marker="CYRIL_NIM_THINK",
         run=run,
         log_delta=(
             "API_REQUEST: request_id=req_1 model=z-ai/glm-5.2 messages=1 "
@@ -484,7 +484,7 @@ def test_cli_matrix_uuid_429_does_not_count_as_upstream_unavailable(
         full_model="open_router/openai/gpt-oss-120b:free",
         source="openrouter_free_cli_default",
         feature="subagent_task",
-        marker="BEAST_OPENROUTER_FREE_TASK",
+        marker="CYRIL_OPENROUTER_FREE_TASK",
         run=run,
         log_delta="API_REQUEST: request_id=req_1 model=openai/gpt-oss-120b:free messages=2",
         log_path=tmp_path / "server.log",
@@ -509,7 +509,7 @@ def test_cli_matrix_real_http_429_counts_as_upstream_unavailable(
         full_model="open_router/openai/gpt-oss-120b:free",
         source="openrouter_free_cli_default",
         feature="subagent_task",
-        marker="BEAST_OPENROUTER_FREE_TASK",
+        marker="CYRIL_OPENROUTER_FREE_TASK",
         run=run,
         log_delta=(
             "API_REQUEST: request_id=req_1 model=openai/gpt-oss-120b:free "
@@ -540,7 +540,7 @@ def test_cli_matrix_deterministic_provider_400_is_not_upstream_unavailable(
         full_model="groq/openai/gpt-oss-120b",
         source="groq_cli_default",
         feature="thinking",
-        marker="BEAST_GROQ_THINK",
+        marker="CYRIL_GROQ_THINK",
         run=run,
         log_delta="API_REQUEST: request_id=req_1 model=openai/gpt-oss-120b messages=2",
         log_path=tmp_path / "server.log",

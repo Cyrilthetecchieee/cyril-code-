@@ -4,12 +4,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.application.errors import InvalidRequestError
-from beast.config.provider_catalog import GEMINI_DEFAULT_BASE
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.gemini import GeminiProvider
-from beast.providers.google_openai import (
+from cyril_code.application.errors import InvalidRequestError
+from cyril_code.config.provider_catalog import GEMINI_DEFAULT_BASE
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.gemini import GeminiProvider
+from cyril_code.providers.google_openai import (
     GOOGLE_SKIP_THOUGHT_SIGNATURE_VALIDATOR,
 )
 from tests.providers.request_factory import make_messages_request
@@ -56,7 +56,7 @@ def gemini_provider(gemini_config):
 
 def test_init(gemini_config):
     """Test provider initialization."""
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = GeminiProvider(gemini_config, admission=immediate_admission())
         assert provider._api_key == "test_gemini_key"
         assert (
@@ -244,7 +244,7 @@ def test_build_request_body_merges_caller_nested_google(gemini_provider):
     }
 
 
-def test_gemini_rejects_caller_thinking_config_with_beast_reasoning_control(
+def test_gemini_rejects_caller_thinking_config_with_cyril_reasoning_control(
     gemini_provider: GeminiProvider,
 ) -> None:
     request = make_request(

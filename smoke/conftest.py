@@ -23,7 +23,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     if SmokeConfig.load().live:
         return
-    skip = pytest.mark.skip(reason="set BEAST_LIVE_SMOKE=1 to run local smoke tests")
+    skip = pytest.mark.skip(reason="set CYRIL_LIVE_SMOKE=1 to run local smoke tests")
     for item in items:
         item.add_marker(skip)
 
@@ -89,7 +89,7 @@ def provider_model_params(config: SmokeConfig) -> list[Any]:
     """Return provider params grouped for pytest-xdist ``--dist=loadgroup``."""
     if not config.live:
         return [
-            _disabled_provider_param("set BEAST_LIVE_SMOKE=1 to run provider smoke")
+            _disabled_provider_param("set CYRIL_LIVE_SMOKE=1 to run provider smoke")
         ]
 
     models = config.provider_smoke_models()

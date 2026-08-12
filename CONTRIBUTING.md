@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Beast. Keep changes focused, test the behavior you change, and preserve the public Beast and Codex workflows.
+Thanks for helping improve Cyril Code. Keep changes focused, test the behavior you change, and preserve the public Cyril Code and Codex workflows.
 
 ## Before Opening A Pull Request
 
@@ -16,7 +16,7 @@ Install [uv](https://docs.astral.sh/uv/) and Python 3.14, then run directly from
 
 ```bash
 git clone https://github.com/Cyrilthetecchieee/cyril-code-.git
-cd beast
+cd cyril_code
 uv python install 3.14.0
 uv run start
 ```
@@ -52,7 +52,7 @@ GitHub CI runs Ruff in check-only mode and also bans `# type: ignore`, `# ty: ig
 
 - Target Python 3.14 and rely on native lazy annotations; do not add `from __future__ import annotations`.
 - Python 3.14 supports multiple exception types without parentheses, such as `except TypeError, ValueError:`.
-- Keep shared Anthropic protocol behavior under `src/beast/core/anthropic/` rather than importing utilities from another provider.
+- Keep shared Anthropic protocol behavior under `src/cyril_code/core/anthropic/` rather than importing utilities from another provider.
 - Keep provider-specific configuration in the provider that owns it.
 - Remove dead compatibility code when completing migrations unless preserving a published interface is explicitly required.
 

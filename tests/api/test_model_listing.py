@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.settings import Settings
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.settings import Settings
 from tests.api.support import create_test_app, provider_manager_for_app
 
 

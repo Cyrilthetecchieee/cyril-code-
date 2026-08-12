@@ -8,18 +8,18 @@ import openai
 import pytest
 from httpx import Request, Response
 
-from beast.core.anthropic import ReasoningReplayMode
-from beast.core.anthropic.models import MessagesRequest
-from beast.core.anthropic.stream_contracts import parse_sse_text
-from beast.core.reasoning import DEFAULT_REASONING_POLICY, ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.openai_chat import (
+from cyril_code.core.anthropic import ReasoningReplayMode
+from cyril_code.core.anthropic.models import MessagesRequest
+from cyril_code.core.anthropic.stream_contracts import parse_sse_text
+from cyril_code.core.reasoning import DEFAULT_REASONING_POLICY, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.openai_chat import (
     OpenAIChatProfile,
     OpenAIChatProvider,
     OpenAIChatRequestPolicy,
 )
-from beast.providers.openai_chat.reasoning import NO_REASONING
-from beast.providers.openai_chat.usage import (
+from cyril_code.providers.openai_chat.reasoning import NO_REASONING
+from cyril_code.providers.openai_chat.usage import (
     clone_without_stream_usage,
     is_stream_usage_rejection,
     request_stream_usage,

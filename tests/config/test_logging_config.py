@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 from loguru import logger
 
-from beast.config import logging_config
-from beast.config.logging_config import configure_logging
+from cyril_code.config import logging_config
+from cyril_code.config.logging_config import configure_logging
 
 
 def test_configure_logging_creates_parent_directories(tmp_path) -> None:

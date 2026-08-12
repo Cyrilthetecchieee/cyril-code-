@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from beast.core.anthropic.models import MessagesRequest
+from cyril_code.core.anthropic.models import MessagesRequest
 
 
 def make_messages_request(

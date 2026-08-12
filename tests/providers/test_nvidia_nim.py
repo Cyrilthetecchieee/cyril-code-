@@ -5,16 +5,16 @@ import openai
 import pytest
 from httpx import Request, Response
 
-from beast.config.nim import NimSettings
-from beast.config.provider_catalog import NVIDIA_NIM_DEFAULT_BASE
-from beast.core.failures import ExecutionFailure
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.admission import UPSTREAM_TRANSIENT_TOTAL_ATTEMPTS
-from beast.providers.nvidia_nim import NvidiaNimProvider
-from beast.providers.nvidia_nim.tool_schema import (
+from cyril_code.config.nim import NimSettings
+from cyril_code.config.provider_catalog import NVIDIA_NIM_DEFAULT_BASE
+from cyril_code.core.failures import ExecutionFailure
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.admission import UPSTREAM_TRANSIENT_TOTAL_ATTEMPTS
+from cyril_code.providers.nvidia_nim import NvidiaNimProvider
+from cyril_code.providers.nvidia_nim.tool_schema import (
     NIM_TOOL_ARGUMENT_ALIASES_KEY,
 )
-from beast.providers.stream_recovery import RecoveryHoldbackBuffer
+from cyril_code.providers.stream_recovery import RecoveryHoldbackBuffer
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import (
     REASONING_OFF,
@@ -130,7 +130,7 @@ def _make_internal_server_error(message: str) -> openai.InternalServerError:
 @pytest.mark.asyncio
 async def test_init(provider_config):
     """Test provider initialization."""
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         provider = NvidiaNimProvider(
             provider_config,
             nim_settings=NimSettings(),
@@ -144,7 +144,7 @@ async def test_init(provider_config):
 @pytest.mark.asyncio
 async def test_init_uses_configurable_timeouts():
     """Test that provider passes configurable read/write/connect timeouts to client."""
-    from beast.providers.base import ProviderConfig
+    from cyril_code.providers.base import ProviderConfig
 
     config = ProviderConfig(
         api_key="test_key",
@@ -153,7 +153,7 @@ async def test_init_uses_configurable_timeouts():
         http_write_timeout=15.0,
         http_connect_timeout=5.0,
     )
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_openai:
         NvidiaNimProvider(
             config, nim_settings=NimSettings(), admission=immediate_admission()
         )
@@ -240,7 +240,7 @@ def test_preflight_and_build_request_issue_206_post_tool_text(nim_provider):
                         type="tool_use",
                         id=tool_id,
                         name="echo_smoke",
-                        input={"value": "BEAST_206"},
+                        input={"value": "CYRIL_206"},
                     ),
                     block(
                         type="text",
@@ -251,7 +251,7 @@ def test_preflight_and_build_request_issue_206_post_tool_text(nim_provider):
             message(
                 "user",
                 [
-                    block(type="tool_result", tool_use_id=tool_id, content="BEAST_206"),
+                    block(type="tool_result", tool_use_id=tool_id, content="CYRIL_206"),
                     block(type="text", text="What was echoed?"),
                 ],
             ),
@@ -720,7 +720,7 @@ async def test_native_minimax_tool_markup_restores_nim_argument_aliases(nim_prov
         f"{namespace}<tool_call>"
         f'{namespace}<invoke name="Grep">'
         f"{namespace}<pattern>needle{namespace}</pattern>"
-        f"{namespace}<_beast_arg_type>py{namespace}</_beast_arg_type>"
+        f"{namespace}<_cyril_arg_type>py{namespace}</_cyril_arg_type>"
         f"{namespace}</invoke>"
         f"{namespace}</tool_call>"
     )
@@ -844,7 +844,7 @@ async def test_midstream_native_tool_suffix_failure_recovers_without_duplication
             new_callable=AsyncMock,
         ) as mock_create,
         patch(
-            "beast.providers.stream_recovery.RecoveryHoldbackBuffer",
+            "cyril_code.providers.stream_recovery.RecoveryHoldbackBuffer",
             side_effect=immediate_holdback,
         ),
     ):
@@ -883,7 +883,7 @@ async def test_stream_response_restores_aliased_tool_arguments(nim_provider):
     )
     mock_chunk = _tool_call_chunk(
         name="Grep",
-        arguments=json.dumps({"pattern": "needle", "-A": 2, "_beast_arg_type": "py"}),
+        arguments=json.dumps({"pattern": "needle", "-A": 2, "_cyril_arg_type": "py"}),
     )
 
     async def mock_stream():
@@ -903,18 +903,18 @@ async def test_stream_response_restores_aliased_tool_arguments(nim_provider):
     properties = create_kwargs["tools"][0]["function"]["parameters"]["properties"]
     assert "-A" in properties
     assert "type" not in properties
-    assert "_beast_arg_A" not in properties
-    assert "_beast_arg_type" in properties
+    assert "_cyril_arg_A" not in properties
+    assert "_cyril_arg_type" in properties
 
     deltas = _input_json_deltas(events)
     assert len(deltas) == 1
     assert json.loads(deltas[0]) == {"pattern": "needle", "-A": 2, "type": "py"}
-    assert "_beast_arg_type" not in deltas[0]
+    assert "_cyril_arg_type" not in deltas[0]
 
 
 @pytest.mark.asyncio
 async def test_stream_response_buffers_chunked_aliased_tool_arguments(nim_provider):
-    """Chunked aliased args are emitted once as restored Beast args."""
+    """Chunked aliased args are emitted once as restored Cyril Code args."""
     req = make_request(
         tools=[
             tool(
@@ -938,7 +938,7 @@ async def test_stream_response_buffers_chunked_aliased_tool_arguments(nim_provid
     )
     second_chunk = _tool_call_chunk(
         name=None,
-        arguments='"_beast_arg_type": "py"}',
+        arguments='"_cyril_arg_type": "py"}',
         tool_id="call_chunked",
     )
 
@@ -985,7 +985,7 @@ async def test_stream_response_restores_nested_aliased_tool_arguments(nim_provid
     mock_chunk = _tool_call_chunk(
         name="NotionLike",
         arguments=json.dumps(
-            {"parent": {"_beast_arg_type": "page_id", "id": "page_123"}}
+            {"parent": {"_cyril_arg_type": "page_id", "id": "page_123"}}
         ),
     )
 
@@ -1152,7 +1152,7 @@ async def test_stream_response_retries_without_reasoning_content(nim_provider):
                         type="tool_use",
                         id="toolu_reasoning",
                         name="echo_smoke",
-                        input={"value": "BEAST_TOOL"},
+                        input={"value": "CYRIL_TOOL"},
                     ),
                 ],
             ),

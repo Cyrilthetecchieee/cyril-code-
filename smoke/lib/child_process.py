@@ -20,23 +20,23 @@ def cmd_python_c(script: str) -> list[str]:
     return [python_exe(), "-c", script]
 
 
-def cmd_beast_version() -> list[str]:
+def cmd_cyril_version() -> list[str]:
     return [
         python_exe(),
         "-c",
         (
             "import sys; "
             "sys.argv = ['start', '--version']; "
-            "from beast.cli.entrypoints import serve; serve()"
+            "from cyril_code.cli.entrypoints import serve; serve()"
         ),
     ]
 
 
-def cmd_beast_server() -> list[str]:
+def cmd_cyril_server() -> list[str]:
     return [
         python_exe(),
         "-c",
-        "from beast.cli.entrypoints import serve; serve()",
+        "from cyril_code.cli.entrypoints import serve; serve()",
     ]
 
 

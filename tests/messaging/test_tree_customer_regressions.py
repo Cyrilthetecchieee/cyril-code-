@@ -4,8 +4,8 @@ import asyncio
 
 import pytest
 
-from beast.messaging.models import IncomingMessage, MessageScope
-from beast.messaging.trees import (
+from cyril_code.messaging.models import IncomingMessage, MessageScope
+from cyril_code.messaging.trees import (
     ConversationSnapshot,
     MessageState,
     NodeClaim,

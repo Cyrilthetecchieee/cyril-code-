@@ -6,7 +6,7 @@ from collections.abc import Callable
 import pytest
 import pytest_asyncio
 
-from beast.messaging.limiter import MessagingRateLimiter
+from cyril_code.messaging.limiter import MessagingRateLimiter
 
 
 class TestMessagingRateLimiter:

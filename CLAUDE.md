@@ -30,7 +30,7 @@
 
 ## ARCHITECTURE PRINCIPLES
 
-- **Shared utilities**: Put shared Anthropic protocol logic in neutral `src/beast/core/anthropic/` modules. Do not have one provider import from another provider's utils.
+- **Shared utilities**: Put shared Anthropic protocol logic in neutral `src/cyril_code/core/anthropic/` modules. Do not have one provider import from another provider's utils.
 - **Failure ownership**: Keep canonical failure semantics and redaction SDK-free in `core/`; providers alone classify SDK/HTTP failures and own retries; protocol/API adapters alone choose wire error types and commit-boundary serialization.
 - **DRY**: Extract shared base classes to eliminate duplication. Prefer composition over copy-paste.
 - **Encapsulation**: Use accessor methods for internal state (e.g. `set_current_task()`), not direct `_attribute` assignment from outside.
@@ -63,8 +63,8 @@ Every commit on `main` that changes a **production file** must include a semver 
 
 These paths count as production (runtime, packaging, or install surface):
 
-- `src/beast/api/`, `src/beast/cli/`, `src/beast/config/`, `src/beast/core/`, `src/beast/messaging/`, `src/beast/providers/`
-- `src/beast/application/`
+- `src/cyril_code/api/`, `src/cyril_code/cli/`, `src/cyril_code/config/`, `src/cyril_code/core/`, `src/cyril_code/messaging/`, `src/cyril_code/providers/`
+- `src/cyril_code/application/`
 - `.env.example`
 - `pyproject.toml` (dependencies, scripts, packaging)
 - `scripts/install.sh`, `scripts/install.ps1`, `scripts/uninstall.sh`, `scripts/uninstall.ps1`, `scripts/ci.sh`, `scripts/ci.ps1`

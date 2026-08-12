@@ -8,12 +8,12 @@ import httpx
 import openai
 import pytest
 
-from beast.config.provider_catalog import GROQ_DEFAULT_BASE
-from beast.core.anthropic.stream_contracts import parse_sse_text
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.groq import GroqProvider
-from beast.providers.groq.client import (
+from cyril_code.config.provider_catalog import GROQ_DEFAULT_BASE
+from cyril_code.core.anthropic.stream_contracts import parse_sse_text
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.groq import GroqProvider
+from cyril_code.providers.groq.client import (
     _parse_reasoning_vocabulary,
     _rewrite_reasoning_effort,
 )

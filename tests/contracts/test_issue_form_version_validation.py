@@ -74,7 +74,7 @@ def test_bug_form_requests_a_contained_version_or_none() -> None:
         ("0.0.0", "0.0.0"),
         ("1.22.333", "1.22.333"),
         ("The version is 1.22.333", "1.22.333"),
-        ("beast 4.11.4", "4.11.4"),
+        ("cyril_code 4.11.4", "4.11.4"),
         ("v123.45.678", "123.45.678"),
         ("Version 4.6.1.", "4.6.1"),
     ],
@@ -96,8 +96,8 @@ def test_version_pattern_extracts_a_contained_version(
         ".4.6.1",
         "4.6.x",
         "none",
-        "beast",
-        "beast 4.6",
+        "cyril_code",
+        "cyril_code 4.6",
         "the version is 4.6.1.2",
         "upgraded from 4.6.1 to 4.11.4",
         "build4.6.1",
@@ -137,13 +137,13 @@ def test_numeric_version_comparison_uses_all_three_components() -> None:
 
 
 def test_field_pattern_extracts_the_issue_form_value() -> None:
-    body = """### BEAST version
+    body = """### CYRIL version
 
 4.6.1
 
 ### CLI
 
-Beast (beast)
+Cyril Code (cyril_code)
 """
 
     match = re.search(_workflow_pattern("fieldPattern"), body, flags=re.MULTILINE)
@@ -157,8 +157,8 @@ def test_workflow_owns_one_idempotent_triage_state() -> None:
 
     assert "types: [opened, edited]" in workflow
     assert "issues: write" in workflow
-    assert "needs-beast-version" in workflow
-    assert "<!-- beast-version-validator -->" in workflow
+    assert "needs-cyril-version" in workflow
+    assert "<!-- cyril-version-validator -->" in workflow
     assert "github.rest.issues.createLabel" in workflow
     assert "github.rest.issues.addLabels" in workflow
     assert "github.rest.issues.removeLabel" in workflow
@@ -272,23 +272,23 @@ const context = {
     },
   },
 };
-const bodyFor = (value) => `### BEAST version\n\n${value}\n\n### CLI\n\nBeast`;
+const bodyFor = (value) => `### CYRIL version\n\n${value}\n\n### CLI\n\nCyril Code`;
 
 liveIssue.body = bodyFor("latest");
 await run(github, context);
 liveIssue.body = bodyFor("The version is 17.23.454");
 await run(github, context);
 await run(github, context);
-liveIssue.body = bodyFor("beast 17.23.455");
+liveIssue.body = bodyFor("cyril_code 17.23.455");
 await run(github, context);
 liveIssue.body = bodyFor(latestVersion);
 await run(github, context);
 comments.push({
   id: 102,
   user: { login: "github-actions[bot]" },
-  body: "<!-- beast-version-outdated -->\nstale",
+  body: "<!-- cyril-version-outdated -->\nstale",
 });
-liveIssue.labels = [{ name: "needs-beast-version" }];
+liveIssue.labels = [{ name: "needs-cyril-version" }];
 liveIssue.body = bodyFor("None");
 await run(github, context);
 
@@ -318,7 +318,7 @@ process.stdout.write(JSON.stringify({ calls, comments }));
         call["args"]["body"]
         for call in calls
         if call["name"] == "createComment"
-        and "beast-version-outdated" in call["args"]["body"]
+        and "cyril-version-outdated" in call["args"]["body"]
     )
     assert "`17.23.455`" in next(
         call["args"]["body"] for call in calls if call["name"] == "updateComment"

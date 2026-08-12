@@ -9,24 +9,24 @@ from google.auth.credentials import Credentials
 from google.auth.exceptions import DefaultCredentialsError, TransportError
 from google.auth.transport.requests import Request
 
-from beast.application.errors import (
+from cyril_code.application.errors import (
     ApplicationUnavailableError,
     InvalidRequestError,
 )
-from beast.application.model_metadata import ProviderModelInfo
-from beast.config.provider_catalog import VERTEX_AI_API_ROOT
-from beast.core.failures import ExecutionFailure, FailureKind
-from beast.core.reasoning import ReasoningEffort, ReasoningPolicy
-from beast.providers.base import ProviderConfig
-from beast.providers.model_listing import ModelListResponseError
-from beast.providers.vertex import VertexProvider
-from beast.providers.vertex.auth import GoogleAccessTokenProvider
-from beast.providers.vertex.endpoint import (
+from cyril_code.application.model_metadata import ProviderModelInfo
+from cyril_code.config.provider_catalog import VERTEX_AI_API_ROOT
+from cyril_code.core.failures import ExecutionFailure, FailureKind
+from cyril_code.core.reasoning import ReasoningEffort, ReasoningPolicy
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.model_listing import ModelListResponseError
+from cyril_code.providers.vertex import VertexProvider
+from cyril_code.providers.vertex.auth import GoogleAccessTokenProvider
+from cyril_code.providers.vertex.endpoint import (
     vertex_openai_base_url,
     vertex_publisher_models_url,
     vertex_service_endpoint,
 )
-from beast.providers.vertex.models import extract_vertex_model_page
+from cyril_code.providers.vertex.models import extract_vertex_model_page
 from tests.providers.request_factory import make_messages_request
 from tests.providers.support import immediate_admission, reasoning_for
 
@@ -222,8 +222,8 @@ async def test_transient_adc_refresh_failure_is_retryable() -> None:
 def test_vertex_provider_supplies_renewable_token_callback_to_openai() -> None:
     token_provider = _token_provider()
     with (
-        patch("beast.providers.openai_chat.provider.AsyncOpenAI") as openai_client,
-        patch("beast.providers.vertex.client.httpx.AsyncClient"),
+        patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client,
+        patch("cyril_code.providers.vertex.client.httpx.AsyncClient"),
     ):
         provider = _provider(token_provider=token_provider)
 
@@ -335,7 +335,7 @@ def test_vertex_preserves_caller_thinking_config_only_for_provider_default() -> 
     }
 
 
-def test_vertex_rejects_caller_thinking_config_with_beast_reasoning_control() -> None:
+def test_vertex_rejects_caller_thinking_config_with_cyril_reasoning_control() -> None:
     provider = _provider()
     request = make_messages_request(
         "google/gemini",

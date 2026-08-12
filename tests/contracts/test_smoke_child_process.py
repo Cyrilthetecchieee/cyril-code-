@@ -2,13 +2,13 @@ import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from beast.config.settings import Settings
+from cyril_code.config.settings import Settings
 from smoke.lib import child_process
 from smoke.lib import e2e as smoke_e2e
 from smoke.lib import http as smoke_http
 from smoke.lib import server as smoke_server
 from smoke.lib.child_process import (
-    cmd_beast_server,
+    cmd_cyril_server,
     cmd_python_c,
     run_captured_text,
 )
@@ -18,11 +18,11 @@ from smoke.lib.http import collect_message_stream
 from smoke.lib.server import RunningServer
 
 
-def test_beast_server_command_uses_cli_entrypoint() -> None:
-    assert cmd_beast_server() == [
+def test_cyril_server_command_uses_cli_entrypoint() -> None:
+    assert cmd_cyril_server() == [
         child_process.python_exe(),
         "-c",
-        "from beast.cli.entrypoints import serve; serve()",
+        "from cyril_code.cli.entrypoints import serve; serve()",
     ]
 
 
@@ -64,7 +64,7 @@ def test_start_server_disables_cli_admin_browser(monkeypatch, tmp_path: Path) ->
     env_obj = captured["env"]
     assert isinstance(env_obj, dict)
     env = {str(key): value for key, value in env_obj.items()}
-    assert env["BEAST_OPEN_BROWSER"] == "0"
+    assert env["CYRIL_OPEN_BROWSER"] == "0"
     assert env["HOST"] == "127.0.0.1"
     assert env["PORT"] == "4567"
 
@@ -137,14 +137,14 @@ def test_run_captured_text_uses_utf8_replacement(monkeypatch, tmp_path: Path) ->
     result = run_captured_text(
         ("cmd", "arg"),
         cwd=tmp_path,
-        env={"BEAST_TEST": "1"},
+        env={"CYRIL_TEST": "1"},
         timeout=1.0,
     )
 
     assert result.stdout == "ok"
     assert calls["command"] == ["cmd", "arg"]
     assert calls["cwd"] == tmp_path
-    assert calls["env"] == {"BEAST_TEST": "1"}
+    assert calls["env"] == {"CYRIL_TEST": "1"}
     assert calls["capture_output"] is True
     assert calls["text"] is True
     assert calls["encoding"] == "utf-8"

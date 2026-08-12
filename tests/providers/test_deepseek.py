@@ -6,18 +6,18 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from beast.application.errors import InvalidRequestError
-from beast.config.constants import ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS
-from beast.config.provider_catalog import DEEPSEEK_DEFAULT_BASE
-from beast.core.anthropic.models import (
+from cyril_code.application.errors import InvalidRequestError
+from cyril_code.config.constants import ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS
+from cyril_code.config.provider_catalog import DEEPSEEK_DEFAULT_BASE
+from cyril_code.core.anthropic.models import (
     ContentBlockImage,
     Message,
     MessagesRequest,
     Tool,
 )
-from beast.core.anthropic.stream_contracts import parse_sse_text
-from beast.providers.base import ProviderConfig
-from beast.providers.deepseek import DeepSeekProvider
+from cyril_code.core.anthropic.stream_contracts import parse_sse_text
+from cyril_code.providers.base import ProviderConfig
+from cyril_code.providers.deepseek import DeepSeekProvider
 from tests.providers.support import (
     REASONING_OFF,
     REASONING_ON,
@@ -47,7 +47,7 @@ def test_default_base_url_alias():
 
 
 def test_init(deepseek_config):
-    with patch("beast.providers.openai_chat.provider.AsyncOpenAI") as mock_client:
+    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as mock_client:
         provider = DeepSeekProvider(deepseek_config, admission=immediate_admission())
     assert provider._api_key == "test_deepseek_key"
     assert provider._base_url == "https://api.deepseek.com"
@@ -1059,7 +1059,7 @@ def test_normalizes_tool_result_content_array_to_string(deepseek_provider):
 
 
 def test_strips_document_blocks_for_deepseek(deepseek_provider):
-    """Document blocks (e.g. PDFs from Beast) are stripped since DeepSeek can't process them."""
+    """Document blocks (e.g. PDFs from Cyril Code) are stripped since DeepSeek can't process them."""
     request = MessagesRequest.model_validate(
         {
             "model": "m",

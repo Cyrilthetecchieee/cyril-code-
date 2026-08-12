@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from beast.messaging.models import MessageScope
-from beast.messaging.platforms.voice_flow import (
+from cyril_code.messaging.models import MessageScope
+from cyril_code.messaging.platforms.voice_flow import (
     VOICE_DISABLED_MESSAGE,
     VOICE_TRANSCRIPTION_ERROR_MESSAGE,
     VoiceNoteFlow,
@@ -13,9 +13,9 @@ from beast.messaging.platforms.voice_flow import (
     audio_suffix_from_metadata,
     is_audio_metadata,
 )
-from beast.messaging.trees.runtime import MessageTree
-from beast.messaging.voice import Transcriber
-from beast.messaging.workflow import MessagingWorkflow
+from cyril_code.messaging.trees.runtime import MessageTree
+from cyril_code.messaging.voice import Transcriber
+from cyril_code.messaging.workflow import MessagingWorkflow
 
 VOICE_SCOPE = MessageScope(platform="telegram", chat_id="chat")
 
@@ -881,7 +881,7 @@ async def test_voice_flow_rejects_oversized_audio_before_transcription(
     monkeypatch,
 ) -> None:
     monkeypatch.setattr(
-        "beast.messaging.platforms.voice_flow.MAX_AUDIO_SIZE_BYTES",
+        "cyril_code.messaging.platforms.voice_flow.MAX_AUDIO_SIZE_BYTES",
         3,
     )
     flow, transcriber = _flow()

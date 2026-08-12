@@ -3,8 +3,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from beast.cli.managed.manager import ManagedClaudeSessionManager
-from beast.cli.managed.session import ManagedClaudeSession
+from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
+from cyril_code.cli.managed.session import ManagedClaudeSession
 
 
 def _manager() -> ManagedClaudeSessionManager:
@@ -44,8 +44,8 @@ async def test_stop_is_idempotent_without_a_live_process() -> None:
     session.process = process
 
     with (
-        patch("beast.cli.managed.session.kill_pid_tree_best_effort") as kill_tree,
-        patch("beast.cli.managed.session.unregister_pid") as unregister,
+        patch("cyril_code.cli.managed.session.kill_pid_tree_best_effort") as kill_tree,
+        patch("cyril_code.cli.managed.session.unregister_pid") as unregister,
     ):
         assert await session.stop() is True
 
@@ -62,10 +62,10 @@ async def test_stopped_session_reference_cannot_launch_a_new_process() -> None:
 
     with (
         patch(
-            "beast.cli.managed.session.asyncio.create_subprocess_exec",
+            "cyril_code.cli.managed.session.asyncio.create_subprocess_exec",
             new=AsyncMock(return_value=_completed_process(100)),
         ) as create_process,
-        patch("beast.cli.managed.session.trace_event") as trace,
+        patch("cyril_code.cli.managed.session.trace_event") as trace,
         pytest.raises(RuntimeError, match="closed"),
     ):
         async for _ in session.start_task("must not launch"):
@@ -105,12 +105,12 @@ async def test_launch_publication_wins_before_concurrent_stop() -> None:
 
     with (
         patch(
-            "beast.cli.managed.session.asyncio.create_subprocess_exec",
+            "cyril_code.cli.managed.session.asyncio.create_subprocess_exec",
             side_effect=create_process,
         ),
-        patch("beast.cli.managed.session.kill_pid_tree_best_effort"),
-        patch("beast.cli.managed.session.register_pid"),
-        patch("beast.cli.managed.session.unregister_pid"),
+        patch("cyril_code.cli.managed.session.kill_pid_tree_best_effort"),
+        patch("cyril_code.cli.managed.session.register_pid"),
+        patch("cyril_code.cli.managed.session.unregister_pid"),
     ):
         stream_task = asyncio.create_task(
             _collect_session_events(session, "launch wins")
@@ -154,12 +154,12 @@ async def test_concurrent_stop_wins_before_launch_publication() -> None:
 
     with (
         patch(
-            "beast.cli.managed.session.asyncio.create_subprocess_exec",
+            "cyril_code.cli.managed.session.asyncio.create_subprocess_exec",
             new=AsyncMock(return_value=unexpected_process),
         ) as create_process,
-        patch("beast.cli.managed.session.kill_pid_tree_best_effort"),
-        patch("beast.cli.managed.session.unregister_pid"),
-        patch("beast.cli.managed.session.trace_event") as trace,
+        patch("cyril_code.cli.managed.session.kill_pid_tree_best_effort"),
+        patch("cyril_code.cli.managed.session.unregister_pid"),
+        patch("cyril_code.cli.managed.session.trace_event") as trace,
     ):
         stop_task = asyncio.create_task(session.stop())
         await stop_entered.wait()
@@ -182,11 +182,11 @@ async def test_normal_sequential_starts_remain_allowed_before_stop() -> None:
 
     with (
         patch(
-            "beast.cli.managed.session.asyncio.create_subprocess_exec",
+            "cyril_code.cli.managed.session.asyncio.create_subprocess_exec",
             new=AsyncMock(side_effect=processes),
         ) as create_process,
-        patch("beast.cli.managed.session.register_pid"),
-        patch("beast.cli.managed.session.unregister_pid"),
+        patch("cyril_code.cli.managed.session.register_pid"),
+        patch("cyril_code.cli.managed.session.unregister_pid"),
     ):
         first = await _collect_session_events(session, "first")
         second = await _collect_session_events(session, "second")
@@ -213,8 +213,8 @@ async def test_failed_stop_keeps_pid_registered_until_retry_confirms_exit() -> N
     session.process = process
 
     with (
-        patch("beast.cli.managed.session.kill_pid_tree_best_effort"),
-        patch("beast.cli.managed.session.unregister_pid") as unregister,
+        patch("cyril_code.cli.managed.session.kill_pid_tree_best_effort"),
+        patch("cyril_code.cli.managed.session.unregister_pid") as unregister,
     ):
         assert await session.stop() is False
         unregister.assert_not_called()
@@ -241,8 +241,8 @@ async def test_cancelled_stop_keeps_pid_registered_and_can_be_retried() -> None:
     session.process = process
 
     with (
-        patch("beast.cli.managed.session.kill_pid_tree_best_effort"),
-        patch("beast.cli.managed.session.unregister_pid") as unregister,
+        patch("cyril_code.cli.managed.session.kill_pid_tree_best_effort"),
+        patch("cyril_code.cli.managed.session.unregister_pid") as unregister,
     ):
         stopping = asyncio.create_task(session.stop())
         await wait_entered.wait()
@@ -268,11 +268,11 @@ async def test_task_failure_keeps_unconfirmed_process_pid_registered() -> None:
 
     with (
         patch(
-            "beast.cli.managed.session.asyncio.create_subprocess_exec",
+            "cyril_code.cli.managed.session.asyncio.create_subprocess_exec",
             new=AsyncMock(return_value=process),
         ),
-        patch("beast.cli.managed.session.register_pid") as register,
-        patch("beast.cli.managed.session.unregister_pid") as unregister,
+        patch("cyril_code.cli.managed.session.register_pid") as register,
+        patch("cyril_code.cli.managed.session.unregister_pid") as unregister,
         pytest.raises(RuntimeError, match="read failed"),
     ):
         async for _ in session.start_task("hello"):
@@ -294,11 +294,11 @@ async def test_completed_task_wait_unregisters_confirmed_process_pid() -> None:
 
     with (
         patch(
-            "beast.cli.managed.session.asyncio.create_subprocess_exec",
+            "cyril_code.cli.managed.session.asyncio.create_subprocess_exec",
             new=AsyncMock(return_value=process),
         ),
-        patch("beast.cli.managed.session.register_pid") as register,
-        patch("beast.cli.managed.session.unregister_pid") as unregister,
+        patch("cyril_code.cli.managed.session.register_pid") as register,
+        patch("cyril_code.cli.managed.session.unregister_pid") as unregister,
     ):
         events = [event async for event in session.start_task("hello")]
 

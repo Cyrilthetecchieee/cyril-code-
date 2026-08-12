@@ -35,7 +35,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
         ("test_provider_text_multiturn_e2e",),
         ("providers",),
         ("configured provider credentials or local provider endpoint",),
-        "missing providers are missing_env unless BEAST_ALLOW_NO_PROVIDER_SMOKE=1",
+        "missing providers are missing_env unless CYRIL_ALLOW_NO_PROVIDER_SMOKE=1",
     ),
     FeatureCoverage(
         "drop_in_claude_code_replacement",
@@ -54,7 +54,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
         ("api", "cli", "clients", "nvidia_nim_cli", "openrouter_free_cli"),
         (
             "configured provider",
-            "BEAST_SMOKE_CLAUDE_BIN for real Claude CLI",
+            "CYRIL_SMOKE_CLAUDE_BIN for real Claude CLI",
             "NVIDIA_NIM_API_KEY",
             "OPENROUTER_API_KEY",
         ),
@@ -73,11 +73,11 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
         ("test_provider_codex_responses_text_e2e",),
         ("api", "providers"),
         ("configured provider credentials or local provider endpoint",),
-        "missing providers are missing_env unless BEAST_ALLOW_NO_PROVIDER_SMOKE=1",
+        "missing providers are missing_env unless CYRIL_ALLOW_NO_PROVIDER_SMOKE=1",
     ),
     FeatureCoverage(
         "pi_cli_integration",
-        "Pi discovers BEAST models and sends Anthropic Messages through the proxy",
+        "Pi discovers CYRIL models and sends Anthropic Messages through the proxy",
         ("tests/cli/test_entrypoints.py",),
         ("test_probe_and_models_routes",),
         ("test_pi_cli_prompt_e2e",),
@@ -92,7 +92,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
         ("test_configured_provider_models_stream_successfully",),
         ("test_provider_matrix_presence_e2e", "test_provider_text_multiturn_e2e"),
         ("providers",),
-        ("configured provider credentials/endpoints", "optional BEAST_SMOKE_MODEL_*"),
+        ("configured provider credentials/endpoints", "optional CYRIL_SMOKE_MODEL_*"),
         "selected providers missing credentials are failing missing_env",
     ),
     FeatureCoverage(
@@ -284,7 +284,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
             "test_voice_nim_backend_e2e",
         ),
         ("messaging", "voice"),
-        ("VOICE_NOTE_ENABLED", "BEAST_SMOKE_RUN_VOICE", "WHISPER_DEVICE"),
+        ("VOICE_NOTE_ENABLED", "CYRIL_SMOKE_RUN_VOICE", "WHISPER_DEVICE"),
         "fake cancellation is required; backend transcription is opt-in",
     ),
     FeatureCoverage(
@@ -367,7 +367,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
         "package_cli_entrypoints",
         "Installed package scripts report version and start the server",
         ("tests/cli/test_entrypoints.py", "tests/core/test_version.py"),
-        ("test_beast_server_entrypoint_starts_server",),
+        ("test_cyril_server_entrypoint_starts_server",),
         (
             "test_entrypoint_server_e2e",
             "test_entrypoint_version_e2e",
@@ -389,7 +389,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
         ),
         ("cli", "nvidia_nim_cli", "openrouter_free_cli"),
         (
-            "BEAST_SMOKE_CLAUDE_BIN",
+            "CYRIL_SMOKE_CLAUDE_BIN",
             "configured provider",
             "NVIDIA_NIM_API_KEY",
             "OPENROUTER_API_KEY",
@@ -457,7 +457,7 @@ FEATURE_INVENTORY: tuple[FeatureCoverage, ...] = (
     ),
     FeatureCoverage(
         "config_env_precedence",
-        "BEAST_ENV_FILE, dotenv, and process env precedence are deterministic",
+        "CYRIL_ENV_FILE, dotenv, and process env precedence are deterministic",
         ("tests/config/test_config.py",),
         (),
         ("test_env_precedence_e2e",),

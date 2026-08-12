@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from beast.config.settings import Settings
-from beast.runtime.application import ApplicationRuntime, best_effort
-from beast.runtime.provider_manager import ProviderRuntimeManager
+from cyril_code.config.settings import Settings
+from cyril_code.runtime.application import ApplicationRuntime, best_effort
+from cyril_code.runtime.provider_manager import ProviderRuntimeManager
 
 
 @pytest.mark.asyncio
@@ -27,7 +27,7 @@ async def test_messaging_start_failure_default_logs_exclude_traceback(caplog):
 
     with (
         patch(
-            "beast.runtime.application.messaging_platform_factory.create_messaging_components",
+            "cyril_code.runtime.application.messaging_platform_factory.create_messaging_components",
             side_effect=RuntimeError("SECRET_RUNTIME_DETAIL"),
         ),
         caplog.at_level(logging.ERROR),

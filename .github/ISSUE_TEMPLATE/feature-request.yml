@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an improvement to Beast.
+description: Suggest an improvement to Cyril Code.
 labels:
   - enhancement
 body:
@@ -7,7 +7,7 @@ body:
     id: what
     attributes:
       label: What?
-      description: What would you like Beast to do?
+      description: What would you like Cyril Code to do?
       placeholder: Describe the feature.
     validations:
       required: true

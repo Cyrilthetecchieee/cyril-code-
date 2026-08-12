@@ -1,13 +1,13 @@
 name: Bug report
-description: Report something that is not working in Beast.
+description: Report something that is not working in Cyril Code.
 labels:
   - bug
 body:
   - type: input
-    id: beast-version
+    id: cyril-version
     attributes:
-      label: BEAST version
-      description: Run `start --version` and include one version in `number.number.number` format. If BEAST did not install, enter `None`.
+      label: CYRIL version
+      description: Run `start --version` and include one version in `number.number.number` format. If CYRIL did not install, enter `None`.
       placeholder: "The version is 1.22.333, or None"
     validations:
       required: true
@@ -18,9 +18,9 @@ body:
       label: CLI
       description: If the problem occurred while using a coding CLI, select it.
       options:
-        - Beast (beast)
-        - Codex (beast-codex)
-        - Pi (beast-pi)
+        - Cyril Code (cyril_code)
+        - Codex (cyril-codex)
+        - Pi (cyril-pi)
 
   - type: input
     id: selected-models

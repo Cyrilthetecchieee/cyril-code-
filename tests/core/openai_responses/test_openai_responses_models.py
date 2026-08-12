@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from beast.core.openai_responses import OpenAIResponsesRequest
+from cyril_code.core.openai_responses import OpenAIResponsesRequest
 
 
 def test_responses_request_preserves_defaults_and_unknown_extensions() -> None:

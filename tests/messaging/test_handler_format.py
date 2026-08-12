@@ -2,14 +2,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from beast.messaging.rendering.telegram_markdown import (
+from cyril_code.messaging.rendering.telegram_markdown import (
     escape_md_v2,
     escape_md_v2_code,
     mdv2_bold,
     mdv2_code_inline,
     render_markdown_to_mdv2,
 )
-from beast.messaging.transcript import RenderCtx, TranscriptBuffer
+from cyril_code.messaging.transcript import RenderCtx, TranscriptBuffer
 
 
 @pytest.fixture

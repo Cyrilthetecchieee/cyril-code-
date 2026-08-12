@@ -1,236 +1,179 @@
-# Contributing to Claude Code Skills
+# Contributing to Awesome Claude Skills
 
-Thank you for your interest in contributing! This repository is the largest open-source Claude Code skills & agent plugins library (6,800+ stars, 205 production-ready skills).
+Thank you for your interest in contributing to Awesome Claude Skills! This document provides guidelines for contributing to this list.
 
-**Before you start:** Read [CONVENTIONS.md](CONVENTIONS.md) — it contains the mandatory technical rules that every contribution must follow. PRs that violate conventions will be closed.
+> [!NOTE]
+> Given the growth in assisted skill development, a new requirement of "social proof" has been added to skill submissions.
 
----
+## How to Contribute
 
-## Target Branch: `dev`
+1. **Fork the repository** - Click the "Fork" button in the top right corner
+2. **Create a branch** - Create a new branch for your contribution
+3. **Make your changes** - Add your skill, resource, or improvement
+4. **Submit a pull request** - Open a PR with a clear description of your changes
 
-**All PRs must target the `dev` branch.** PRs targeting `main` will be closed automatically.
+## What to Contribute
 
-```bash
-git clone https://github.com/YOUR_USERNAME/claude-skills.git
-cd claude-skills
-git remote add upstream https://github.com/alirezarezvani/claude-skills.git
-git fetch upstream dev
-git checkout -b feature/my-skill upstream/dev
-```
+We welcome contributions in the following categories:
 
----
+### Skills
 
-## What We Accept
+- Official skills from Anthropic
+- Community-created skills
+- Your own custom skills
 
-### New Skills
+### Resources
 
-Add domain expertise that doesn't already exist in the repo:
-- Engineering tools and workflows
-- Marketing, sales, customer success patterns
-- Product management frameworks
-- Regulatory and compliance (ISO, SOC, GDPR, FDA)
-- Business functions (finance, HR, operations)
+- Documentation
+- Tutorials and guides
+- Blog posts and articles
+- Videos and presentations
+- Tools and utilities
 
-**Before building:** Check existing skills to avoid overlap. Open an issue to discuss if unsure.
+### Improvements
 
-### Improvements to Existing Skills
+- Fixing typos or broken links
+- Improving descriptions
+- Reorganizing content for better clarity
+- Adding missing information
 
-- Better workflows and actionable patterns
-- Additional Python automation scripts
-- New reference material
-- More code examples and cross-references
-- Bug fixes in scripts or documentation
+## Guidelines
 
-### Bug Fixes
+### Quality Standards
 
-- Python scripts that fail `--help`
-- Broken cross-references between skills
-- Incorrect information in reference docs
+All contributions should:
 
----
+- Be related to Claude Skills
+- Provide clear value to users
+- **Be non-promotional (see below)**
+- Include accurate, up-to-date information
+- Use proper formatting and grammar
 
-## What We Do NOT Accept
+### No Promotions or Commercial Segues
 
-| Type | Reason |
-|------|--------|
-| Links to external repos/tools in README | No 3rd party promotion |
-| Skills requiring paid API keys | Must work without external services |
-| Scripts with pip dependencies | stdlib-only Python |
-| PRs that change the skill count (205) | Curated number |
-| PRs modifying `.codex/`, `.gemini/`, `marketplace.json` | Auto-generated files |
-| Bloated diffs with fork merge history | Rebase on `dev` first |
-| Generic advice without actionable frameworks | Must be executable by an AI agent |
+This list is a community resource, not a marketing channel. We strictly filter out submissions that serve primarily as a funnel for commercial products.
 
----
+- **No "SaaS Wrappers":** Skills that exist solely to call a specific commercial API or require a paid subscription to a specific SaaS platform (especially one owned by the submitter) to function are generally not accepted.
+- **Standalone Value:** Submissions must provide value on their own. If the content is clearly just a segue to a paid product, it will be rejected.
+- **Genuine Resources:** Tutorials and articles must focus on education, not conversion. "Teaser" content designed to upsell a course or tool will not be merged.
 
-## Skill Creation Guide
+### Formatting
 
-### 1. Create the directory
-
-```bash
-# Example: new engineering skill
-mkdir -p engineering/my-new-skill/scripts
-mkdir -p engineering/my-new-skill/references
-```
-
-### 2. Write SKILL.md
-
-**Frontmatter — only `name` and `description`:**
-
-```yaml
----
-name: "my-new-skill"
-description: "Use when the user asks to [specific trigger]. Covers [key capabilities]."
----
-```
-
-> **Important:** Do NOT add `license`, `metadata`, `triggers`, `version`, `author`, or any other fields. See [CONVENTIONS.md](CONVENTIONS.md) for the full specification.
-
-**Content must be:**
-- Under 500 lines (move detailed content to `references/`)
-- Opinionated (recommend specific approaches)
-- Actionable (agent can execute, not just advise)
-- Include anti-patterns and cross-references sections
-
-### 3. Write Python scripts (optional but valuable)
-
-```python
-#!/usr/bin/env python3
-"""Tool Name — brief description."""
-
-import argparse
-import json
-import sys
-
-def main():
-    parser = argparse.ArgumentParser(description="Tool description")
-    parser.add_argument("input", help="Input file or value")
-    parser.add_argument("--json", action="store_true", help="Output as JSON")
-    parser.add_argument("--verbose", action="store_true", help="Verbose output")
-    args = parser.parse_args()
-
-    # Your logic here
-    result = {"status": "ok"}
-
-    if args.json:
-        print(json.dumps(result, indent=2))
-    else:
-        print(f"Result: {result['status']}")
-
-if __name__ == "__main__":
-    main()
-```
-
-**Script rules:** stdlib-only, argparse, `--help`, `--json`, proper exit codes (0/1/2). See [CONVENTIONS.md](CONVENTIONS.md) for full requirements.
-
-### 4. Add reference docs (optional)
-
-Place detailed material in `references/`:
-```
-my-new-skill/references/
-├── patterns.md          # Detailed patterns and examples
-├── best-practices.md    # Best practices guide
-└── decision-matrix.md   # Comparison tables
-```
-
-Reference them from SKILL.md:
-```markdown
-> See [references/patterns.md](references/patterns.md) for detailed patterns.
-```
-
-### 5. Validate before submitting
-
-```bash
-# Structure validation
-python3 engineering/skill-tester/scripts/skill_validator.py <your-skill-path>
-
-# Script testing
-python3 engineering/skill-tester/scripts/script_tester.py <your-skill-path> --verbose
-
-# Security audit
-python3 engineering/skill-security-auditor/scripts/skill_security_auditor.py <your-skill-path> --strict
-```
-
----
-
-## PR Checklist
-
-Before submitting your PR, verify:
-
-- [ ] **Targets `dev` branch** (not `main`)
-- [ ] **SKILL.md frontmatter** has only `name` + `description`
-- [ ] **SKILL.md under 500 lines** (detailed content in `references/`)
-- [ ] **All scripts pass** `python3 script.py --help`
-- [ ] **Scripts use stdlib only** (no pip dependencies)
-- [ ] **Scripts support `--json` output**
-- [ ] **Anti-patterns section** included in SKILL.md
-- [ ] **Cross-references** to related skills included
-- [ ] **No modifications** to `.codex/`, `.gemini/`, `marketplace.json`, or index files
-- [ ] **No 3rd party links** added to README
-- [ ] **Clean diff** — rebased on `dev`, no merge commit history
-- [ ] **Security audit passes** with zero CRITICAL/HIGH findings
-
----
-
-## Commit Messages
-
-[Conventional Commits](https://www.conventionalcommits.org/) format:
-
-```
-feat(engineering): add browser-automation skill
-fix(self-improving-agent): use absolute path for hooks
-improve(tdd-guide): add per-language examples
-docs: update CONTRIBUTING.md
-```
-
----
-
-## PR Description Template
+When adding a new item:
 
 ```markdown
-## Summary
-- What: [What does this add/change/fix?]
-- Why: [Why is this valuable?]
+- **[Name](link)** - Clear, concise description of what it does
 
-## Checklist
-- [x] Targets dev branch
-- [x] SKILL.md frontmatter: name + description only
-- [x] Under 500 lines
-- [x] Scripts pass --help
-- [x] Security audit: 0 critical/high findings
 ```
 
----
+Examples:
 
-## After Your PR is Merged
+```markdown
+- **[pdf-analyzer](https://github.com/username/pdf-analyzer)** - Advanced PDF analysis skill with OCR support
+- **[Claude Skills Tutorial](https://example.com/tutorial)** - Step-by-step guide to creating your first skill
 
-Maintainers will handle:
-1. Running sync scripts (Codex, Gemini, integrations)
-2. Generating docs pages
-3. Updating mkdocs.yml navigation
-4. Updating domain plugin.json counts
-5. Updating marketplace.json
-6. Merging dev → main for deployment
+```
 
-You do NOT need to do any of these steps in your PR.
+#### Adding an individual skill
 
----
+Add a row to the individual skills table using the same pattern as the other rows.
 
-## Recognition
+### Skill Submissions
 
-Contributors are credited via:
-- `Co-Authored-By:` in commit messages
-- PR merge messages and changelogs
-- Attribution in SKILL.md when skills are improved from community submissions
+When submitting a skill, please include:
 
----
+* Clear name and link to the skill repository
+* Brief description (1-2 sentences) of what it does
+* Any prerequisites or dependencies
+* License information (if applicable)
+
+The skill should:
+
+* Have a clear purpose and use case
+* Include documentation (README or SKILL.md)
+* Follow Claude Skills best practices
+* Be functional and tested
+
+Above all else, the skill should be a value-add. Trivial functionalities that were whipped up with a session or two with Claude Code are not likely to be worthwhile skills for community members to make use of almost by definition (i.e. if the skill could be created that quickly, it would probably be something an individual would implement by themselves to match their own particular use case).
+
+While not an absolute requirement, a strong general guideline would be that more exists to the skill than a single `SKILL.md` file. 
+
+#### Social Proof
+
+Skills must have gathered enough attention from the community so-as to have acquired a number of GitHub stars to be considered in most cases. 
+
+*This is due to the increase in PR submissions of either newly completed and untested skills or narrow-focused and not generalizable skills that simply do not make sense in a GitHub Awesome list meant to appeal to a wide audience.*
+
+> [!NOTE]
+> Due to the volume of PR submissions that do not conform to these contribution guidelines, if your skill hasn't acquired a basic 10 stars, it will be closed automatically.
+
+#### AI Automated Submissions
+
+Due to the influx of PRs, there is a requirement now that the PR not be explicitly generated / submitted with AI-assistance. 
+
+It's too untenable to try and review the entire codebase of an LLM-generated project that was also submitted with the help of generative AI. This requirement is intended to serve as a quick filter (which is honestly surprising, given that AI coding assistants are easily capable of ingesting the language of a `CONTRIBUTING.md` file of a repository).
+
+PRs will be closed without comment if the submitter has failed to acknowledge this or adhere by its basic tenets in order to weed out the low-effort submissions. 
+
+#### SaaS Submissions
+
+If the skill you're submitting is based around a SaaS, it's unlikely to get reviewed and will be closed. 
+
+This awesome list is not a jumping off point for your new venture — it's intended to be mostly for skills that improve the DX or UX of Claude / Claude Code without requiring requests going through your server.
+
+### Article/Resource Submissions
+
+When submitting articles or resources:
+
+* Ensure the content is substantial and informative
+* Include the title and a direct link
+* Add a brief description
+* Verify all links work correctly
+
+## Categories
+
+Place your contribution in the most appropriate category:
+
+* **Official Resources** - Only official Anthropic content
+* **Documentation** - Technical documentation and reference material
+* **Official Skills** - Skills from anthropics/skills repository
+* **Community Skills** - Skills created by the community
+* **Tools & Utilities** - Development tools and utilities
+* **Tutorials & Guides** - How-to guides and tutorials
+* **Articles & Blog Posts** - Published articles and blog posts
+
+If you're unsure which category fits best, place it where you think it belongs and mention it in your PR description.
+
+## Pull Request Process
+
+1. **Search existing PRs** - Check if someone else has already submitted something similar
+2. **One item per PR** - Submit one skill/resource per pull request (unless they're closely related)
+3. **Clear title** - Use a descriptive PR title like "Add PDF analysis skill" or "Add tutorial on creating custom skills"
+4. **Description** - Explain what you're adding and why it's valuable
+5. **Test links** - Ensure all links work before submitting
+6. **Follow the format** - Match the existing style and structure
+
+### PR Title Examples
+
+* ✅ `Add custom SQL query skill`
+* ✅ `Add tutorial: Building your first Claude Skill`
+* ✅ `Fix broken link in Documentation section`
+* ❌ `Update README` (too vague)
+* ❌ `Add stuff` (not descriptive)
+
+## Code of Conduct
+
+By contributing, you agree to:
+
+* Be respectful and inclusive
+* Provide constructive feedback
+* Focus on what is best for the community
+* Show empathy towards other community members
 
 ## Questions?
 
-- **General:** Open a [discussion](https://github.com/alirezarezvani/claude-skills/discussions)
-- **Bugs:** Use the [issue tracker](https://github.com/alirezarezvani/claude-skills/issues)
-- **Contact:** [alirezarezvani.com](https://alirezarezvani.com)
+If you have questions about contributing:
 
----
-
-**Full technical conventions:** [CONVENTIONS.md](CONVENTIONS.md)
+* Open an issue with your question
+* Check existing issues to see if it's already been answered
+* Review the [Awesome list guidelines](https://github.com/sindresorhus/awesome/blob/main/contributing.md)

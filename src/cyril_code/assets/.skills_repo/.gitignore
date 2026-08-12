@@ -1,2 +1,4 @@
-*.DS_Store
+
+# Obviously~
 .claude/
+CLAUDE.md

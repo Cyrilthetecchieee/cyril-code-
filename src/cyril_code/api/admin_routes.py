@@ -22,6 +22,7 @@ from cyril_code.config.provider_catalog import (
     PROVIDER_CATALOG,
     ProviderAuthKind,
 )
+from cyril_code.core.skills import install_skill, list_available_skills
 
 from .dependencies import get_services
 from .ports import ApiServices
@@ -317,3 +318,26 @@ def _require_connected_account_provider(provider_id: str) -> None:
 
 def _no_store(payload: Any) -> JSONResponse:
     return JSONResponse(payload, headers={"Cache-Control": "no-store"})
+
+
+class SkillInstallPayload(BaseModel):
+    skill_id: str
+
+
+@router.get("/admin/api/skills")
+async def get_skills(request: Request):
+    require_loopback_admin(request)
+    return {"skills": list_available_skills()}
+
+
+@router.post("/admin/api/skills/install")
+async def install_skill_route(
+    payload: SkillInstallPayload,
+    request: Request,
+):
+    require_loopback_admin(request)
+    try:
+        install_skill(payload.skill_id)
+        return {"success": True}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

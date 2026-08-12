@@ -123,7 +123,8 @@ def _terminal_trace(trace_mock: MagicMock) -> dict[str, Any]:
         next(
             call.kwargs
             for call in trace_mock.call_args_list
-            if call.kwargs.get("event") == "cyril_code.api.response.terminal_execution_error"
+            if call.kwargs.get("event")
+            == "cyril_code.api.response.terminal_execution_error"
         )
     )
 

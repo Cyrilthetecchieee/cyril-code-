@@ -1107,7 +1107,9 @@ def test_install_ps1_gui_icon_export_completes_before_returning(
     assert completed.returncode == 0, completed.stderr
     assert (
         destination.read_bytes()
-        == (_repo_root() / "src" / "cyril_code" / "assets" / "app-icon.ico").read_bytes()
+        == (
+            _repo_root() / "src" / "cyril_code" / "assets" / "app-icon.ico"
+        ).read_bytes()
     )
 
 
@@ -1521,7 +1523,12 @@ def test_install_ps1_fresh_install_is_verified(
     #     == f"{icon},0"
     # )
     assert (
-        app_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Cyril Code.lnk"
+        app_data
+        / "Microsoft"
+        / "Windows"
+        / "Start Menu"
+        / "Programs"
+        / "Cyril Code.lnk"
     ).is_file()
 
 

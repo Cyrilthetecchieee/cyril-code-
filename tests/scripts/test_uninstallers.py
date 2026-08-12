@@ -508,7 +508,12 @@ else {
 
     desktop_shortcut = home / "Desktop" / "Cyril Code.lnk"
     start_shortcut = (
-        app_data / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Cyril Code.lnk"
+        app_data
+        / "Microsoft"
+        / "Windows"
+        / "Start Menu"
+        / "Programs"
+        / "Cyril Code.lnk"
     )
     for shortcut in (desktop_shortcut, start_shortcut):
         _create_windows_shortcut(
@@ -569,7 +574,9 @@ def test_uninstall_ps1_preserves_unowned_desktop_shortcut(
     powershell_uninstall_harness: PowerShellUninstallHarness,
 ) -> None:
     desktop_shortcut = (
-        Path(powershell_uninstall_harness.env["USERPROFILE"]) / "Desktop" / "Cyril Code.lnk"
+        Path(powershell_uninstall_harness.env["USERPROFILE"])
+        / "Desktop"
+        / "Cyril Code.lnk"
     )
     unrelated_target = powershell_uninstall_harness.home / "unrelated.cmd"
     unrelated_target.write_text("@echo off\n", encoding="utf-8")

@@ -7,7 +7,9 @@ import pytest
 async def test_register_real_session_id_moves_pending_to_active_and_maps():
     from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
-    with patch("cyril_code.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
+    with patch(
+        "cyril_code.cli.managed.manager.ManagedClaudeSession"
+    ) as mock_session_cls:
         mock_session = MagicMock()
         mock_session.is_busy = False
         mock_session.stop = AsyncMock(return_value=True)
@@ -49,7 +51,9 @@ async def test_register_real_session_id_missing_temp_id_returns_false():
 async def test_remove_session_pending_stops_and_returns_true():
     from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
-    with patch("cyril_code.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
+    with patch(
+        "cyril_code.cli.managed.manager.ManagedClaudeSession"
+    ) as mock_session_cls:
         mock_session = MagicMock()
         mock_session.is_busy = False
         mock_session.stop = AsyncMock(return_value=True)
@@ -69,7 +73,9 @@ async def test_remove_session_pending_stops_and_returns_true():
 async def test_remove_session_active_removes_temp_mapping():
     from cyril_code.cli.managed.manager import ManagedClaudeSessionManager
 
-    with patch("cyril_code.cli.managed.manager.ManagedClaudeSession") as mock_session_cls:
+    with patch(
+        "cyril_code.cli.managed.manager.ManagedClaudeSession"
+    ) as mock_session_cls:
         mock_session = MagicMock()
         mock_session.is_busy = False
         mock_session.stop = AsyncMock(return_value=True)

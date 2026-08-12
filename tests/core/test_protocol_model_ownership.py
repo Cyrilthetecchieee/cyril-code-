@@ -40,7 +40,9 @@ def test_responses_request_model_is_core_owned_and_permissive() -> None:
         }
     )
 
-    assert OpenAIResponsesRequest.__module__ == "cyril_code.core.openai_responses.models"
+    assert (
+        OpenAIResponsesRequest.__module__ == "cyril_code.core.openai_responses.models"
+    )
     assert PublicOpenAIResponsesRequest is OpenAIResponsesRequest
     assert request.model_extra == {"provider_extension": {"enabled": True}}
 

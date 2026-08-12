@@ -54,7 +54,9 @@ def _cloud_provider() -> OpenAIChatProvider:
     ],
 )
 def test_init_normalizes_openai_base_url(configured: str, expected: str) -> None:
-    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
+    with patch(
+        "cyril_code.providers.openai_chat.provider.AsyncOpenAI"
+    ) as openai_client:
         provider = _provider(configured)
 
     assert provider._provider_name == "OLLAMA"
@@ -64,7 +66,9 @@ def test_init_normalizes_openai_base_url(configured: str, expected: str) -> None
 
 
 def test_cloud_init_uses_fixed_openai_endpoint_and_api_key() -> None:
-    with patch("cyril_code.providers.openai_chat.provider.AsyncOpenAI") as openai_client:
+    with patch(
+        "cyril_code.providers.openai_chat.provider.AsyncOpenAI"
+    ) as openai_client:
         provider = _cloud_provider()
 
     assert provider._provider_name == "OLLAMA_CLOUD"

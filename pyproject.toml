@@ -81,6 +81,7 @@ dev = [
 [tool.ruff]
 target-version = "py314"
 line-length = 88
+exclude = ["src/cyril_code/assets/.skills_repo"]
 
 [tool.ruff.lint]
 select = [
@@ -140,4 +141,10 @@ allowed-unresolved-imports = [
     "riva.client",
     "pystray",
     "PIL",
+]
+
+[tool.pyright]
+exclude = [
+    "**/assets",
+    "**/.skills_repo"
 ]

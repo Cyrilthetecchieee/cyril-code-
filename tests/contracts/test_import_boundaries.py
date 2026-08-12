@@ -490,7 +490,8 @@ def test_core_does_not_import_provider_transport_sdks() -> None:
         record.describe()
         for record in _scan_imports(_PACKAGE_ROOT)
         if (
-            record.importer == "cyril_code.core" or record.importer.startswith("cyril_code.core.")
+            record.importer == "cyril_code.core"
+            or record.importer.startswith("cyril_code.core.")
         )
         and record.imported.split(".", 1)[0] in forbidden_roots
     ]

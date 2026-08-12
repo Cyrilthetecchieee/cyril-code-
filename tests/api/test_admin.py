@@ -150,13 +150,17 @@ def test_admin_cache_policy_does_not_match_similar_public_paths(monkeypatch, tmp
 
 
 def test_admin_api_fetches_bypass_browser_cache():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert 'cache: "no-store"' in script
 
 
 def test_admin_connected_account_login_preopens_sign_in_window():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert 'window.open("about:blank", "_blank")' in script
     assert "popup.location.replace(target)" in script
@@ -261,7 +265,9 @@ def test_admin_rejects_auth_routes_for_non_connected_provider(monkeypatch, tmp_p
 
 
 def test_admin_provider_cards_support_non_key_configuration():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert '"missing_config"' in script
     assert ": provider.configuration;" in script
@@ -291,7 +297,9 @@ def test_admin_page_no_longer_renders_global_status_header(monkeypatch, tmp_path
 
 
 def test_admin_static_no_longer_fetches_global_status_header():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert 'api("/admin/api/status")' not in script
     assert "updateHeader" not in script
@@ -301,7 +309,9 @@ def test_admin_static_no_longer_fetches_global_status_header():
 
 
 def test_admin_static_hides_managed_source_label():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert 'managed_env: "",' in script
     assert "hasOwnProperty.call(labels, source)" in script
@@ -310,15 +320,21 @@ def test_admin_static_hides_managed_source_label():
 
 
 def test_admin_static_places_reasoning_fields_in_model_config():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert 'sections: ["models", "reasoning", "web_tools"]' in script
     assert 'sections: ["models", "thinking", "web_tools"]' not in script
 
 
 def test_admin_static_model_combobox_owns_dropdown_and_search_behavior():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
-    styles = Path("src/cyril_code/api/admin_static/admin.css").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
+    styles = Path("src/cyril_code/api/admin_static/admin.css").read_text(
+        encoding="utf-8"
+    )
 
     assert 'api("/admin/api/models" + (refresh ? "/refresh" : "")' in script
     assert 'field.type === "model" || field.type === "optional_model"' in script
@@ -339,7 +355,9 @@ def test_admin_static_model_combobox_owns_dropdown_and_search_behavior():
 
 
 def test_admin_static_model_combobox_preserves_custom_slugs_and_none_semantics():
-    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(encoding="utf-8")
+    script = Path("src/cyril_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
 
     assert '? ["None", ...state.modelOptions]' in script
     assert "You can still enter a custom slug." in script

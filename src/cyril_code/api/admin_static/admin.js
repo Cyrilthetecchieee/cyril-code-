@@ -31,6 +31,13 @@ const VIEW_GROUPS = [
     sections: ["messaging", "voice"],
     containerId: "messagingSections",
   },
+  {
+    id: "skills",
+    label: "Skills Hub",
+    title: "Skills Hub",
+    sections: [],
+    containerId: "skillsGrid",
+  },
 ];
 
 const byId = (id) => document.getElementById(id);
@@ -98,6 +105,7 @@ async function load() {
   await hydrateModelOptions();
   await validate(false);
   await refreshLocalStatus();
+  await loadSkills();
   updateDirtyState();
   showMessage("");
 }
@@ -950,6 +958,66 @@ function setModelOptions(models) {
   ).sort((left, right) => left.localeCompare(right));
   state.modelComboboxes.forEach((combobox) => {
     if (combobox.isOpen) combobox.render(combobox.query);
+  });
+}
+
+async function loadSkills() {
+  try {
+    const data = await api("/admin/api/skills");
+    renderSkills(data.skills);
+  } catch (error) {
+    console.error("Failed to load skills", error);
+  }
+}
+
+function renderSkills(skills) {
+  const grid = byId("skillsGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  skills.forEach((skill) => {
+    const card = document.createElement("article");
+    card.className = "provider-card";
+
+    const title = document.createElement("div");
+    title.className = "provider-title";
+    title.innerHTML = `<strong>${skill.name}</strong>`;
+
+    const pill = document.createElement("span");
+    pill.className = `status-pill ${skill.installed ? "ok" : "neutral"}`;
+    pill.textContent = skill.installed ? "Installed" : "Available";
+    title.appendChild(pill);
+
+    const meta = document.createElement("div");
+    meta.className = "provider-meta";
+    meta.textContent = skill.description;
+
+    const action = document.createElement("div");
+    action.className = "provider-actions";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = skill.installed ? "secondary-button" : "primary-button";
+    button.textContent = skill.installed ? "Reinstall" : "Install";
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      button.textContent = "Installing...";
+      try {
+        await api("/admin/api/skills/install", {
+          method: "POST",
+          body: JSON.stringify({ skill_id: skill.id })
+        });
+        showMessage(`Skill ${skill.name} installed successfully!`, "ok");
+        await loadSkills();
+      } catch (error) {
+        showMessage(`Error: ${error.message}`, "error");
+        button.disabled = false;
+        button.textContent = "Install";
+      }
+    });
+
+    action.appendChild(button);
+    card.append(title, meta, action);
+    grid.appendChild(card);
   });
 }
 

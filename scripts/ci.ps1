@@ -134,7 +134,8 @@ function Invoke-SuppressionsCheck {
             Where-Object {
                 $full = $_.FullName
                 $full -notmatch '[\\/]\.venv[\\/]' -and
-                    $full -notmatch '[\\/]\.git[\\/]'
+                    $full -notmatch '[\\/]\.git[\\/]' -and
+                    $full -notmatch '[\\/]assets[\\/]'
             } |
             Select-String -Pattern $pattern
 

@@ -1,179 +1,377 @@
-# Contributing to Awesome Claude Skills
+# Contributing to Fullstack Dev Skills Plugin
 
-Thank you for your interest in contributing to Awesome Claude Skills! This document provides guidelines for contributing to this list.
-
-> [!NOTE]
-> Given the growth in assisted skill development, a new requirement of "social proof" has been added to skill submissions.
+Guidelines for contributing to this project.
 
 ## How to Contribute
 
-1. **Fork the repository** - Click the "Fork" button in the top right corner
-2. **Create a branch** - Create a new branch for your contribution
-3. **Make your changes** - Add your skill, resource, or improvement
-4. **Submit a pull request** - Open a PR with a clear description of your changes
+### Reporting Issues
+- Use GitHub Issues to report bugs or suggest features
+- Check existing issues before creating a new one
+- Provide detailed information:
+  - Steps to reproduce (for bugs)
+  - Expected vs actual behavior
+  - Claude Code version
+  - Relevant error messages or logs
 
-## What to Contribute
+### Suggesting New Skills
+When suggesting a new skill:
+1. Explain the use case and target audience
+2. Describe what the skill should do
+3. List relevant technologies/frameworks
+4. Provide examples of when it would be triggered
 
-We welcome contributions in the following categories:
+### Adding Supported Agents
+To add a new agent that implements the Agent Skills specification, see the [Supported Agents guide](docs/SUPPORTED_AGENTS.md#submit-a-new-agent) for submission instructions and PR template.
 
-### Skills
+### Submitting Changes
 
-- Official skills from Anthropic
-- Community-created skills
-- Your own custom skills
+#### 1. Fork and Clone
+```bash
+# Fork on GitHub, then:
+git clone https://github.com/jeffallan/claude-skills.git
+cd claude-skills
+```
 
-### Resources
+#### 2. Create a Branch
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/your-bug-fix
+```
 
-- Documentation
-- Tutorials and guides
-- Blog posts and articles
-- Videos and presentations
-- Tools and utilities
+#### 3. Make Your Changes
 
-### Improvements
+**For New Skills:**
+```bash
+# Create skill directory
+mkdir -p skills/my-new-skill
 
-- Fixing typos or broken links
-- Improving descriptions
-- Reorganizing content for better clarity
-- Adding missing information
+# Create SKILL.md following the structure below
+```
 
-## Guidelines
+#### 4. Test Your Changes
+```bash
+# Copy skills to test location
+cp -r skills/* ~/.claude/skills/
 
-### Quality Standards
+# Restart Claude Code and test
+# Verify your skill activates correctly
+# Test all examples in the SKILL.md
+```
 
-All contributions should:
+#### 4.5. Validate Your Skill
 
-- Be related to Claude Skills
-- Provide clear value to users
-- **Be non-promotional (see below)**
-- Include accurate, up-to-date information
-- Use proper formatting and grammar
+Run the validation script to catch issues before CI:
 
-### No Promotions or Commercial Segues
+```bash
+python scripts/validate-skills.py --skill your-skill-name
+```
 
-This list is a community resource, not a marketing channel. We strictly filter out submissions that serve primarily as a funnel for commercial products.
+#### 5. Commit Your Changes
+```bash
+git add .
+git commit -m "Add: My New Skill for XYZ framework"
+```
 
-- **No "SaaS Wrappers":** Skills that exist solely to call a specific commercial API or require a paid subscription to a specific SaaS platform (especially one owned by the submitter) to function are generally not accepted.
-- **Standalone Value:** Submissions must provide value on their own. If the content is clearly just a segue to a paid product, it will be rejected.
-- **Genuine Resources:** Tutorials and articles must focus on education, not conversion. "Teaser" content designed to upsell a course or tool will not be merged.
+**Commit Message Format:**
+- `Add:` for new features/skills
+- `Fix:` for bug fixes
+- `Update:` for improvements to existing content
+- `Docs:` for documentation changes
+- `Refactor:` for code restructuring
 
-### Formatting
+#### 6. Push and Create Pull Request
+```bash
+git push origin feature/your-feature-name
+```
 
-When adding a new item:
+Then create a Pull Request on GitHub with:
+- Clear title describing the change
+- Description of what changed and why
+- Any relevant issue numbers (e.g., "Fixes #123")
+
+## Linting & Formatting
+
+This is a polyglot repo. All formatting is enforced via pre-commit hooks and CI.
+
+### Setup
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Hooks run automatically on `git commit`. To run manually:
+
+```bash
+pre-commit run --all-files
+
+# Or use Make targets:
+make lint      # Check all formatting (Python, JS/TS, Markdown, Astro)
+make format    # Auto-fix all formatting
+make validate  # Run skill validation, markdown checks, and docs sync
+```
+
+### Conventions
+
+| Language | Linter | Formatter | Config | Scope |
+|----------|--------|-----------|--------|-------|
+| Python | ruff | ruff-format | `ruff.toml` | `scripts/*.py` |
+| Python | pyright | — | `pyrightconfig.json` | `scripts/*.py` |
+| JS/TS/CSS | — | prettier | `.prettierrc` | `site/`, `assets/` |
+| Markdown | — | prettier | `.prettierrc` | `skills/`, `docs/`, `*.md` (excludes `commands/`) |
+| Astro | — | prettier + prettier-plugin-astro | — | `site/src/**/*.astro` |
+
+### Key settings
+
+- **Line length:** 120 (Python and Prettier)
+- **Python target:** 3.11+
+- **Quote style:** double (Python), single (JS/TS)
+- **Markdown in `commands/`** is excluded from formatting — these are prompt templates where whitespace may be intentional
+
+### CI
+
+The `validate.yml` workflow runs pre-commit and Prettier checks on all PRs. Your PR will fail if formatting doesn't pass.
+
+## Skill Writing Guidelines
+
+### Frontmatter Schema
+
+```yaml
+---
+name: my-skill-name
+description: Use when [triggering conditions]. Invoke for [specific keywords].
+license: MIT
+metadata:
+  author: https://github.com/YourGitHub
+  version: "1.0.0"
+  triggers: keyword1, keyword2, phrase1
+  role: specialist
+  scope: implementation
+  output-format: code
+  domain: frontend
+  related-skills: react-expert, typescript-pro, nextjs-developer
+---
+```
+
+**Description Formula:**
+```
+Use when [triggering conditions]. Invoke for [specific keywords].
+```
+
+**Example:**
+```yaml
+description: Use when building React 18+ applications requiring component architecture, hooks patterns, or state management. Invoke for Server Components, performance optimization, Suspense boundaries, React 19 features.
+```
+
+### Required Sections (In Order)
 
 ```markdown
-- **[Name](link)** - Clear, concise description of what it does
+# [Skill Name]
+
+[One-sentence role definition]
+
+## Role Definition
+
+[2-3 sentences defining expert persona with years of experience and specializations]
+
+## When to Use This Skill
+
+- [Bullet list of specific scenarios]
+- [When this skill should be triggered]
+
+## Core Workflow
+
+1. **Step** - Brief description
+2. **Step** - Brief description
+3. **Step** - Brief description
+
+## Technical Guidelines
+
+[Framework-specific patterns, code examples, tables]
+
+### Subsection Title
+
+| Column | Column |
+|--------|--------|
+| Data   | Data   |
+
+```language
+// Code examples with comments
+```
+
+## Constraints
+
+### MUST DO
+- [Required practices - strong directive language]
+- [Use imperative form]
+
+### MUST NOT DO
+- [Things to avoid - strong directive language]
+- [Use imperative form]
+
+## Output Templates
+
+When implementing [X], provide:
+1. [Expected output format]
+2. [Additional deliverables]
+
+## Knowledge Reference
+
+[Comma-separated keywords only - no sentences]
 
 ```
 
-Examples:
+### Progressive Disclosure Pattern
 
-```markdown
-- **[pdf-analyzer](https://github.com/username/pdf-analyzer)** - Advanced PDF analysis skill with OCR support
-- **[Claude Skills Tutorial](https://example.com/tutorial)** - Step-by-step guide to creating your first skill
+For skills with extensive reference material, use the progressive disclosure pattern to reduce initial token load:
 
+**Structure:**
+```text
+skills/my-skill/
+├── SKILL.md           # Lean main file (~80-100 lines)
+└── references/        # Domain-specific reference files
+    ├── topic-a.md     # Loaded when topic A is relevant
+    ├── topic-b.md     # Loaded when topic B is relevant
+    └── topic-c.md     # Loaded when topic C is relevant
 ```
 
-#### Adding an individual skill
+**Main SKILL.md includes a routing table:**
+```markdown
+## Reference Guide
 
-Add a row to the individual skills table using the same pattern as the other rows.
+Load detailed guidance based on context:
 
-### Skill Submissions
+| Topic | Reference | Load When |
+|-------|-----------|-----------|
+| State Management | `references/state-management.md` | Using Redux, Zustand, Context |
+| Server Components | `references/server-components.md` | Next.js App Router, RSC |
+| Testing | `references/testing.md` | Writing tests, jest, RTL |
+```
 
-When submitting a skill, please include:
+**Reference File Format:**
+```markdown
+# Topic Title
 
-* Clear name and link to the skill repository
-* Brief description (1-2 sentences) of what it does
-* Any prerequisites or dependencies
-* License information (if applicable)
+> Reference for: Skill Name
+> Load when: Specific trigger conditions
 
-The skill should:
+## Section
 
-* Have a clear purpose and use case
-* Include documentation (README or SKILL.md)
-* Follow Claude Skills best practices
-* Be functional and tested
+[Detailed content, code examples, tables...]
 
-Above all else, the skill should be a value-add. Trivial functionalities that were whipped up with a session or two with Claude Code are not likely to be worthwhile skills for community members to make use of almost by definition (i.e. if the skill could be created that quickly, it would probably be something an individual would implement by themselves to match their own particular use case).
+## Quick Reference
 
-While not an absolute requirement, a strong general guideline would be that more exists to the skill than a single `SKILL.md` file. 
+| Item | Description |
+|------|-------------|
+| Key  | Value       |
+```
 
-#### Social Proof
+**When to Use Progressive Disclosure:**
+- Skill has 5+ distinct topic areas
+- Original content exceeds 100 lines
+- Topics are contextually independent
+- Code examples are extensive
 
-Skills must have gathered enough attention from the community so-as to have acquired a number of GitHub stars to be considered in most cases. 
+**Benefits:**
+- 40-50% reduction in initial token load
+- Contextual loading of relevant information
+- Easier maintenance of domain-specific content
 
-*This is due to the increase in PR submissions of either newly completed and untested skills or narrow-focused and not generalizable skills that simply do not make sense in a GitHub Awesome list meant to appeal to a wide audience.*
+### Token Efficiency Guidelines
 
-> [!NOTE]
-> Due to the volume of PR submissions that do not conform to these contribution guidelines, if your skill hasn't acquired a basic 10 stars, it will be closed automatically.
+1. **Use Tables** - Convert lists to tables where comparing options
+2. **One Example Per Pattern** - One comprehensive example instead of many small ones
+3. **Keywords Only** - Knowledge Reference should be comma-separated terms, not sentences
+4. **Remove Redundancy** - Don't repeat information across sections
+5. **Avoid Obvious Comments** - Code should be self-explanatory where possible
+6. **Link Don't Reproduce** - Reference external docs instead of copying content
+7. **Use Progressive Disclosure** - Split large skills into main file + references/
 
-#### AI Automated Submissions
+### Code Examples Best Practices
 
-Due to the influx of PRs, there is a requirement now that the PR not be explicitly generated / submitted with AI-assistance. 
+```typescript
+// ❌ Bad: Unclear or anti-pattern
+function badExample() {
+  // Why this is bad
+}
 
-It's too untenable to try and review the entire codebase of an LLM-generated project that was also submitted with the help of generative AI. This requirement is intended to serve as a quick filter (which is honestly surprising, given that AI coding assistants are easily capable of ingesting the language of a `CONTRIBUTING.md` file of a repository).
+// ✅ Good: Clear, follows best practices
+function goodExample() {
+  // Why this is good
+}
+```
 
-PRs will be closed without comment if the submitter has failed to acknowledge this or adhere by its basic tenets in order to weed out the low-effort submissions. 
+**Guidelines:**
+- Include both bad and good examples for common mistakes
+- Use language tags on all code blocks
+- Keep examples practical and real-world
+- Remove unnecessary comments that state the obvious
 
-#### SaaS Submissions
+### Framework Version Requirements
 
-If the skill you're submitting is based around a SaaS, it's unlikely to get reviewed and will be closed. 
+Keep examples current with latest stable versions:
+- **React**: 19+ (Server Components, use() hook, form actions)
+- **Python**: 3.11+ (X | None syntax, match/case)
+- **FastAPI/Pydantic**: V2 (field_validator, Annotated pattern)
+- **Django**: 5.0+ (async views, async ORM)
+- **TypeScript**: 5.x (satisfies operator, const type parameters)
+- **Node.js**: 20+ LTS
 
-This awesome list is not a jumping off point for your new venture — it's intended to be mostly for skills that improve the DX or UX of Claude / Claude Code without requiring requests going through your server.
+### Testing Your Skill
 
-### Article/Resource Submissions
-
-When submitting articles or resources:
-
-* Ensure the content is substantial and informative
-* Include the title and a direct link
-* Add a brief description
-* Verify all links work correctly
-
-## Categories
-
-Place your contribution in the most appropriate category:
-
-* **Official Resources** - Only official Anthropic content
-* **Documentation** - Technical documentation and reference material
-* **Official Skills** - Skills from anthropics/skills repository
-* **Community Skills** - Skills created by the community
-* **Tools & Utilities** - Development tools and utilities
-* **Tutorials & Guides** - How-to guides and tutorials
-* **Articles & Blog Posts** - Published articles and blog posts
-
-If you're unsure which category fits best, place it where you think it belongs and mention it in your PR description.
-
-## Pull Request Process
-
-1. **Search existing PRs** - Check if someone else has already submitted something similar
-2. **One item per PR** - Submit one skill/resource per pull request (unless they're closely related)
-3. **Clear title** - Use a descriptive PR title like "Add PDF analysis skill" or "Add tutorial on creating custom skills"
-4. **Description** - Explain what you're adding and why it's valuable
-5. **Test links** - Ensure all links work before submitting
-6. **Follow the format** - Match the existing style and structure
-
-### PR Title Examples
-
-* ✅ `Add custom SQL query skill`
-* ✅ `Add tutorial: Building your first Claude Skill`
-* ✅ `Fix broken link in Documentation section`
-* ❌ `Update README` (too vague)
-* ❌ `Add stuff` (not descriptive)
+Before submitting:
+1. **Trigger Test**: Does it activate with appropriate prompts?
+2. **Code Test**: Do all code examples compile/run?
+3. **Completeness**: Does it cover main use cases?
+4. **Accuracy**: Is information correct and up-to-date?
+5. **Token Efficiency**: Is content concise without redundancy?
+6. **Integration**: Does it reference related skills?
 
 ## Code of Conduct
 
-By contributing, you agree to:
+This project follows the [Contributor Covenant v2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
 
-* Be respectful and inclusive
-* Provide constructive feedback
-* Focus on what is best for the community
-* Show empathy towards other community members
+### Our Pledge
 
-## Questions?
+We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
 
-If you have questions about contributing:
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
-* Open an issue with your question
-* Check existing issues to see if it's already been answered
-* Review the [Awesome list guidelines](https://github.com/sindresorhus/awesome/blob/main/contributing.md)
+### Our Standards
+
+Examples of behavior that contributes to a positive environment:
+
+- Demonstrating empathy and kindness toward other people
+- Being respectful of differing opinions, viewpoints, and experiences
+- Giving and gracefully accepting constructive feedback
+- Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
+- Focusing on what is best not just for us as individuals, but for the overall community
+
+Examples of unacceptable behavior:
+
+- The use of sexualized language or imagery, and sexual attention or advances of any kind
+- Trolling, insulting or derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information, such as a physical or email address, without their explicit permission
+- Other conduct which could reasonably be considered inappropriate in a professional setting
+
+### Enforcement
+
+Project maintainers are responsible for clarifying and enforcing standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting the maintainers directly. All complaints will be reviewed and investigated promptly and fairly.
+
+## Questions
+
+- Open a [GitHub Discussion](https://github.com/jeffallan/claude-skills/discussions)
+- Comment on relevant issues
+- Reach out to maintainers
+
+## Recognition
+
+Contributors will be recognized in:
+- [GitHub contributors page](https://github.com/Jeffallan/claude-skills/graphs/contributors)
+- Release notes for significant contributions
+
+

@@ -171,7 +171,7 @@ def _message_payload(*, stream: bool) -> dict[str, Any]:
 
 
 def _write_initial_managed_config(home: Path, upstream: FakeOpenAIUpstream) -> None:
-    config_path = home / ".fcc" / ".env"
+    config_path = home / ".cyril" / ".env"
     config_path.parent.mkdir(parents=True, exist_ok=True)
     template = "\n".join(
         line
@@ -267,7 +267,7 @@ def test_provider_hot_swap_preserves_inflight_stream_e2e(
             )
         )
 
-        managed_config = (home / ".fcc" / ".env").read_text(encoding="utf-8")
+        managed_config = (home / ".cyril" / ".env").read_text(encoding="utf-8")
         assert "REASONING_POLICY=off" in managed_config
         assert "ENABLE_MODEL_THINKING" not in managed_config
 

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-CYRIL_CONFIG_DIRNAME = ".fcc"
+CYRIL_CONFIG_DIRNAME = ".cyril"
 CYRIL_ENV_FILENAME = ".env"
 LEGACY_REPO_DIRNAME = "cyril_code"
 LEGACY_XDG_CONFIG_DIRNAME = ".config"
@@ -28,7 +28,7 @@ def managed_env_path() -> Path:
 
 
 def legacy_env_paths() -> tuple[Path, ...]:
-    """Return legacy user env paths that can be migrated to ~/.fcc/.env."""
+    """Return legacy user env paths that can be migrated to ~/.cyril/.env."""
 
     home = Path.home()
     return (

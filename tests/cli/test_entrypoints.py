@@ -56,7 +56,7 @@ def test_legacy_env_migration_supports_xdg_path(tmp_path: Path) -> None:
     with patch("pathlib.Path.home", return_value=tmp_path):
         migrated_from = _migrate_legacy_env_if_missing()
 
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cyril" / ".env"
     assert migrated_from == legacy_env
     assert env_file.read_text("utf-8") == "MODEL=open_router/free-model\n"
 
@@ -64,10 +64,10 @@ def test_legacy_env_migration_supports_xdg_path(tmp_path: Path) -> None:
 def test_legacy_env_migration_does_not_overwrite_managed_env(
     tmp_path: Path,
 ) -> None:
-    """Legacy migration never overwrites an existing ~/.fcc/.env."""
+    """Legacy migration never overwrites an existing ~/.cyril/.env."""
     from cyril_code.cli.commands import _migrate_legacy_env_if_missing
 
-    managed_env = tmp_path / ".fcc" / ".env"
+    managed_env = tmp_path / ".cyril" / ".env"
     managed_env.parent.mkdir(parents=True)
     managed_env.write_text("MODEL=nvidia_nim/current\n", encoding="utf-8")
     legacy_env = tmp_path / "cyril_code" / ".env"
@@ -311,7 +311,7 @@ def test_serve_migrates_legacy_env_before_loading_settings(tmp_path: Path) -> No
     ):
         commands.serve()
 
-    assert (tmp_path / ".fcc" / ".env").read_text("utf-8") == (
+    assert (tmp_path / ".cyril" / ".env").read_text("utf-8") == (
         "MODEL=deepseek/deepseek-chat\n"
     )
     get_settings.assert_called_once_with()
@@ -585,12 +585,12 @@ def test_launch_codex_passes_responses_config_and_child_env(
     assert exc_info.value.code == 0
     command = popen.call_args.args[0]
     assert command[0] == "resolved-codex.cmd"
-    assert 'model_provider="fcc"' in command
-    assert 'model_providers.fcc.base_url="http://127.0.0.1:9191/v1"' in command
-    assert 'model_providers.fcc.auth.command="cyril-codex"' in command
-    assert 'model_providers.fcc.auth.args=["--print-proxy-auth-token"]' in command
-    assert 'model_providers.fcc.wire_api="responses"' in command
-    assert not any("model_providers.fcc.env_key" in arg for arg in command)
+    assert 'model_provider="cyril"' in command
+    assert 'model_providers.cyril.base_url="http://127.0.0.1:9191/v1"' in command
+    assert 'model_providers.cyril.auth.command="cyril-codex"' in command
+    assert 'model_providers.cyril.auth.args=["--print-proxy-auth-token"]' in command
+    assert 'model_providers.cyril.wire_api="responses"' in command
+    assert not any("model_providers.cyril.env_key" in arg for arg in command)
     assert f"model_catalog_json={json.dumps(str(catalog_path))}" in command
     assert command[-2:] == ["exec", "hello"]
     assert len(requests) == 1

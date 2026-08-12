@@ -9,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $PackageName = "cyril_code"
-$FccHomeDirname = ".fcc"
+$FccHomeDirname = ".cyril"
 $FccCommands = @(
     # Include retired entry points so older installations are fully stopped and removed.
     "cyril-desktop",
@@ -27,7 +27,7 @@ function Show-Usage {
     @"
 Usage: uninstall.ps1 [options]
 
-Removes the Cyril Code uv tool and deletes ~/.fcc/ after removal is verified.
+Removes the Cyril Code uv tool and deletes ~/.cyril/ after removal is verified.
 Does not remove uv, Cyril Code, Codex, Pi, the uv-managed Python runtime, or shared PATH entries.
 
 Options:
@@ -144,7 +144,7 @@ function Initialize-UvContext {
 
     $uvCommand = Get-ApplicationCommand "uv"
     if (-not $uvCommand) {
-        throw "uv is required to remove the Cyril Code tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
+        throw "uv is required to remove the Cyril Code tool. Install uv, then rerun this uninstaller; ~/.cyril was not deleted."
     }
     $script:UvPath = $uvCommand.Source
 
@@ -155,11 +155,11 @@ function Initialize-UvContext {
         if (-not [string]::IsNullOrWhiteSpace($result.Output)) {
             [Console]::Error.WriteLine($result.Output)
         }
-        throw "Could not determine the uv tool bin directory (exit code $($result.ExitCode)); ~/.fcc was not deleted."
+        throw "Could not determine the uv tool bin directory (exit code $($result.ExitCode)); ~/.cyril was not deleted."
     }
     $script:UvToolBin = $result.Output.Trim()
     if ([string]::IsNullOrWhiteSpace($script:UvToolBin)) {
-        throw "uv returned an empty tool bin directory; ~/.fcc was not deleted."
+        throw "uv returned an empty tool bin directory; ~/.cyril was not deleted."
     }
 }
 
@@ -187,7 +187,7 @@ function Uninstall-FreeClaudeCode {
     if (-not [string]::IsNullOrWhiteSpace($result.Output)) {
         [Console]::Error.WriteLine($result.Output)
     }
-    throw "uv tool uninstall $PackageName failed with exit code $($result.ExitCode); ~/.fcc was not deleted."
+    throw "uv tool uninstall $PackageName failed with exit code $($result.ExitCode); ~/.cyril was not deleted."
 }
 
 function Confirm-FccCommandsRemoved {
@@ -207,7 +207,7 @@ function Confirm-FccCommandsRemoved {
         }
     }
     if ($remaining.Count -gt 0) {
-        throw "Cyril Code entry points remain after uv uninstall: $($remaining -join ', '); ~/.fcc was not deleted."
+        throw "Cyril Code entry points remain after uv uninstall: $($remaining -join ', '); ~/.cyril was not deleted."
     }
 }
 
@@ -324,7 +324,7 @@ Confirm-FccCommandsRemoved
 Write-Step "Removing Cyril Code desktop shortcuts"
 Remove-FccDesktopShortcuts
 
-Write-Step "Purging CYRIL config and data from ~/.fcc"
+Write-Step "Purging CYRIL config and data from ~/.cyril"
 Purge-FccHome
 
 Write-Host ""

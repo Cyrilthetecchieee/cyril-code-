@@ -307,13 +307,13 @@ Add the matching model-catalog path and replace `YOUR_USERNAME`.
 Windows:
 
 ```toml
-model_catalog_json = "C:/Users/YOUR_USERNAME/.fcc/codex-model-catalog.json"
+model_catalog_json = "C:/Users/YOUR_USERNAME/.cyril/codex-model-catalog.json"
 ```
 
 macOS:
 
 ```toml
-model_catalog_json = "/Users/YOUR_USERNAME/.fcc/codex-model-catalog.json"
+model_catalog_json = "/Users/YOUR_USERNAME/.cyril/codex-model-catalog.json"
 ```
 
 Then add the shared CYRIL settings:
@@ -322,12 +322,12 @@ Then add the shared CYRIL settings:
 model_provider = "fcc"
 model = "nvidia_nim/nvidia/nemotron-3-super-120b-a12b"
 
-[model_providers.fcc]
+[model_providers.cyril]
 name = "Cyril Code"
 base_url = "http://127.0.0.1:8082/v1"
 wire_api = "responses"
 
-[model_providers.fcc.auth]
+[model_providers.cyril.auth]
 command = "cyril-codex"
 args = ["--print-proxy-auth-token"]
 ```
@@ -347,12 +347,12 @@ Install the [Codex extension](https://marketplace.visualstudio.com/items?itemNam
 model_provider = "fcc"
 model = "nvidia_nim/nvidia/nemotron-3-super-120b-a12b"
 
-[model_providers.fcc]
+[model_providers.cyril]
 name = "Cyril Code"
 base_url = "http://127.0.0.1:8082/v1"
 wire_api = "responses"
 
-[model_providers.fcc.auth]
+[model_providers.cyril.auth]
 command = "cyril-codex"
 args = ["--print-proxy-auth-token"]
 ```
@@ -500,7 +500,7 @@ Stop every running CYRIL command before uninstalling.
 **Removes**
 
 - Cyril Code, including its desktop launcher and commands
-- `~/.fcc/`
+- `~/.cyril/`
 
 **Keeps**
 

@@ -68,7 +68,7 @@ function modelDefinition(providerModel: string, reasoning: boolean): ProviderMod
 	};
 }
 
-export function projectFccModels(payload: unknown): ProviderModelConfig[] {
+export function projectCyrilModels(payload: unknown): ProviderModelConfig[] {
 	const ids = catalogModelIds(payload);
 	const normalModels = new Set<string>();
 	for (const id of ids) {
@@ -105,7 +105,7 @@ function requestIdSuffix(response: Response): string {
 	return requestId ? ` (request ${requestId})` : "";
 }
 
-async function fetchFccModels(baseUrl: string, apiKey: string): Promise<ProviderModelConfig[]> {
+async function fetchCyrilModels(baseUrl: string, apiKey: string): Promise<ProviderModelConfig[]> {
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), CATALOG_TIMEOUT_MS);
 	try {
@@ -136,7 +136,7 @@ async function fetchFccModels(baseUrl: string, apiKey: string): Promise<Provider
 			}
 			throw new Error(`CYRIL model catalog returned invalid JSON${requestIdSuffix(response)}.`);
 		}
-		return projectFccModels(payload);
+		return projectCyrilModels(payload);
 	} finally {
 		clearTimeout(timeout);
 	}
@@ -145,7 +145,7 @@ async function fetchFccModels(baseUrl: string, apiKey: string): Promise<Provider
 export default async function freeClaudeCode(pi: ExtensionAPI): Promise<void> {
 	const baseUrl = normalizeBaseUrl(requireEnvironment(BASE_URL_ENV));
 	const apiKey = requireEnvironment(API_KEY_ENV);
-	const models = await fetchFccModels(baseUrl, apiKey);
+	const models = await fetchCyrilModels(baseUrl, apiKey);
 
 	pi.registerProvider("cyril_code", {
 		name: "Cyril Code",

@@ -80,17 +80,17 @@ class TestSettings:
 
         settings = Settings()
 
-        assert messaging_state_dir_path() == tmp_path / ".fcc" / "agent_workspace"
+        assert messaging_state_dir_path() == tmp_path / ".cyril" / "agent_workspace"
         assert not hasattr(settings, "claude_workspace")
 
     def test_server_log_path_uses_cyril_home(self, monkeypatch, tmp_path):
-        """The server log location is fixed under ~/.fcc."""
+        """The server log location is fixed under ~/.cyril."""
         from cyril_code.config.paths import server_log_path
 
         monkeypatch.setenv("HOME", str(tmp_path))
         monkeypatch.setenv("USERPROFILE", str(tmp_path))
 
-        assert server_log_path() == tmp_path / ".fcc" / "logs" / "server.log"
+        assert server_log_path() == tmp_path / ".cyril" / "logs" / "server.log"
 
     def test_removed_log_file_env_is_ignored(self, monkeypatch):
         """Legacy LOG_FILE values do not affect Settings or block startup."""
@@ -125,7 +125,7 @@ class TestSettings:
 
         settings = Settings()
 
-        assert messaging_state_dir_path() == tmp_path / ".fcc" / "agent_workspace"
+        assert messaging_state_dir_path() == tmp_path / ".cyril" / "agent_workspace"
         assert not hasattr(settings, "claude_workspace")
 
     def test_explicit_claude_workspace_is_ignored(self, monkeypatch, tmp_path):
@@ -140,7 +140,7 @@ class TestSettings:
 
         settings = Settings()
 
-        assert messaging_state_dir_path() == tmp_path / ".fcc" / "agent_workspace"
+        assert messaging_state_dir_path() == tmp_path / ".cyril" / "agent_workspace"
         assert not hasattr(settings, "claude_workspace")
 
     def test_explicit_claude_cli_bin_is_ignored(self, monkeypatch):
@@ -173,7 +173,7 @@ class TestSettings:
             )
         )
 
-        assert messaging_state_dir_path() == tmp_path / ".fcc" / "agent_workspace"
+        assert messaging_state_dir_path() == tmp_path / ".cyril" / "agent_workspace"
         assert not hasattr(settings, "claude_workspace")
         assert not hasattr(settings, "claude_cli_bin")
 

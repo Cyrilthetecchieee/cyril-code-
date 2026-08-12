@@ -221,7 +221,7 @@ install or update the uv tool plus optional voice extras. On Windows the
 installer owns the CYRIL desktop and Start-menu shortcuts; on macOS it owns the
 per-user application bundle and desktop link. [scripts/uninstall.sh](scripts/uninstall.sh)
 and [scripts/uninstall.ps1](scripts/uninstall.ps1) remove those exact desktop
-artifacts, the CYRIL uv tool, and the managed `~/.fcc/` tree from
+artifacts, the CYRIL uv tool, and the managed `~/.cyril/` tree from
 [config/paths.py](src/cyril_code/config/paths.py); they do not remove
 uv, Cyril Code, Codex, Pi, or uv-managed Python runtimes. [scripts/ci.sh](scripts/ci.sh) and
 [scripts/ci.ps1](scripts/ci.ps1) mirror [.github/workflows/tests.yml](.github/workflows/tests.yml)
@@ -315,7 +315,7 @@ model-ref parsing, launcher defaults, or web-tool policy. Dotenv discovery lives
 in [config/env_files.py](src/cyril_code/config/env_files.py) and uses this order:
 
 1. repo-local `.env`;
-2. managed `~/.fcc/.env`;
+2. managed `~/.cyril/.env`;
 3. optional `CYRIL_ENV_FILE`, appended when present.
 
 Later dotenv files override earlier dotenv files. Process environment variables
@@ -326,11 +326,11 @@ source detection for startup warnings also belongs to `src/cyril_code/config/env
 
 [config/paths.py](src/cyril_code/config/paths.py) defines managed paths:
 
-- config directory: `~/.fcc`;
-- managed env file: `~/.fcc/.env`;
-- generated Codex model catalog: `~/.fcc/codex-model-catalog.json`;
-- messaging state directory: `~/.fcc/agent_workspace`;
-- server log: `~/.fcc/logs/server.log`.
+- config directory: `~/.cyril`;
+- managed env file: `~/.cyril/.env`;
+- generated Codex model catalog: `~/.cyril/codex-model-catalog.json`;
+- messaging state directory: `~/.cyril/agent_workspace`;
+- server log: `~/.cyril/logs/server.log`.
 
 Model routing configuration is tiered:
 
@@ -366,7 +366,7 @@ not publish an in-process generation first.
 [.env.example](.env.example) is the single Admin UI template source. It is
 packaged as a [src/cyril_code/config/](src/cyril_code/config/) resource for Admin UI defaults;
 runtime settings do not read it as a live config file. The Admin UI creates and
-atomically replaces `~/.fcc/.env` when configuration is applied; server startup
+atomically replaces `~/.cyril/.env` when configuration is applied; server startup
 only migrates legacy env files when the managed file is absent.
 
 Admin routes call `require_loopback_admin()`, which rejects non-loopback clients
@@ -547,7 +547,7 @@ Codex-specific model picker shaping stays out of this route.
 [runtime/codex_catalog.py](src/cyril_code/runtime/codex_catalog.py) is the
 composition bridge: it asks this route's pure builder for the exact application
 inventory, passes that response to the existing Codex adapter, and writes
-`~/.fcc/codex-model-catalog.json` without making a loopback HTTP request.
+`~/.cyril/codex-model-catalog.json` without making a loopback HTTP request.
 `ProviderRuntimeManager` invokes the bridge after authoritative settings,
 discovery, provider-test, or connected-account changes. Startup creates a
 missing file after routed-provider warming but preserves an existing
@@ -1116,7 +1116,7 @@ instead of stopping at its login gate.
 - It creates an ephemeral `fcc` model provider with `wire_api = "responses"` and
   a base URL pointing at the local proxy `/v1` path.
 - After proxy health succeeds, it fetches `/v1/models`, writes a generated Codex
-  `model_catalog_json` file under `~/.fcc/`, and injects that path so Codex's
+  `model_catalog_json` file under `~/.cyril/`, and injects that path so Codex's
   native `/model` picker lists CYRIL provider slugs. Catalog generation is
   fail-open: launch continues with a warning if the catalog cannot be prepared.
 - The server lifecycle independently keeps that same file synchronized for

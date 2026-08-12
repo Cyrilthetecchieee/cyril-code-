@@ -795,7 +795,7 @@ function Export-FccDesktopIcon {
 }
 
 function Configure-AndConfirmFreeClaudeCode {
-    $iconPath = Join-Path $env:USERPROFILE ".fcc\app-icon.ico"
+    $iconPath = Join-Path $env:USERPROFILE ".cyril\app-icon.ico"
     if ($DryRun) {
         Write-Host "+ uv tool update-shell"
         Write-Host "+ uv tool dir --bin"

@@ -2,7 +2,7 @@
 set -eu
 
 PACKAGE_NAME="cyril_code"
-CYRIL_HOME_DIRNAME=".fcc"
+CYRIL_HOME_DIRNAME=".cyril"
 CYRIL_MACOS_BUNDLE_ID="io.github.alishahryar1.cyril_code"
 CYRIL_MACOS_OWNER_FILE=".cyril_code-owner"
 # Include retired entry points so older installations are fully stopped and removed.
@@ -15,7 +15,7 @@ show_usage() {
     cat <<'USAGE'
 Usage: uninstall.sh [options]
 
-Removes the Cyril Code uv tool and deletes ~/.fcc/ after removal is verified.
+Removes the Cyril Code uv tool and deletes ~/.cyril/ after removal is verified.
 Does not remove uv, Cyril Code, Codex, Pi, the uv-managed Python runtime, or shared PATH entries.
 
 Options:
@@ -146,7 +146,7 @@ initialize_uv_context() {
     fi
 
     if ! command -v uv >/dev/null 2>&1; then
-        fail "uv is required to remove the Cyril Code tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
+        fail "uv is required to remove the Cyril Code tool. Install uv, then rerun this uninstaller; ~/.cyril was not deleted."
     fi
 
     print_command uv tool dir --bin
@@ -154,9 +154,9 @@ initialize_uv_context() {
         :
     else
         status=$?
-        fail "Could not determine the uv tool bin directory (exit code $status); ~/.fcc was not deleted."
+        fail "Could not determine the uv tool bin directory (exit code $status); ~/.cyril was not deleted."
     fi
-    [ -n "$uv_tool_bin" ] || fail "uv returned an empty tool bin directory; ~/.fcc was not deleted."
+    [ -n "$uv_tool_bin" ] || fail "uv returned an empty tool bin directory; ~/.cyril was not deleted."
 }
 
 uninstall_beast() {
@@ -181,7 +181,7 @@ uninstall_beast() {
     if [ -n "$output" ]; then
         printf '%s\n' "$output" >&2
     fi
-    fail "uv tool uninstall $PACKAGE_NAME failed with exit code $status; ~/.fcc was not deleted."
+    fail "uv tool uninstall $PACKAGE_NAME failed with exit code $status; ~/.cyril was not deleted."
 }
 
 verify_cyril_commands_removed() {
@@ -198,7 +198,7 @@ verify_cyril_commands_removed() {
         fi
     done
     if [ -n "$remaining" ]; then
-        fail "Cyril Code entry points remain after uv uninstall:${remaining}; ~/.fcc was not deleted."
+        fail "Cyril Code entry points remain after uv uninstall:${remaining}; ~/.cyril was not deleted."
     fi
 }
 
@@ -291,7 +291,7 @@ verify_cyril_commands_removed
 step "Removing the Cyril Code desktop launcher"
 remove_macos_desktop_app
 
-step "Purging CYRIL config and data from ~/.fcc"
+step "Purging CYRIL config and data from ~/.cyril"
 purge_cyril_home
 
 if [ "$dry_run" -eq 1 ]; then

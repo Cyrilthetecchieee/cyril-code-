@@ -227,7 +227,7 @@ def _migrate_legacy_env_if_missing() -> Path | None:
     if env_file.exists():
         return None
 
-    # TODO: Remove after the ~/.fcc/.env migration has had a release cycle.
+    # TODO: Remove after the ~/.cyril/.env migration has had a release cycle.
     for legacy_env in legacy_env_paths():
         if not legacy_env.is_file():
             continue

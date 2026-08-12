@@ -30,7 +30,7 @@ def test_entrypoint_version_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> No
     assert result.returncode == 0
     assert result.stdout == f"cyril_code {package_version()}\n"
     assert result.stderr == ""
-    assert not (tmp_path / ".fcc" / ".env").exists()
+    assert not (tmp_path / ".cyril" / ".env").exists()
 
 
 @pytest.mark.asyncio

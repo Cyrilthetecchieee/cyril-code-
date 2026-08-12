@@ -64,7 +64,7 @@ def test_migrate_owned_env_files_rewrites_repo_and_managed_env(
 ) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
-    managed = tmp_path / ".fcc" / ".env"
+    managed = tmp_path / ".cyril" / ".env"
     managed.parent.mkdir()
     (repo / ".env").write_text("HF_TOKEN=repo-token\n", encoding="utf-8")
     managed.write_text("HF_TOKEN=managed-token\n", encoding="utf-8")

@@ -195,19 +195,19 @@ def codex_config_args(*, api_url: str, model: str | None = None) -> list[str]:
 
     args = [
         "-c",
-        _toml_assignment("model_provider", "fcc"),
+        _toml_assignment("model_provider", "cyril"),
         "-c",
-        _toml_assignment("model_providers.fcc.name", "Cyril Code"),
+        _toml_assignment("model_providers.cyril.name", "Cyril Code"),
         "-c",
-        _toml_assignment("model_providers.fcc.base_url", _ensure_v1_url(api_url)),
+        _toml_assignment("model_providers.cyril.base_url", _ensure_v1_url(api_url)),
         "-c",
-        _toml_assignment("model_providers.fcc.auth.command", "cyril-codex"),
+        _toml_assignment("model_providers.cyril.auth.command", "cyril-codex"),
         "-c",
         _toml_assignment(
-            "model_providers.fcc.auth.args", [_PRINT_PROXY_AUTH_TOKEN_FLAG]
+            "model_providers.cyril.auth.args", [_PRINT_PROXY_AUTH_TOKEN_FLAG]
         ),
         "-c",
-        _toml_assignment("model_providers.fcc.wire_api", "responses"),
+        _toml_assignment("model_providers.cyril.wire_api", "responses"),
     ]
     if model:
         args.extend(["-c", _toml_assignment("model", model)])
